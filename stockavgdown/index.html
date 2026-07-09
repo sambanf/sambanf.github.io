@@ -176,19 +176,19 @@
         <div class="field-grid">
           <div>
             <label for="ad-s0" data-i18n="lbl_shares_owned">Shares owned</label>
-            <input id="ad-s0" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 100" data-i18n-attr="placeholder:ph_shares">
+            <input id="ad-s0" type="text" inputmode="decimal" autocomplete="off" placeholder="e.g. 100" data-i18n-attr="placeholder:ph_shares">
           </div>
           <div>
             <label for="ad-a0" data-i18n="lbl_avg_cost">Average cost per share</label>
-            <input id="ad-a0" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 10.00" data-i18n-attr="placeholder:ph_price">
+            <input id="ad-a0" type="text" inputmode="decimal" autocomplete="off" placeholder="e.g. 10.00" data-i18n-attr="placeholder:ph_price">
           </div>
           <div>
             <label for="ad-s1" data-i18n="lbl_shares_buy">Shares to buy</label>
-            <input id="ad-s1" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 100" data-i18n-attr="placeholder:ph_shares">
+            <input id="ad-s1" type="text" inputmode="decimal" autocomplete="off" placeholder="e.g. 100" data-i18n-attr="placeholder:ph_shares">
           </div>
           <div>
             <label for="ad-p" data-i18n="lbl_buy_price">Buy price per share</label>
-            <input id="ad-p" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 5.00" data-i18n-attr="placeholder:ph_low">
+            <input id="ad-p" type="text" inputmode="decimal" autocomplete="off" placeholder="e.g. 5.00" data-i18n-attr="placeholder:ph_low">
           </div>
         </div>
 
@@ -213,19 +213,19 @@
         <div class="field-grid">
           <div>
             <label for="ta-s0" data-i18n="lbl_shares_owned">Shares owned</label>
-            <input id="ta-s0" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 100" data-i18n-attr="placeholder:ph_shares">
+            <input id="ta-s0" type="text" inputmode="decimal" autocomplete="off" placeholder="e.g. 100" data-i18n-attr="placeholder:ph_shares">
           </div>
           <div>
             <label for="ta-a0" data-i18n="lbl_avg_cost">Average cost per share</label>
-            <input id="ta-a0" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 10.00" data-i18n-attr="placeholder:ph_price">
+            <input id="ta-a0" type="text" inputmode="decimal" autocomplete="off" placeholder="e.g. 10.00" data-i18n-attr="placeholder:ph_price">
           </div>
           <div>
             <label for="ta-p" data-i18n="lbl_cur_price">Current price per share</label>
-            <input id="ta-p" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 5.00" data-i18n-attr="placeholder:ph_low">
+            <input id="ta-p" type="text" inputmode="decimal" autocomplete="off" placeholder="e.g. 5.00" data-i18n-attr="placeholder:ph_low">
           </div>
           <div>
             <label for="ta-t" data-i18n="lbl_target_avg">Target average cost</label>
-            <input id="ta-t" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 7.50" aria-describedby="ta-t-help" data-i18n-attr="placeholder:ph_target">
+            <input id="ta-t" type="text" inputmode="decimal" autocomplete="off" placeholder="e.g. 7.50" aria-describedby="ta-t-help" data-i18n-attr="placeholder:ph_target">
             <p class="help" id="ta-t-help" data-i18n="help_target">Must be between the current price and your average cost.</p>
           </div>
         </div>
@@ -287,11 +287,11 @@
         </div>
         <div>
           <label for="pf-shares" data-i18n="pf_shares">Shares</label>
-          <input id="pf-shares" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 100" data-i18n-attr="placeholder:ph_shares">
+          <input id="pf-shares" type="text" inputmode="decimal" autocomplete="off" placeholder="e.g. 100" data-i18n-attr="placeholder:ph_shares">
         </div>
         <div>
           <label for="pf-avg" data-i18n="pf_avg">Average price</label>
-          <input id="pf-avg" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 10.00" data-i18n-attr="placeholder:ph_price">
+          <input id="pf-avg" type="text" inputmode="decimal" autocomplete="off" placeholder="e.g. 10.00" data-i18n-attr="placeholder:ph_price">
         </div>
       </div>
       <div class="pf-actions">
@@ -466,9 +466,9 @@
         lbl_target_avg: 'Target harga rata-rata',
         help_target: 'Harus berada di antara harga saat ini dan harga rata-rata Anda.',
         ph_shares: 'mis. 100',
-        ph_price: 'mis. 10.00',
-        ph_low: 'mis. 5.00',
-        ph_target: 'mis. 7.50',
+        ph_price: 'mis. 10,00',
+        ph_low: 'mis. 5,00',
+        ph_target: 'mis. 7,50',
         hint_avgdown: 'Isi keempat nilai di atas nol untuk melihat rata-rata baru Anda.',
         hint_target: 'Isi keempat nilai di atas nol untuk melihat berapa banyak saham yang perlu dibeli.',
         hint_lots: 'Isi jumlah saham dan harga untuk minimal satu transaksi untuk melihat rata-rata tertimbang.',
@@ -630,6 +630,91 @@
       return n.toLocaleString(window.SiteLang.locale(), { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
     }
 
+    /* ---------- Input formatting (live thousand separators) ----------
+       Inputs are text fields whose value is grouped per locale
+       (EN 1,234.5 / ID 1.234,5). canonFromDisplay turns any display
+       string back into a canonical "1234.5" string; groupCanon does
+       the reverse for the given locale. ---------- */
+
+    function isId() { return window.SiteLang.get() === 'id'; }
+
+    function canonFromDisplay(str, idMode) {
+      var t = (str || '').replace(/[^0-9.,]/g, '');
+      if (!t) return '';
+      if (!idMode) {
+        // EN: ',' is always grouping; first '.' is the decimal point.
+        t = t.split(',').join('');
+        var i = t.indexOf('.');
+        if (i === -1) return t;
+        return t.slice(0, i) + '.' + t.slice(i + 1).split('.').join('');
+      }
+      // ID: ',' is the decimal comma when present; all '.' group.
+      if (t.indexOf(',') !== -1) {
+        t = t.split('.').join('');
+        var j = t.indexOf(',');
+        return t.slice(0, j) + '.' + t.slice(j + 1).split(',').join('');
+      }
+      // ID with only dots: dots are grouping, except a single trailing
+      // dot (just typed on a "."-only device keypad) which starts the
+      // decimal part; the formatter then shows it as a comma.
+      var endsDot = t.charAt(t.length - 1) === '.';
+      var body = (endsDot ? t.slice(0, -1) : t).split('.').join('');
+      return endsDot ? body + '.' : body;
+    }
+
+    function groupCanon(canon, idMode) {
+      if (!canon) return '';
+      var g = idMode ? '.' : ',', d = idMode ? ',' : '.';
+      var parts = canon.split('.');
+      var intPart = parts[0].replace(/^0+(?=\d)/, '');
+      if (intPart === '') intPart = '0';
+      var out = '';
+      for (var i = 0; i < intPart.length; i++) {
+        out += intPart[i];
+        var rem = intPart.length - 1 - i;
+        if (rem > 0 && rem % 3 === 0) out += g;
+      }
+      if (parts.length > 1) out += d + parts[1];
+      return out;
+    }
+
+    // Format a stored canonical string ("1234.5") for the current locale.
+    function displayStored(str) {
+      return groupCanon(canonFromDisplay(str, false), isId());
+    }
+
+    // Reformat an input in place, keeping the caret in a sane spot.
+    function formatInputEl(el) {
+      var idMode = isId();
+      var raw = el.value;
+      var caret = el.selectionStart == null ? raw.length : el.selectionStart;
+      var atEnd = caret === raw.length;
+      var prefixCanon = canonFromDisplay(raw.slice(0, caret), idMode);
+      var digitsBefore = prefixCanon.replace(/[^0-9]/g, '').length;
+      var decBefore = prefixCanon.indexOf('.') !== -1;
+      var display = groupCanon(canonFromDisplay(raw, idMode), idMode);
+      if (display === raw) return;
+      el.value = display;
+      var pos;
+      if (atEnd) {
+        pos = display.length;
+      } else {
+        pos = 0;
+        var count = 0;
+        while (pos < display.length && count < digitsBefore) {
+          if (display[pos] >= '0' && display[pos] <= '9') count++;
+          pos++;
+        }
+        var dIdx = display.indexOf(idMode ? ',' : '.');
+        if (decBefore && dIdx !== -1 && pos <= dIdx) pos = dIdx + 1;
+      }
+      try { el.setSelectionRange(pos, pos); } catch (e) { /* not focusable */ }
+    }
+
+    function attachFormatter(el) {
+      el.addEventListener('input', function () { formatInputEl(el); });
+    }
+
     /* ---------- localStorage (safe in private browsing) ---------- */
 
     var NS = 'stockavgdown.';
@@ -648,7 +733,14 @@
        ===================================================== */
 
     function $(id) { return document.getElementById(id); }
-    function readField(el) { return parseFloat(el.value); }
+    function readField(el) { return parseFloat(canonFromDisplay(el.value, isId())); }
+    function canonOf(el) { return canonFromDisplay(el.value, isId()); }
+
+    // Live thousand-separator formatting on every numeric input.
+    // Registered before the render listeners so renders read the
+    // already-formatted value.
+    ['ad-s0', 'ad-a0', 'ad-s1', 'ad-p', 'ta-s0', 'ta-a0', 'ta-p', 'ta-t', 'pf-shares', 'pf-avg']
+      .forEach(function (id) { attachFormatter($(id)); });
 
     /* ---------- Tabs ---------- */
 
@@ -686,7 +778,7 @@
     var ad = { s0: $('ad-s0'), a0: $('ad-a0'), s1: $('ad-s1'), p: $('ad-p') };
 
     function renderAvgDown() {
-      saveJSON('avgdown', { s0: ad.s0.value, a0: ad.a0.value, s1: ad.s1.value, p: ad.p.value });
+      saveJSON('avgdown', { s0: canonOf(ad.s0), a0: canonOf(ad.a0), s1: canonOf(ad.s1), p: canonOf(ad.p) });
 
       var p = readField(ad.p);
       var r = avgDown(readField(ad.s0), readField(ad.a0), readField(ad.s1), p);
@@ -733,7 +825,7 @@
     var ta = { s0: $('ta-s0'), a0: $('ta-a0'), p: $('ta-p'), t: $('ta-t') };
 
     function renderTarget() {
-      saveJSON('target', { s0: ta.s0.value, a0: ta.a0.value, p: ta.p.value, t: ta.t.value });
+      saveJSON('target', { s0: canonOf(ta.s0), a0: canonOf(ta.a0), p: canonOf(ta.p), t: canonOf(ta.t) });
 
       var p = readField(ta.p);
       var res = sharesForTarget(readField(ta.s0), readField(ta.a0), p, readField(ta.t));
@@ -791,14 +883,16 @@
       num.setAttribute('aria-hidden', 'true');
 
       var shares = document.createElement('input');
-      shares.type = 'number'; shares.min = '0'; shares.step = 'any';
+      shares.type = 'text'; shares.autocomplete = 'off';
       shares.inputMode = 'decimal'; shares.className = 'lot-shares';
-      shares.placeholder = t('ph_shares'); shares.value = sharesVal;
+      shares.placeholder = t('ph_shares'); shares.value = displayStored(sharesVal || '');
+      attachFormatter(shares);
 
       var price = document.createElement('input');
-      price.type = 'number'; price.min = '0'; price.step = 'any';
+      price.type = 'text'; price.autocomplete = 'off';
       price.inputMode = 'decimal'; price.className = 'lot-price';
-      price.placeholder = t('ph_price'); price.value = priceVal;
+      price.placeholder = t('ph_price'); price.value = displayStored(priceVal || '');
+      attachFormatter(price);
 
       var remove = document.createElement('button');
       remove.type = 'button'; remove.className = 'remove-btn';
@@ -832,8 +926,8 @@
       rows.forEach(function (row) {
         var sEl = row.querySelector('.lot-shares');
         var pEl = row.querySelector('.lot-price');
-        raw.push({ s: sEl.value, p: pEl.value });
-        var s = parseFloat(sEl.value), p = parseFloat(pEl.value);
+        raw.push({ s: canonOf(sEl), p: canonOf(pEl) });
+        var s = readField(sEl), p = readField(pEl);
         if (isFinite(s) && isFinite(p) && s > 0 && p > 0) valid.push({ shares: s, price: p });
       });
       saveJSON('lots', raw);
@@ -960,8 +1054,8 @@
     function loadPosition(i) {
       var pos = positions[i];
       if (!pos) return;
-      ad.s0.value = pos.shares; ad.a0.value = pos.avg;
-      ta.s0.value = pos.shares; ta.a0.value = pos.avg;
+      ad.s0.value = displayStored(String(pos.shares)); ad.a0.value = displayStored(String(pos.avg));
+      ta.s0.value = displayStored(String(pos.shares)); ta.a0.value = displayStored(String(pos.avg));
       renderAvgDown();
       renderTarget();
       var activeLots = tabs[2].getAttribute('aria-selected') === 'true';
@@ -972,8 +1066,8 @@
     function collectValidLots() {
       var valid = [];
       lotRowsEl.querySelectorAll('.lot-row').forEach(function (row) {
-        var s = parseFloat(row.querySelector('.lot-shares').value);
-        var p = parseFloat(row.querySelector('.lot-price').value);
+        var s = readField(row.querySelector('.lot-shares'));
+        var p = readField(row.querySelector('.lot-price'));
         if (isFinite(s) && isFinite(p) && s > 0 && p > 0) valid.push({ shares: s, price: p });
       });
       return valid;
@@ -987,8 +1081,8 @@
       if (active === 2) {
         var r = weightedAvg(collectValidLots());
         if (r.totalShares > 0) {
-          pfShares.value = Number(r.totalShares.toFixed(2));
-          pfAvg.value = Number(r.avg.toFixed(2));
+          pfShares.value = displayStored(String(Number(r.totalShares.toFixed(2))));
+          pfAvg.value = displayStored(String(Number(r.avg.toFixed(2))));
         }
       } else {
         var src = active === 1 ? ta : ad;
@@ -1001,7 +1095,7 @@
     $('pf-save').addEventListener('click', function () {
       var name = pfName.value.trim();
       if (!name) { pfMessage(t('pf_err_name'), true); pfName.focus(); return; }
-      var pos = validPosition({ name: name, shares: pfShares.value, avg: pfAvg.value });
+      var pos = validPosition({ name: name, shares: readField(pfShares), avg: readField(pfAvg) });
       if (!pos) { pfMessage(t('pf_err_values'), true); return; }
       var idx = findPosition(pos.name);
       if (idx >= 0) {
@@ -1090,14 +1184,14 @@
     var savedAd = loadJSON('avgdown', null);
     if (savedAd && typeof savedAd === 'object') {
       Object.keys(ad).forEach(function (k) {
-        if (typeof savedAd[k] === 'string') ad[k].value = savedAd[k];
+        if (typeof savedAd[k] === 'string') ad[k].value = displayStored(savedAd[k]);
       });
     }
 
     var savedTa = loadJSON('target', null);
     if (savedTa && typeof savedTa === 'object') {
       Object.keys(ta).forEach(function (k) {
-        if (typeof savedTa[k] === 'string') ta[k].value = savedTa[k];
+        if (typeof savedTa[k] === 'string') ta[k].value = displayStored(savedTa[k]);
       });
     }
 
@@ -1123,7 +1217,19 @@
     /* ---------- Language: apply translations, then (re)render everything.
        The callback also fires once immediately, doing the first render. ---------- */
 
+    var prevIdMode = isId();
     window.SiteLang.init(I18N, function () {
+      // Re-display every numeric input in the new locale's separators
+      // (parse with the OLD locale's rules, regroup with the new).
+      var idMode = isId();
+      if (idMode !== prevIdMode) {
+        var els = [ad.s0, ad.a0, ad.s1, ad.p, ta.s0, ta.a0, ta.p, ta.t, pfShares, pfAvg];
+        lotRowsEl.querySelectorAll('.lot-shares, .lot-price').forEach(function (el) { els.push(el); });
+        els.forEach(function (el) {
+          el.value = groupCanon(canonFromDisplay(el.value, prevIdMode), idMode);
+        });
+        prevIdMode = idMode;
+      }
       renumberLots();      // lot aria-labels and placeholders in the new language
       renderAvgDown();
       renderTarget();
