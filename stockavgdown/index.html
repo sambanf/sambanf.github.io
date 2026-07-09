@@ -3,12 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Stock Average Down Calculator</title>
-  <meta name="description" content="Free stock average down calculator. Find your new average cost after buying more shares, the exact shares needed to hit a target average, and weighted averages across multiple lots.">
+  <title>Stock Average Calculator</title>
+  <meta name="description" content="Free stock average calculator. Find your new average cost after buying more shares, the exact shares needed to hit a target average, and weighted averages across multiple lots.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%230d9488'/><path d='M5 9l9 9 5-4 8 8' stroke='%23ffffff' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/><path d='M27 15v7h-7' stroke='%23ffffff' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
   <link rel="stylesheet" href="../assets/style.css">
   <style>
-    .top-nav { padding: 1.25rem 0 2.25rem; font-size: 0.9rem; }
+    .top-nav {
+      padding: 1.25rem 0 2.25rem; font-size: 0.9rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
     .top-nav a { color: var(--text-muted); text-decoration: none; }
     .top-nav a:hover { color: var(--accent-strong); }
     .lede { color: var(--text-muted); max-width: 44rem; margin-bottom: 0; }
@@ -93,6 +96,33 @@
     .remove-btn:disabled { opacity: 0.4; cursor: not-allowed; }
     #add-lot { margin-top: 0.25rem; }
 
+    /* Portfolio */
+    .pf-card h3 { margin-top: 1.5rem; }
+    .pf-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+    .pf-list li {
+      display: flex; justify-content: space-between; align-items: center; gap: 0.75rem;
+      padding: 0.6rem 0.85rem; background: var(--surface-2);
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+    }
+    .pf-info { display: flex; flex-direction: column; min-width: 0; }
+    .pf-info strong { overflow-wrap: anywhere; }
+    .pf-detail { font-size: 0.85rem; }
+    .pf-row-actions { display: flex; gap: 0.4rem; flex: none; }
+    .btn-sm { padding: 0.35rem 0.7rem; font-size: 0.8rem; }
+    .pf-form {
+      display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr);
+      gap: 1rem; margin-bottom: 1rem;
+    }
+    .pf-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+    #pf-io {
+      width: 100%; margin-top: 0.9rem; padding: 0.6rem 0.75rem;
+      font-family: var(--mono); font-size: 0.85rem; color: var(--text);
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); resize: vertical;
+    }
+    #pf-msg { min-height: 1.2em; margin-top: 0.75rem; }
+    .pf-error { color: var(--negative); }
+
     /* Formulas */
     .formula {
       margin: 0.4rem 0 0.9rem; padding: 0.6rem 0.9rem;
@@ -106,62 +136,73 @@
       .field-grid { grid-template-columns: 1fr; }
       .card { padding: 1.1rem; }
       .tabs [role="tab"] { font-size: 0.8rem; padding: 0.45rem 0.3rem; }
+      .pf-form { grid-template-columns: 1fr; }
+      .pf-list li { flex-direction: column; align-items: stretch; }
+      .pf-row-actions { justify-content: flex-end; }
     }
   </style>
 </head>
 <body>
   <header class="container">
-    <nav class="top-nav" aria-label="Site">
+    <nav class="top-nav" aria-label="Site" data-i18n-attr="aria-label:nav_site">
       <a href="../">&#8592; samba nugraha</a>
+      <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
+        <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0l60 30M60 0L0 30" stroke="#fff" stroke-width="6"/><path d="M0 0l60 30M60 0L0 30" stroke="#C8102E" stroke-width="2.5"/><path d="M30 0v30M0 15h60" stroke="#fff" stroke-width="10"/><path d="M30 0v30M0 15h60" stroke="#C8102E" stroke-width="6"/></svg>EN
+        </button>
+        <button type="button" data-lang="id" aria-pressed="false" aria-label="Bahasa Indonesia">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="15" fill="#E70011"/><rect y="15" width="60" height="15" fill="#F7F7F7"/></svg>ID
+        </button>
+      </div>
     </nav>
-    <h1>Stock Average Down Calculator</h1>
-    <p class="lede">See how buying more shares changes your average cost per share &mdash; average down after a buy, work backwards from a target average, or combine multiple lots.</p>
+    <h1 data-i18n="h1">Stock Average Calculator</h1>
+    <p class="lede" data-i18n="lede">See how buying more shares changes your average cost per share &mdash; average down after a buy, work backwards from a target average, or combine multiple lots.</p>
   </header>
 
   <main class="container">
     <noscript>
-      <div class="notice notice-error">This calculator needs JavaScript to run. Please enable it and reload the page.</div>
+      <div class="notice notice-error">This calculator needs JavaScript to run. Please enable it and reload the page. / Kalkulator ini membutuhkan JavaScript. Aktifkan JavaScript lalu muat ulang halaman.</div>
     </noscript>
 
     <div class="card tool-card">
-      <div class="tabs" role="tablist" aria-label="Calculator mode">
-        <button type="button" role="tab" id="tab-avgdown" aria-controls="panel-avgdown" aria-selected="true">Average down</button>
-        <button type="button" role="tab" id="tab-target" aria-controls="panel-target" aria-selected="false" tabindex="-1">Target average</button>
-        <button type="button" role="tab" id="tab-lots" aria-controls="panel-lots" aria-selected="false" tabindex="-1">Multi-lot average</button>
+      <div class="tabs" role="tablist" aria-label="Calculator mode" data-i18n-attr="aria-label:tabs_aria">
+        <button type="button" role="tab" id="tab-avgdown" aria-controls="panel-avgdown" aria-selected="true" data-i18n="tab_avgdown">Average down</button>
+        <button type="button" role="tab" id="tab-target" aria-controls="panel-target" aria-selected="false" tabindex="-1" data-i18n="tab_target">Target average</button>
+        <button type="button" role="tab" id="tab-lots" aria-controls="panel-lots" aria-selected="false" tabindex="-1" data-i18n="tab_lots">Multi-lot average</button>
       </div>
 
       <!-- Mode 1: Average down -->
       <div role="tabpanel" id="panel-avgdown" aria-labelledby="tab-avgdown">
         <div class="field-grid">
           <div>
-            <label for="ad-s0">Shares owned</label>
-            <input id="ad-s0" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 100">
+            <label for="ad-s0" data-i18n="lbl_shares_owned">Shares owned</label>
+            <input id="ad-s0" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 100" data-i18n-attr="placeholder:ph_shares">
           </div>
           <div>
-            <label for="ad-a0">Average cost per share</label>
-            <input id="ad-a0" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 10.00">
+            <label for="ad-a0" data-i18n="lbl_avg_cost">Average cost per share</label>
+            <input id="ad-a0" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 10.00" data-i18n-attr="placeholder:ph_price">
           </div>
           <div>
-            <label for="ad-s1">Shares to buy</label>
-            <input id="ad-s1" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 100">
+            <label for="ad-s1" data-i18n="lbl_shares_buy">Shares to buy</label>
+            <input id="ad-s1" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 100" data-i18n-attr="placeholder:ph_shares">
           </div>
           <div>
-            <label for="ad-p">Buy price per share</label>
-            <input id="ad-p" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 5.00">
+            <label for="ad-p" data-i18n="lbl_buy_price">Buy price per share</label>
+            <input id="ad-p" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 5.00" data-i18n-attr="placeholder:ph_low">
           </div>
         </div>
 
         <div class="results" aria-live="polite">
-          <p class="hint" id="ad-hint">Enter all four values above zero to see your new average.</p>
+          <p class="hint" id="ad-hint" data-i18n="hint_avgdown">Enter all four values above zero to see your new average.</p>
           <div class="key-figure">
-            <span class="key-label">New average cost per share</span>
+            <span class="key-label" data-i18n="key_new_avg">New average cost per share</span>
             <span class="key-value" id="ad-newavg">&mdash;</span>
             <span class="key-delta" id="ad-delta"></span>
           </div>
           <dl class="result-rows">
-            <div><dt>Total shares</dt><dd id="ad-shares">&mdash;</dd></div>
-            <div><dt>Total invested</dt><dd id="ad-invested">&mdash;</dd></div>
-            <div><dt>Additional cash needed</dt><dd id="ad-cash">&mdash;</dd></div>
+            <div><dt data-i18n="row_total_shares">Total shares</dt><dd id="ad-shares">&mdash;</dd></div>
+            <div><dt data-i18n="row_total_invested">Total invested</dt><dd id="ad-invested">&mdash;</dd></div>
+            <div><dt data-i18n="row_cash_needed">Additional cash needed</dt><dd id="ad-cash">&mdash;</dd></div>
           </dl>
           <p class="note" id="ad-breakeven"></p>
         </div>
@@ -171,100 +212,353 @@
       <div role="tabpanel" id="panel-target" aria-labelledby="tab-target" hidden>
         <div class="field-grid">
           <div>
-            <label for="ta-s0">Shares owned</label>
-            <input id="ta-s0" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 100">
+            <label for="ta-s0" data-i18n="lbl_shares_owned">Shares owned</label>
+            <input id="ta-s0" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 100" data-i18n-attr="placeholder:ph_shares">
           </div>
           <div>
-            <label for="ta-a0">Average cost per share</label>
-            <input id="ta-a0" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 10.00">
+            <label for="ta-a0" data-i18n="lbl_avg_cost">Average cost per share</label>
+            <input id="ta-a0" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 10.00" data-i18n-attr="placeholder:ph_price">
           </div>
           <div>
-            <label for="ta-p">Current price per share</label>
-            <input id="ta-p" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 5.00">
+            <label for="ta-p" data-i18n="lbl_cur_price">Current price per share</label>
+            <input id="ta-p" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 5.00" data-i18n-attr="placeholder:ph_low">
           </div>
           <div>
-            <label for="ta-t">Target average cost</label>
-            <input id="ta-t" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 7.50" aria-describedby="ta-t-help">
-            <p class="help" id="ta-t-help">Must be between the current price and your average cost.</p>
+            <label for="ta-t" data-i18n="lbl_target_avg">Target average cost</label>
+            <input id="ta-t" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 7.50" aria-describedby="ta-t-help" data-i18n-attr="placeholder:ph_target">
+            <p class="help" id="ta-t-help" data-i18n="help_target">Must be between the current price and your average cost.</p>
           </div>
         </div>
 
         <div class="notice" id="ta-notice" hidden></div>
 
         <div class="results" aria-live="polite">
-          <p class="hint" id="ta-hint">Enter all four values above zero to see how many shares to buy.</p>
+          <p class="hint" id="ta-hint" data-i18n="hint_target">Enter all four values above zero to see how many shares to buy.</p>
           <div class="key-figure">
-            <span class="key-label">Shares to buy</span>
+            <span class="key-label" data-i18n="key_shares_buy">Shares to buy</span>
             <span class="key-value" id="ta-buy">&mdash;</span>
             <span class="key-delta" id="ta-buy-sub"></span>
           </div>
           <dl class="result-rows">
-            <div><dt>Cost of purchase</dt><dd id="ta-cost">&mdash;</dd></div>
-            <div><dt>Total shares after</dt><dd id="ta-shares">&mdash;</dd></div>
-            <div><dt>Total invested after</dt><dd id="ta-invested">&mdash;</dd></div>
-            <div><dt>Resulting average cost</dt><dd id="ta-newavg">&mdash;</dd></div>
+            <div><dt data-i18n="row_cost_purchase">Cost of purchase</dt><dd id="ta-cost">&mdash;</dd></div>
+            <div><dt data-i18n="row_shares_after">Total shares after</dt><dd id="ta-shares">&mdash;</dd></div>
+            <div><dt data-i18n="row_invested_after">Total invested after</dt><dd id="ta-invested">&mdash;</dd></div>
+            <div><dt data-i18n="row_resulting_avg">Resulting average cost</dt><dd id="ta-newavg">&mdash;</dd></div>
           </dl>
-          <p class="note">Assumes fractional shares are allowed. If your broker only trades whole shares, round up to stay at or below the target.</p>
+          <p class="note" data-i18n="note_fractional">Assumes fractional shares are allowed. If your broker only trades whole shares, round up to stay at or below the target.</p>
         </div>
       </div>
 
       <!-- Mode 3: Multi-lot average -->
       <div role="tabpanel" id="panel-lots" aria-labelledby="tab-lots" hidden>
         <div class="lots-head" aria-hidden="true">
-          <span></span><span>Shares</span><span>Price per share</span><span></span>
+          <span></span><span data-i18n="lots_head_shares">Shares</span><span data-i18n="lots_head_price">Price per share</span><span></span>
         </div>
         <div id="lot-rows"></div>
-        <button type="button" class="btn" id="add-lot">+ Add lot</button>
-        <p class="help">Rows missing a value are ignored in the average.</p>
+        <button type="button" class="btn" id="add-lot" data-i18n="add_lot">+ Add lot</button>
+        <p class="help" data-i18n="lots_note">Rows missing a value are ignored in the average.</p>
 
         <div class="results" aria-live="polite">
-          <p class="hint" id="lot-hint">Enter shares and price for at least one lot to see the weighted average.</p>
+          <p class="hint" id="lot-hint" data-i18n="hint_lots">Enter shares and price for at least one lot to see the weighted average.</p>
           <div class="key-figure">
-            <span class="key-label">Weighted average cost per share</span>
+            <span class="key-label" data-i18n="key_weighted_avg">Weighted average cost per share</span>
             <span class="key-value" id="lot-avg">&mdash;</span>
           </div>
           <dl class="result-rows">
-            <div><dt>Total shares</dt><dd id="lot-shares">&mdash;</dd></div>
-            <div><dt>Total cost</dt><dd id="lot-cost">&mdash;</dd></div>
+            <div><dt data-i18n="row_total_shares">Total shares</dt><dd id="lot-shares">&mdash;</dd></div>
+            <div><dt data-i18n="row_total_cost">Total cost</dt><dd id="lot-cost">&mdash;</dd></div>
           </dl>
         </div>
       </div>
     </div>
 
+    <section class="card pf-card" aria-labelledby="pf-heading">
+      <h2 id="pf-heading" data-i18n="pf_title">My portfolio</h2>
+      <p class="muted small" data-i18n="pf_intro">Positions are saved only in this browser (localStorage) — nothing leaves your device. Use export / import to move them to another device.</p>
+
+      <p class="hint" id="pf-empty" data-i18n="pf_empty">No saved positions yet. Add one below.</p>
+      <ul class="pf-list" id="pf-list"></ul>
+
+      <h3 data-i18n="pf_add_title">Add or update a position</h3>
+      <div class="pf-form">
+        <div>
+          <label for="pf-name" data-i18n="pf_name">Name</label>
+          <input id="pf-name" type="text" maxlength="40" autocomplete="off" placeholder="e.g. BBCA" data-i18n-attr="placeholder:ph_name">
+        </div>
+        <div>
+          <label for="pf-shares" data-i18n="pf_shares">Shares</label>
+          <input id="pf-shares" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 100" data-i18n-attr="placeholder:ph_shares">
+        </div>
+        <div>
+          <label for="pf-avg" data-i18n="pf_avg">Average price</label>
+          <input id="pf-avg" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 10.00" data-i18n-attr="placeholder:ph_price">
+        </div>
+      </div>
+      <div class="pf-actions">
+        <button type="button" class="btn btn-primary" id="pf-save" data-i18n="pf_save">Save position</button>
+        <button type="button" class="btn" id="pf-use-current" data-i18n="pf_use">Use calculator values</button>
+      </div>
+
+      <h3 data-i18n="pf_transfer">Export / import</h3>
+      <div class="pf-actions">
+        <button type="button" class="btn" id="pf-export" data-i18n="pf_export">Export JSON</button>
+        <button type="button" class="btn" id="pf-copy" data-i18n="pf_copy">Copy</button>
+        <button type="button" class="btn" id="pf-import" data-i18n="pf_import">Import JSON</button>
+      </div>
+      <textarea id="pf-io" rows="4" spellcheck="false" hidden data-i18n-attr="aria-label:pf_io_aria"></textarea>
+      <p class="help" id="pf-msg" aria-live="polite"></p>
+    </section>
+
     <section class="card how-card" aria-labelledby="how-heading">
-      <h2 id="how-heading">How it works</h2>
-      <p>Your average cost per share is your total money in divided by your total shares. Buying more shares below your current average pulls the average down toward the new buy price &mdash; it can never go below it.</p>
+      <h2 id="how-heading" data-i18n="how_title">How it works</h2>
+      <p data-i18n="how_intro">Your average cost per share is your total money in divided by your total shares. Buying more shares below your current average pulls the average down toward the new buy price &mdash; it can never go below it.</p>
 
-      <h3>New average after a buy</h3>
+      <h3 data-i18n="how_h_newavg">New average after a buy</h3>
       <div class="formula">new average = (S&#8320; &times; A&#8320; + S&#8321; &times; P) &divide; (S&#8320; + S&#8321;)</div>
-      <p class="muted small">S&#8320; = shares owned, A&#8320; = current average cost, S&#8321; = shares bought, P = buy price per share.</p>
+      <p class="muted small" data-i18n="how_legend_newavg">S&#8320; = shares owned, A&#8320; = current average cost, S&#8321; = shares bought, P = buy price per share.</p>
 
-      <h3>Shares needed to reach a target average</h3>
+      <h3 data-i18n="how_h_target">Shares needed to reach a target average</h3>
       <div class="formula">shares to buy = S&#8320; &times; (A&#8320; &minus; T) &divide; (T &minus; P)</div>
-      <p class="muted small">T = target average. Only possible when P &lt; T &lt; A&#8320;: the target must sit between the current price and your existing average.</p>
+      <p class="muted small" data-i18n="how_legend_target">T = target average. Only possible when P &lt; T &lt; A&#8320;: the target must sit between the current price and your existing average.</p>
 
-      <h3>Weighted average across lots</h3>
+      <h3 data-i18n="how_h_weighted">Weighted average across lots</h3>
       <div class="formula">average = &Sigma;(shares&#7522; &times; price&#7522;) &divide; &Sigma; shares&#7522;</div>
 
-      <h3>Break-even after averaging down</h3>
+      <h3 data-i18n="how_h_breakeven">Break-even after averaging down</h3>
       <div class="formula">rise needed from buy price = (new average &divide; P &minus; 1) &times; 100%</div>
 
-      <h3>Worked example</h3>
-      <p>You own 100 shares at an average of 10.00 and buy 100 more at 5.00. Total invested is 100&times;10.00 + 100&times;5.00 = 1,500 across 200 shares, so the new average is <strong class="mono">7.50</strong> &mdash; a 25.00% reduction. From the 5.00 buy price, the stock must rise 50.00% to reach the new 7.50 break-even.</p>
+      <h3 data-i18n="how_h_example">Worked example</h3>
+      <p><span data-i18n="how_ex_1">You own 100 shares at an average of 10.00 and buy 100 more at 5.00. Total invested is 100&times;10.00 + 100&times;5.00 = 1,500 across 200 shares, so the new average is</span> <strong class="mono" data-i18n="how_ex_num">7.50</strong> <span data-i18n="how_ex_2">&mdash; a 25.00% reduction. From the 5.00 buy price, the stock must rise 50.00% to reach the new 7.50 break-even.</span></p>
 
-      <p class="muted small">This tool only does the arithmetic &mdash; it is not investment advice. Averaging down increases your exposure to a falling position.</p>
+      <p class="muted small" data-i18n="disclaimer">This tool only does the arithmetic &mdash; it is not investment advice. Averaging down increases your exposure to a falling position.</p>
     </section>
   </main>
 
   <footer class="site-footer">
     <div class="container">
-      <p><a href="../">&#8592; back to all tools</a> &middot; &copy; 2026 Samba Nugraha</p>
+      <p><a href="../" data-i18n="footer_back">&#8592; back to all tools</a> &middot; &copy; 2026 Samba Nugraha</p>
     </div>
   </footer>
 
+  <script src="../assets/lang.js"></script>
   <script>
   (function () {
     'use strict';
+
+    /* =====================================================
+       Translations (see ../assets/lang.js)
+       ===================================================== */
+
+    var I18N = {
+      en: {
+        _title: 'Stock Average Calculator',
+        _meta: 'Free stock average calculator. Find your new average cost after buying more shares, the exact shares needed to hit a target average, and weighted averages across multiple lots.',
+        nav_site: 'Site',
+        h1: 'Stock Average Calculator',
+        lede: 'See how buying more shares changes your average cost per share — average down after a buy, work backwards from a target average, or combine multiple lots.',
+        tabs_aria: 'Calculator mode',
+        tab_avgdown: 'Average down',
+        tab_target: 'Target average',
+        tab_lots: 'Multi-lot average',
+        lbl_shares_owned: 'Shares owned',
+        lbl_avg_cost: 'Average cost per share',
+        lbl_shares_buy: 'Shares to buy',
+        lbl_buy_price: 'Buy price per share',
+        lbl_cur_price: 'Current price per share',
+        lbl_target_avg: 'Target average cost',
+        help_target: 'Must be between the current price and your average cost.',
+        ph_shares: 'e.g. 100',
+        ph_price: 'e.g. 10.00',
+        ph_low: 'e.g. 5.00',
+        ph_target: 'e.g. 7.50',
+        hint_avgdown: 'Enter all four values above zero to see your new average.',
+        hint_target: 'Enter all four values above zero to see how many shares to buy.',
+        hint_lots: 'Enter shares and price for at least one lot to see the weighted average.',
+        key_new_avg: 'New average cost per share',
+        key_shares_buy: 'Shares to buy',
+        key_weighted_avg: 'Weighted average cost per share',
+        row_total_shares: 'Total shares',
+        row_total_invested: 'Total invested',
+        row_cash_needed: 'Additional cash needed',
+        row_cost_purchase: 'Cost of purchase',
+        row_shares_after: 'Total shares after',
+        row_invested_after: 'Total invested after',
+        row_resulting_avg: 'Resulting average cost',
+        row_total_cost: 'Total cost',
+        note_fractional: 'Assumes fractional shares are allowed. If your broker only trades whole shares, round up to stay at or below the target.',
+        lots_head_shares: 'Shares',
+        lots_head_price: 'Price per share',
+        add_lot: '+ Add lot',
+        lots_note: 'Rows missing a value are ignored in the average.',
+        delta_down: '↓ {n} per share (−{pct})',
+        delta_up: '↑ {n} per share (+{pct})',
+        delta_none: 'No change in average',
+        breakeven_rise: 'Break-even: the stock must rise {pct} from the buy price of {price} to reach your new average.',
+        breakeven_already: 'Break-even: at this buy price you would already be at or above break-even — the new average is not above the buy price.',
+        notice_no_purchase: 'Good news — your average cost is already at or below the target. No purchase needed.',
+        notice_price_high: 'The current price is at or above your average cost, so buying now cannot lower your average. Averaging down needs a price below your average.',
+        notice_target_low: 'The target must be above the current price of {p}. Buying at that price can only pull your average down toward it — never to it or below it.',
+        at_per_share: 'at {p} per share',
+        aria_lot_shares: 'Lot {n} shares',
+        aria_lot_price: 'Lot {n} price per share',
+        aria_lot_remove: 'Remove lot {n}',
+        how_title: 'How it works',
+        how_intro: 'Your average cost per share is your total money in divided by your total shares. Buying more shares below your current average pulls the average down toward the new buy price — it can never go below it.',
+        how_h_newavg: 'New average after a buy',
+        how_legend_newavg: 'S₀ = shares owned, A₀ = current average cost, S₁ = shares bought, P = buy price per share.',
+        how_h_target: 'Shares needed to reach a target average',
+        how_legend_target: 'T = target average. Only possible when P < T < A₀: the target must sit between the current price and your existing average.',
+        how_h_weighted: 'Weighted average across lots',
+        how_h_breakeven: 'Break-even after averaging down',
+        how_h_example: 'Worked example',
+        how_ex_1: 'You own 100 shares at an average of 10.00 and buy 100 more at 5.00. Total invested is 100×10.00 + 100×5.00 = 1,500 across 200 shares, so the new average is',
+        how_ex_num: '7.50',
+        how_ex_2: '— a 25.00% reduction. From the 5.00 buy price, the stock must rise 50.00% to reach the new 7.50 break-even.',
+        disclaimer: 'This tool only does the arithmetic — it is not investment advice. Averaging down increases your exposure to a falling position.',
+        footer_back: '← back to all tools',
+        pf_title: 'My portfolio',
+        pf_intro: 'Positions are saved only in this browser (localStorage) — nothing leaves your device. Use export / import to move them to another device.',
+        pf_empty: 'No saved positions yet. Add one below.',
+        pf_add_title: 'Add or update a position',
+        pf_name: 'Name',
+        ph_name: 'e.g. BBCA',
+        pf_shares: 'Shares',
+        pf_avg: 'Average price',
+        pf_save: 'Save position',
+        pf_use: 'Use calculator values',
+        pf_transfer: 'Export / import',
+        pf_export: 'Export JSON',
+        pf_copy: 'Copy',
+        pf_import: 'Import JSON',
+        pf_load: 'Load',
+        pf_delete: 'Delete',
+        pf_io_aria: 'Exported or imported portfolio JSON',
+        pf_msg_saved: 'Saved "{name}".',
+        pf_msg_deleted: 'Deleted "{name}".',
+        pf_msg_loaded: 'Loaded "{name}" into the calculator.',
+        pf_msg_copied: 'Copied to clipboard.',
+        pf_msg_copy_fail: 'Could not copy automatically — select the text and copy it manually.',
+        pf_msg_exported: 'Exported {n} positions — copy the text below.',
+        pf_msg_imported: 'Imported {n} positions.',
+        pf_msg_imported_skipped: 'Imported {n} positions, skipped {m} invalid entries.',
+        pf_err_name: 'Enter a name for the position.',
+        pf_err_values: 'Shares and average price must be above zero.',
+        pf_err_json: 'Invalid JSON — paste the exported text exactly as it was.',
+        pf_err_none: 'No valid positions found in the pasted JSON.',
+        pf_err_import_first: 'Paste exported JSON into the text box, then press Import again.',
+        pf_err_full: 'Portfolio is full ({n} positions max).'
+      },
+      id: {
+        _title: 'Kalkulator Average Saham',
+        _meta: 'Kalkulator average saham gratis. Hitung harga rata-rata baru setelah membeli saham tambahan, jumlah saham yang dibutuhkan untuk mencapai target rata-rata, dan rata-rata tertimbang dari beberapa transaksi.',
+        nav_site: 'Situs',
+        h1: 'Kalkulator Average Saham',
+        lede: 'Lihat bagaimana membeli saham tambahan mengubah harga rata-rata per saham Anda — average down setelah pembelian, hitung mundur dari target rata-rata, atau gabungkan beberapa transaksi.',
+        tabs_aria: 'Mode kalkulator',
+        tab_avgdown: 'Average down',
+        tab_target: 'Target rata-rata',
+        tab_lots: 'Rata-rata gabungan',
+        lbl_shares_owned: 'Jumlah saham dimiliki',
+        lbl_avg_cost: 'Harga rata-rata per saham',
+        lbl_shares_buy: 'Jumlah saham dibeli',
+        lbl_buy_price: 'Harga beli per saham',
+        lbl_cur_price: 'Harga saat ini per saham',
+        lbl_target_avg: 'Target harga rata-rata',
+        help_target: 'Harus berada di antara harga saat ini dan harga rata-rata Anda.',
+        ph_shares: 'mis. 100',
+        ph_price: 'mis. 10.00',
+        ph_low: 'mis. 5.00',
+        ph_target: 'mis. 7.50',
+        hint_avgdown: 'Isi keempat nilai di atas nol untuk melihat rata-rata baru Anda.',
+        hint_target: 'Isi keempat nilai di atas nol untuk melihat berapa banyak saham yang perlu dibeli.',
+        hint_lots: 'Isi jumlah saham dan harga untuk minimal satu transaksi untuk melihat rata-rata tertimbang.',
+        key_new_avg: 'Harga rata-rata baru per saham',
+        key_shares_buy: 'Saham yang perlu dibeli',
+        key_weighted_avg: 'Harga rata-rata tertimbang per saham',
+        row_total_shares: 'Total saham',
+        row_total_invested: 'Total investasi',
+        row_cash_needed: 'Dana tambahan yang dibutuhkan',
+        row_cost_purchase: 'Biaya pembelian',
+        row_shares_after: 'Total saham setelahnya',
+        row_invested_after: 'Total investasi setelahnya',
+        row_resulting_avg: 'Harga rata-rata akhir',
+        row_total_cost: 'Total biaya',
+        note_fractional: 'Diasumsikan saham pecahan diperbolehkan. Jika broker Anda hanya bisa membeli saham utuh, bulatkan ke atas agar tetap di atau di bawah target.',
+        lots_head_shares: 'Saham',
+        lots_head_price: 'Harga per saham',
+        add_lot: '+ Tambah transaksi',
+        lots_note: 'Baris yang belum lengkap diabaikan dalam perhitungan.',
+        delta_down: '↓ {n} per saham (−{pct})',
+        delta_up: '↑ {n} per saham (+{pct})',
+        delta_none: 'Rata-rata tidak berubah',
+        breakeven_rise: 'Break-even: saham harus naik {pct} dari harga beli {price} untuk mencapai rata-rata baru Anda.',
+        breakeven_already: 'Break-even: pada harga beli ini Anda sudah berada di atau di atas break-even — rata-rata baru tidak berada di atas harga beli.',
+        notice_no_purchase: 'Kabar baik — harga rata-rata Anda sudah berada di atau di bawah target. Tidak perlu membeli.',
+        notice_price_high: 'Harga saat ini berada di atau di atas harga rata-rata Anda, jadi membeli sekarang tidak dapat menurunkan rata-rata Anda. Average down membutuhkan harga di bawah rata-rata Anda.',
+        notice_target_low: 'Target harus di atas harga saat ini {p}. Membeli di harga itu hanya bisa menarik rata-rata Anda turun mendekatinya — tidak akan pernah mencapai atau melewatinya.',
+        at_per_share: 'pada {p} per saham',
+        aria_lot_shares: 'Jumlah saham transaksi {n}',
+        aria_lot_price: 'Harga per saham transaksi {n}',
+        aria_lot_remove: 'Hapus transaksi {n}',
+        how_title: 'Cara kerjanya',
+        how_intro: 'Harga rata-rata per saham Anda adalah total dana yang ditanamkan dibagi total saham Anda. Membeli saham tambahan di bawah rata-rata saat ini menarik rata-rata turun mendekati harga beli baru — tidak akan pernah bisa lebih rendah dari harga beli itu.',
+        how_h_newavg: 'Rata-rata baru setelah pembelian',
+        how_legend_newavg: 'S₀ = jumlah saham dimiliki, A₀ = harga rata-rata saat ini, S₁ = jumlah saham dibeli, P = harga beli per saham.',
+        how_h_target: 'Saham yang dibutuhkan untuk mencapai target rata-rata',
+        how_legend_target: 'T = target rata-rata. Hanya mungkin ketika P < T < A₀: target harus berada di antara harga saat ini dan rata-rata Anda yang sekarang.',
+        how_h_weighted: 'Rata-rata tertimbang antar transaksi',
+        how_h_breakeven: 'Break-even setelah average down',
+        how_h_example: 'Contoh perhitungan',
+        how_ex_1: 'Anda memiliki 100 saham dengan rata-rata 10,00 dan membeli 100 saham lagi di harga 5,00. Total investasi adalah 100×10,00 + 100×5,00 = 1.500 untuk 200 saham, sehingga rata-rata baru menjadi',
+        how_ex_num: '7,50',
+        how_ex_2: '— penurunan 25,00%. Dari harga beli 5,00, saham harus naik 50,00% untuk mencapai break-even baru di 7,50.',
+        disclaimer: 'Alat ini hanya melakukan perhitungan — bukan saran investasi. Average down memperbesar eksposur Anda pada posisi yang sedang turun.',
+        footer_back: '← kembali ke semua alat',
+        pf_title: 'Portofolio saya',
+        pf_intro: 'Posisi hanya disimpan di browser ini (localStorage) — tidak ada data yang keluar dari perangkat Anda. Gunakan ekspor / impor untuk memindahkannya ke perangkat lain.',
+        pf_empty: 'Belum ada posisi tersimpan. Tambahkan di bawah.',
+        pf_add_title: 'Tambah atau perbarui posisi',
+        pf_name: 'Nama',
+        ph_name: 'mis. BBCA',
+        pf_shares: 'Jumlah saham',
+        pf_avg: 'Harga rata-rata',
+        pf_save: 'Simpan posisi',
+        pf_use: 'Ambil nilai dari kalkulator',
+        pf_transfer: 'Ekspor / impor',
+        pf_export: 'Ekspor JSON',
+        pf_copy: 'Salin',
+        pf_import: 'Impor JSON',
+        pf_load: 'Muat',
+        pf_delete: 'Hapus',
+        pf_io_aria: 'JSON portofolio untuk ekspor atau impor',
+        pf_msg_saved: 'Posisi "{name}" disimpan.',
+        pf_msg_deleted: 'Posisi "{name}" dihapus.',
+        pf_msg_loaded: 'Posisi "{name}" dimuat ke kalkulator.',
+        pf_msg_copied: 'Disalin ke clipboard.',
+        pf_msg_copy_fail: 'Tidak bisa menyalin otomatis — pilih teksnya lalu salin manual.',
+        pf_msg_exported: '{n} posisi diekspor — salin teks di bawah.',
+        pf_msg_imported: '{n} posisi diimpor.',
+        pf_msg_imported_skipped: '{n} posisi diimpor, {m} entri tidak valid dilewati.',
+        pf_err_name: 'Masukkan nama posisi.',
+        pf_err_values: 'Jumlah saham dan harga rata-rata harus di atas nol.',
+        pf_err_json: 'JSON tidak valid — tempel teks hasil ekspor apa adanya.',
+        pf_err_none: 'Tidak ada posisi valid dalam JSON yang ditempel.',
+        pf_err_import_first: 'Tempel JSON hasil ekspor ke kotak teks, lalu tekan Impor lagi.',
+        pf_err_full: 'Portofolio penuh (maksimal {n} posisi).'
+      }
+    };
+
+    // t('key') for the current language; tf('key', {a: 1}) fills {a} placeholders.
+    function t(key) { return window.SiteLang.t(key); }
+    function tf(key, vars) {
+      var s = t(key);
+      for (var k in vars) {
+        if (Object.prototype.hasOwnProperty.call(vars, k)) {
+          s = s.replace('{' + k + '}', vars[k]);
+        }
+      }
+      return s;
+    }
 
     /* =====================================================
        Pure calculation functions (no DOM access)
@@ -328,12 +622,12 @@
 
     function fmtNum(n) {
       if (typeof n !== 'number' || !isFinite(n)) return '—';
-      return n.toLocaleString(undefined, { maximumFractionDigits: 4 });
+      return n.toLocaleString(window.SiteLang.locale(), { maximumFractionDigits: 2 });
     }
 
     function fmtPct(n) {
       if (typeof n !== 'number' || !isFinite(n)) return '—';
-      return n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
+      return n.toLocaleString(window.SiteLang.locale(), { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
     }
 
     /* ---------- localStorage (safe in private browsing) ---------- */
@@ -412,13 +706,13 @@
 
       $('ad-newavg').textContent = fmtNum(r.newAvg);
       if (r.reductionAbs > 0) {
-        delta.textContent = '↓ ' + fmtNum(r.reductionAbs) + ' per share (−' + fmtPct(r.reductionPct) + ')';
+        delta.textContent = tf('delta_down', { n: fmtNum(r.reductionAbs), pct: fmtPct(r.reductionPct) });
         delta.className = 'key-delta delta-down';
       } else if (r.reductionAbs < 0) {
-        delta.textContent = '↑ ' + fmtNum(-r.reductionAbs) + ' per share (+' + fmtPct(-r.reductionPct) + ')';
+        delta.textContent = tf('delta_up', { n: fmtNum(-r.reductionAbs), pct: fmtPct(-r.reductionPct) });
         delta.className = 'key-delta delta-up';
       } else {
-        delta.textContent = 'No change in average';
+        delta.textContent = t('delta_none');
         delta.className = 'key-delta';
       }
       $('ad-shares').textContent = fmtNum(r.totalShares);
@@ -426,10 +720,9 @@
       $('ad-cash').textContent = fmtNum(r.cashNeeded);
 
       if (r.newAvg > p) {
-        $('ad-breakeven').textContent = 'Break-even: the stock must rise ' + fmtPct(r.breakEvenRisePct) +
-          ' from the buy price of ' + fmtNum(p) + ' to reach your new average.';
+        $('ad-breakeven').textContent = tf('breakeven_rise', { pct: fmtPct(r.breakEvenRisePct), price: fmtNum(p) });
       } else {
-        $('ad-breakeven').textContent = 'Break-even: at this buy price you would already be at or above break-even — the new average is not above the buy price.';
+        $('ad-breakeven').textContent = t('breakeven_already');
       }
     }
 
@@ -460,22 +753,21 @@
 
         if (res.status === 'noPurchase') {
           notice.hidden = false;
-          notice.textContent = 'Good news — your average cost is already at or below the target. No purchase needed.';
+          notice.textContent = t('notice_no_purchase');
         } else if (res.status === 'priceTooHigh') {
           notice.hidden = false;
           notice.className = 'notice notice-error';
-          notice.textContent = 'The current price is at or above your average cost, so buying now cannot lower your average. Averaging down needs a price below your average.';
+          notice.textContent = t('notice_price_high');
         } else if (res.status === 'targetTooLow') {
           notice.hidden = false;
           notice.className = 'notice notice-error';
-          notice.textContent = 'The target must be above the current price of ' + fmtNum(p) +
-            '. Buying at that price can only pull your average down toward it — never to it or below it.';
+          notice.textContent = tf('notice_target_low', { p: fmtNum(p) });
         }
         return;
       }
 
       $('ta-buy').textContent = fmtNum(res.shares);
-      $('ta-buy-sub').textContent = 'at ' + fmtNum(p) + ' per share';
+      $('ta-buy-sub').textContent = tf('at_per_share', { p: fmtNum(p) });
       $('ta-buy-sub').className = 'key-delta';
       $('ta-cost').textContent = fmtNum(res.cost);
       $('ta-shares').textContent = fmtNum(res.totalShares);
@@ -501,12 +793,12 @@
       var shares = document.createElement('input');
       shares.type = 'number'; shares.min = '0'; shares.step = 'any';
       shares.inputMode = 'decimal'; shares.className = 'lot-shares';
-      shares.placeholder = 'e.g. 100'; shares.value = sharesVal;
+      shares.placeholder = t('ph_shares'); shares.value = sharesVal;
 
       var price = document.createElement('input');
       price.type = 'number'; price.min = '0'; price.step = 'any';
       price.inputMode = 'decimal'; price.className = 'lot-price';
-      price.placeholder = 'e.g. 10.00'; price.value = priceVal;
+      price.placeholder = t('ph_price'); price.value = priceVal;
 
       var remove = document.createElement('button');
       remove.type = 'button'; remove.className = 'remove-btn';
@@ -521,10 +813,14 @@
       rows.forEach(function (row, i) {
         var n = i + 1;
         row.querySelector('.lot-num').textContent = n;
-        row.querySelector('.lot-shares').setAttribute('aria-label', 'Lot ' + n + ' shares');
-        row.querySelector('.lot-price').setAttribute('aria-label', 'Lot ' + n + ' price per share');
+        var sh = row.querySelector('.lot-shares');
+        sh.setAttribute('aria-label', tf('aria_lot_shares', { n: n }));
+        sh.placeholder = t('ph_shares');
+        var pr = row.querySelector('.lot-price');
+        pr.setAttribute('aria-label', tf('aria_lot_price', { n: n }));
+        pr.placeholder = t('ph_price');
         var rm = row.querySelector('.remove-btn');
-        rm.setAttribute('aria-label', 'Remove lot ' + n);
+        rm.setAttribute('aria-label', tf('aria_lot_remove', { n: n }));
         rm.disabled = rows.length <= MIN_LOTS;
       });
     }
@@ -571,6 +867,224 @@
       row.querySelector('.lot-shares').focus();
     });
 
+    /* ---------- Portfolio (saved positions, export/import) ---------- */
+
+    var PF_MAX = 100;
+    var pfList = $('pf-list'), pfEmpty = $('pf-empty'), pfMsg = $('pf-msg'), pfIo = $('pf-io');
+    var pfName = $('pf-name'), pfShares = $('pf-shares'), pfAvg = $('pf-avg');
+
+    // Accepts anything JSON-shaped and returns a clean {name, shares, avg} or null.
+    function validPosition(p) {
+      if (!p || typeof p !== 'object') return null;
+      var name = typeof p.name === 'string' ? p.name.trim().slice(0, 40) : '';
+      var shares = Number(p.shares), avg = Number(p.avg);
+      if (!name || !isFinite(shares) || !isFinite(avg) || shares <= 0 || avg <= 0) return null;
+      return { name: name, shares: shares, avg: avg };
+    }
+
+    function loadPortfolio() {
+      var raw = loadJSON('portfolio', []);
+      var list = Array.isArray(raw) ? raw
+        : (raw && Array.isArray(raw.positions) ? raw.positions : []);
+      var clean = [];
+      list.forEach(function (p) {
+        var v = validPosition(p);
+        if (v && clean.length < PF_MAX) clean.push(v);
+      });
+      return clean;
+    }
+
+    var positions = loadPortfolio();
+
+    function savePortfolio() { saveJSON('portfolio', positions); }
+
+    function pfMessage(text, isError) {
+      pfMsg.textContent = text;
+      pfMsg.className = 'help' + (isError ? ' pf-error' : '');
+    }
+
+    function findPosition(name) {
+      var idx = -1;
+      positions.forEach(function (p, i) {
+        if (p.name.toLowerCase() === name.toLowerCase()) idx = i;
+      });
+      return idx;
+    }
+
+    function renderPortfolio() {
+      pfList.innerHTML = '';
+      pfEmpty.hidden = positions.length > 0;
+      positions.forEach(function (pos, i) {
+        var li = document.createElement('li');
+
+        var info = document.createElement('div');
+        info.className = 'pf-info';
+        var name = document.createElement('strong');
+        name.textContent = pos.name;
+        var detail = document.createElement('span');
+        detail.className = 'muted mono pf-detail';
+        detail.textContent = fmtNum(pos.shares) + ' × ' + fmtNum(pos.avg);
+        info.appendChild(name);
+        info.appendChild(detail);
+
+        var actions = document.createElement('div');
+        actions.className = 'pf-row-actions';
+        var loadBtn = document.createElement('button');
+        loadBtn.type = 'button';
+        loadBtn.className = 'btn btn-sm';
+        loadBtn.textContent = t('pf_load');
+        loadBtn.setAttribute('aria-label', t('pf_load') + ' ' + pos.name);
+        loadBtn.addEventListener('click', function () { loadPosition(i); });
+        var delBtn = document.createElement('button');
+        delBtn.type = 'button';
+        delBtn.className = 'btn btn-sm';
+        delBtn.textContent = t('pf_delete');
+        delBtn.setAttribute('aria-label', t('pf_delete') + ' ' + pos.name);
+        delBtn.addEventListener('click', function () {
+          positions.splice(i, 1);
+          savePortfolio();
+          renderPortfolio();
+          pfMessage(tf('pf_msg_deleted', { name: pos.name }), false);
+        });
+        actions.appendChild(loadBtn);
+        actions.appendChild(delBtn);
+
+        li.appendChild(info);
+        li.appendChild(actions);
+        pfList.appendChild(li);
+      });
+    }
+
+    // Loading a position fills "shares owned" + "average cost" in both
+    // calculator modes (they describe the same holding).
+    function loadPosition(i) {
+      var pos = positions[i];
+      if (!pos) return;
+      ad.s0.value = pos.shares; ad.a0.value = pos.avg;
+      ta.s0.value = pos.shares; ta.a0.value = pos.avg;
+      renderAvgDown();
+      renderTarget();
+      var activeLots = tabs[2].getAttribute('aria-selected') === 'true';
+      if (activeLots) selectTab(0);
+      pfMessage(tf('pf_msg_loaded', { name: pos.name }), false);
+    }
+
+    function collectValidLots() {
+      var valid = [];
+      lotRowsEl.querySelectorAll('.lot-row').forEach(function (row) {
+        var s = parseFloat(row.querySelector('.lot-shares').value);
+        var p = parseFloat(row.querySelector('.lot-price').value);
+        if (isFinite(s) && isFinite(p) && s > 0 && p > 0) valid.push({ shares: s, price: p });
+      });
+      return valid;
+    }
+
+    $('pf-use-current').addEventListener('click', function () {
+      var active = 0;
+      for (var i = 0; i < tabs.length; i++) {
+        if (tabs[i].getAttribute('aria-selected') === 'true') active = i;
+      }
+      if (active === 2) {
+        var r = weightedAvg(collectValidLots());
+        if (r.totalShares > 0) {
+          pfShares.value = Number(r.totalShares.toFixed(2));
+          pfAvg.value = Number(r.avg.toFixed(2));
+        }
+      } else {
+        var src = active === 1 ? ta : ad;
+        pfShares.value = src.s0.value;
+        pfAvg.value = src.a0.value;
+      }
+      pfName.focus();
+    });
+
+    $('pf-save').addEventListener('click', function () {
+      var name = pfName.value.trim();
+      if (!name) { pfMessage(t('pf_err_name'), true); pfName.focus(); return; }
+      var pos = validPosition({ name: name, shares: pfShares.value, avg: pfAvg.value });
+      if (!pos) { pfMessage(t('pf_err_values'), true); return; }
+      var idx = findPosition(pos.name);
+      if (idx >= 0) {
+        positions[idx] = pos;
+      } else if (positions.length >= PF_MAX) {
+        pfMessage(tf('pf_err_full', { n: PF_MAX }), true);
+        return;
+      } else {
+        positions.push(pos);
+      }
+      savePortfolio();
+      renderPortfolio();
+      pfMessage(tf('pf_msg_saved', { name: pos.name }), false);
+    });
+
+    $('pf-export').addEventListener('click', function () {
+      pfIo.hidden = false;
+      pfIo.value = JSON.stringify({ v: 1, positions: positions });
+      pfIo.focus();
+      pfIo.select();
+      pfMessage(tf('pf_msg_exported', { n: positions.length }), false);
+    });
+
+    $('pf-copy').addEventListener('click', function () {
+      if (pfIo.hidden || !pfIo.value) {
+        pfIo.hidden = false;
+        pfIo.value = JSON.stringify({ v: 1, positions: positions });
+      }
+      var showFallback = function () {
+        pfIo.focus();
+        pfIo.select();
+        pfMessage(t('pf_msg_copy_fail'), true);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(pfIo.value).then(
+          function () { pfMessage(t('pf_msg_copied'), false); },
+          showFallback
+        );
+      } else {
+        try {
+          pfIo.focus();
+          pfIo.select();
+          if (document.execCommand('copy')) pfMessage(t('pf_msg_copied'), false);
+          else showFallback();
+        } catch (e) { showFallback(); }
+      }
+    });
+
+    $('pf-import').addEventListener('click', function () {
+      if (pfIo.hidden || !pfIo.value.trim()) {
+        pfIo.hidden = false;
+        pfIo.value = '';
+        pfIo.focus();
+        pfMessage(t('pf_err_import_first'), false);
+        return;
+      }
+      var parsed;
+      try { parsed = JSON.parse(pfIo.value); } catch (e) { pfMessage(t('pf_err_json'), true); return; }
+      var list = Array.isArray(parsed) ? parsed
+        : (parsed && Array.isArray(parsed.positions) ? parsed.positions : null);
+      if (!list) { pfMessage(t('pf_err_json'), true); return; }
+
+      var added = 0, skipped = 0;
+      list.forEach(function (p) {
+        var v = validPosition(p);
+        if (!v) { skipped++; return; }
+        var idx = findPosition(v.name);
+        if (idx >= 0) { positions[idx] = v; added++; }
+        else if (positions.length < PF_MAX) { positions.push(v); added++; }
+        else skipped++;
+      });
+
+      if (!added) { pfMessage(t('pf_err_none'), true); return; }
+      savePortfolio();
+      renderPortfolio();
+      pfMessage(
+        skipped
+          ? tf('pf_msg_imported_skipped', { n: added, m: skipped })
+          : tf('pf_msg_imported', { n: added }),
+        false
+      );
+    });
+
     /* ---------- Restore saved state and first render ---------- */
 
     var savedAd = loadJSON('avgdown', null);
@@ -606,9 +1120,16 @@
     var savedTab = loadJSON('tab', 0);
     selectTab(savedTab === 1 || savedTab === 2 ? savedTab : 0);
 
-    renderAvgDown();
-    renderTarget();
-    renderLots();
+    /* ---------- Language: apply translations, then (re)render everything.
+       The callback also fires once immediately, doing the first render. ---------- */
+
+    window.SiteLang.init(I18N, function () {
+      renumberLots();      // lot aria-labels and placeholders in the new language
+      renderAvgDown();
+      renderTarget();
+      renderLots();
+      renderPortfolio();   // Load/Delete button labels and number locale
+    });
   })();
   </script>
 </body>

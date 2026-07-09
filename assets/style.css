@@ -142,6 +142,49 @@ a:focus-visible {
 
 input::placeholder { color: var(--text-muted); opacity: 0.7; }
 
+/* ---------- Language toggle ---------- */
+
+.lang-toggle {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+}
+
+.lang-toggle button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.lang-toggle button:hover { color: var(--text); }
+
+.lang-toggle button[aria-pressed="true"] {
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
+.lang-toggle .flag {
+  display: block;
+  width: 20px;
+  height: 10px;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px var(--border);
+}
+
 /* ---------- Misc ---------- */
 
 hr { border: 0; border-top: 1px solid var(--border); margin: 2rem 0; }

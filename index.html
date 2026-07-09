@@ -71,9 +71,17 @@
       background: radial-gradient(circle, color-mix(in srgb, var(--pop) 24%, transparent), transparent 65%);
     }
 
+    .topbar {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: flex-end;
+      padding-top: 1.25rem;
+    }
+
     .hero {
       position: relative;
-      padding: 4.5rem 0 4rem;
+      padding: 3.25rem 0 4rem;
     }
 
     .hero-eyebrow {
@@ -413,19 +421,29 @@
       <div class="blob blob-1"></div>
       <div class="blob blob-2"></div>
     </div>
+    <div class="container topbar">
+      <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
+        <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0l60 30M60 0L0 30" stroke="#fff" stroke-width="6"/><path d="M0 0l60 30M60 0L0 30" stroke="#C8102E" stroke-width="2.5"/><path d="M30 0v30M0 15h60" stroke="#fff" stroke-width="10"/><path d="M30 0v30M0 15h60" stroke="#C8102E" stroke-width="6"/></svg>EN
+        </button>
+        <button type="button" data-lang="id" aria-pressed="false" aria-label="Bahasa Indonesia">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="15" fill="#E70011"/><rect y="15" width="60" height="15" fill="#F7F7F7"/></svg>ID
+        </button>
+      </div>
+    </div>
     <div class="container hero">
       <p class="hero-eyebrow">Software Engineer</p>
       <!-- EDITABLE: Name below was derived from git config — change it here if needed. -->
       <h1>Samba Nugraha</h1>
       <!-- PLACEHOLDER TAGLINE: personalize this line to describe your own focus. -->
-      <p class="hero-tagline">I build practical software and small, useful tools — simple things that solve everyday problems.</p>
+      <p class="hero-tagline" data-i18n="tagline">I build practical software and small, useful tools — simple things that solve everyday problems.</p>
       <p class="hero-typed">
         <span class="prompt" aria-hidden="true">&#10095;</span>
-        <span class="visually-hidden">building simple web tools</span>
-        <span aria-hidden="true">building <span id="typed">simple web tools</span><span class="caret"></span></span>
+        <span class="visually-hidden" data-i18n="typedSr">building simple web tools</span>
+        <span aria-hidden="true"><span data-i18n="typedPrefix">building</span> <span id="typed">simple web tools</span><span class="caret"></span></span>
       </p>
       <div class="hero-actions">
-        <a class="btn btn-primary" href="#tools">Browse the tools</a>
+        <a class="btn btn-primary" href="#tools" data-i18n="browseTools">Browse the tools</a>
         <a class="btn" href="https://github.com/sambanf" rel="me">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.42 7.42 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
           GitHub
@@ -443,8 +461,8 @@
          ============================================================ -->
     <section class="section" id="tools" aria-labelledby="tools-heading">
       <div class="container">
-        <h2 class="section-heading reveal" id="tools-heading">Tools</h2>
-        <p class="section-intro reveal">Small, self-contained web tools. Free to use, no sign-up, everything runs in your browser.</p>
+        <h2 class="section-heading reveal" id="tools-heading" data-i18n="toolsHeading">Tools</h2>
+        <p class="section-intro reveal" data-i18n="toolsIntro">Small, self-contained web tools. Free to use, no sign-up, everything runs in your browser.</p>
 
         <ul class="tool-grid">
 
@@ -456,9 +474,9 @@
                 <path pathLength="1" d="M19 12V7h-5"/>
               </svg>
             </span>
-            <h3><a href="stockavgdown/">Stock Average Down Calculator</a></h3>
-            <p>Work out your new average cost when buying more shares at a lower price, and see how far your break-even moves.</p>
-            <span class="tool-cta" aria-hidden="true">Open tool</span>
+            <h3><a href="stockavgdown/" data-i18n="toolStockTitle">Stock Average Calculator</a></h3>
+            <p data-i18n="toolStockDesc">Work out your new average cost when buying more shares at a lower price, and see how far your break-even moves.</p>
+            <span class="tool-cta" aria-hidden="true" data-i18n="openTool">Open tool</span>
           </li>
 
           <!-- TEMPLATE: copy this block to add a new tool card.
@@ -480,19 +498,19 @@
 
     <section class="section" id="about" aria-labelledby="about-heading">
       <div class="container">
-        <h2 class="section-heading reveal" id="about-heading">About</h2>
-        <!-- PLACEHOLDER ABOUT TEXT: rewrite these sentences in your own words. -->
+        <h2 class="section-heading reveal" id="about-heading" data-i18n="aboutHeading">About</h2>
+        <!-- PLACEHOLDER ABOUT TEXT: rewrite these sentences in your own words (both languages live in the I18N dictionary at the bottom of this file). -->
         <div class="about-text reveal">
-          <p>I'm a software engineer who enjoys turning small, recurring annoyances into simple tools that just work.</p>
-          <p>This site is where I publish those tools — each one is a plain, fast web page with no accounts and no tracking.</p>
+          <p data-i18n="about1">I'm a software engineer who enjoys turning small, recurring annoyances into simple tools that just work.</p>
+          <p data-i18n="about2">This site is where I publish those tools — each one is a plain, fast web page with no accounts and no tracking.</p>
         </div>
       </div>
     </section>
 
     <section class="section" id="contact" aria-labelledby="contact-heading">
       <div class="container">
-        <h2 class="section-heading reveal" id="contact-heading">Contact</h2>
-        <p class="section-intro reveal">Found a bug in one of the tools, or have an idea for a new one? Get in touch.</p>
+        <h2 class="section-heading reveal" id="contact-heading" data-i18n="contactHeading">Contact</h2>
+        <p class="section-intro reveal" data-i18n="contactIntro">Found a bug in one of the tools, or have an idea for a new one? Get in touch.</p>
         <ul class="contact-links reveal">
           <li>
             <a class="btn" href="https://github.com/sambanf" rel="me">
@@ -519,6 +537,7 @@
     </div>
   </footer>
 
+  <script src="assets/lang.js"></script>
   <script>
     (function () {
       var reduced = window.matchMedia &&
@@ -540,35 +559,86 @@
         revealEls.forEach(function (el) { el.classList.add('in'); });
       }
 
-      /* ----- Typewriter line in the hero ----- */
+      /* ----- Translations ----- */
+      var I18N = {
+        en: {
+          _title: 'Samba Nugraha — Software Engineer',
+          _meta: 'Portfolio of Samba Nugraha, software engineer. Practical software and small, useful web tools.',
+          tagline: 'I build practical software and small, useful tools — simple things that solve everyday problems.',
+          typedPrefix: 'building',
+          typedSr: 'building simple web tools',
+          browseTools: 'Browse the tools',
+          toolsHeading: 'Tools',
+          toolsIntro: 'Small, self-contained web tools. Free to use, no sign-up, everything runs in your browser.',
+          toolStockTitle: 'Stock Average Calculator',
+          toolStockDesc: 'Work out your new average cost when buying more shares at a lower price, and see how far your break-even moves.',
+          openTool: 'Open tool',
+          aboutHeading: 'About',
+          about1: "I'm a software engineer who enjoys turning small, recurring annoyances into simple tools that just work.",
+          about2: 'This site is where I publish those tools — each one is a plain, fast web page with no accounts and no tracking.',
+          contactHeading: 'Contact',
+          contactIntro: 'Found a bug in one of the tools, or have an idea for a new one? Get in touch.'
+        },
+        id: {
+          _title: 'Samba Nugraha — Software Engineer',
+          _meta: 'Portofolio Samba Nugraha, software engineer. Perangkat lunak praktis dan alat web kecil yang berguna.',
+          tagline: 'Saya membuat perangkat lunak praktis dan alat kecil yang berguna — hal sederhana yang menyelesaikan masalah sehari-hari.',
+          typedPrefix: 'membuat',
+          typedSr: 'membuat alat web sederhana',
+          browseTools: 'Lihat semua alat',
+          toolsHeading: 'Alat',
+          toolsIntro: 'Alat web kecil yang mandiri. Gratis, tanpa daftar, semuanya berjalan di browser Anda.',
+          toolStockTitle: 'Kalkulator Average Saham',
+          toolStockDesc: 'Hitung harga rata-rata baru saat membeli saham tambahan di harga yang lebih rendah, dan lihat seberapa jauh titik break-even Anda bergeser.',
+          openTool: 'Buka alat',
+          aboutHeading: 'Tentang',
+          about1: 'Saya software engineer yang senang mengubah gangguan kecil sehari-hari menjadi alat sederhana yang benar-benar berfungsi.',
+          about2: 'Situs ini tempat saya memublikasikan alat-alat itu — masing-masing berupa halaman web sederhana dan cepat, tanpa akun dan tanpa pelacakan.',
+          contactHeading: 'Kontak',
+          contactIntro: 'Menemukan bug di salah satu alat, atau punya ide alat baru? Hubungi saya.'
+        }
+      };
+
+      /* ----- Typewriter line in the hero (restarts on language switch) ----- */
       var typed = document.getElementById('typed');
-      if (typed && !reduced) {
-        var WORDS = [
-          'simple web tools',
-          'a stock average calculator',
-          'things that just work'
-        ];
-        var wordIdx = 0, charIdx = WORDS[0].length, deleting = false;
+      var TYPED_WORDS = {
+        en: ['simple web tools', 'a stock average calculator', 'things that just work'],
+        id: ['alat web sederhana', 'kalkulator average saham', 'hal yang langsung berfungsi']
+      };
+      var twTimer = null;
+
+      function startTypewriter(lang) {
+        if (!typed) return;
+        var words = TYPED_WORDS[lang] || TYPED_WORDS.en;
+        if (reduced) {
+          typed.textContent = words[0];
+          return;
+        }
+        clearTimeout(twTimer);
+        var wordIdx = 0, charIdx = 0, deleting = false;
+        typed.textContent = '';
 
         function tick() {
-          var word = WORDS[wordIdx];
+          var word = words[wordIdx];
           if (!deleting && charIdx === word.length) {
             deleting = true;
-            setTimeout(tick, 2300);            // pause on the full word
+            twTimer = setTimeout(tick, 2300);  // pause on the full word
             return;
           }
           if (deleting && charIdx === 0) {
             deleting = false;
-            wordIdx = (wordIdx + 1) % WORDS.length;
-            setTimeout(tick, 350);             // pause before typing next
+            wordIdx = (wordIdx + 1) % words.length;
+            twTimer = setTimeout(tick, 350);   // pause before typing next
             return;
           }
           charIdx += deleting ? -1 : 1;
           typed.textContent = word.slice(0, charIdx);
-          setTimeout(tick, deleting ? 35 : 70);
+          twTimer = setTimeout(tick, deleting ? 35 : 70);
         }
-        setTimeout(tick, 2000);                // let the entrance settle first
+        twTimer = setTimeout(tick, 600);
       }
+
+      SiteLang.init(I18N, startTypewriter);
     })();
   </script>
 
