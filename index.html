@@ -7,15 +7,72 @@
   <meta name="description" content="Portfolio of Samba Nugraha, software engineer. Practical software and small, useful web tools.">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d9488'/%3E%3Ctext x='16' y='22' font-family='system-ui,sans-serif' font-size='16' font-weight='700' fill='%23ffffff' text-anchor='middle'%3ESN%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="assets/style.css">
+  <script>document.documentElement.className += ' js';</script>
   <style>
     /* ---------- Page-specific styles (landing page) ---------- */
 
+    :root { --pop: #6366f1; }
+    @media (prefers-color-scheme: dark) {
+      :root { --pop: #818cf8; }
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px; height: 1px;
+      margin: -1px; padding: 0;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* ---------- Hero with animated background ---------- */
+
     .site-header {
+      position: relative;
+      overflow: hidden;
       border-bottom: 1px solid var(--border);
       background: var(--surface);
     }
 
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(to right, var(--border) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--border) 1px, transparent 1px);
+      background-size: 44px 44px;
+      opacity: 0.4;
+      -webkit-mask-image: radial-gradient(ellipse 90% 100% at 50% 0%, black 25%, transparent 78%);
+      mask-image: radial-gradient(ellipse 90% 100% at 50% 0%, black 25%, transparent 78%);
+    }
+
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.55;
+    }
+
+    .blob-1 {
+      width: 34rem; height: 34rem;
+      top: -14rem; right: -8rem;
+      background: radial-gradient(circle, color-mix(in srgb, var(--accent) 30%, transparent), transparent 65%);
+    }
+
+    .blob-2 {
+      width: 30rem; height: 30rem;
+      bottom: -18rem; left: -12rem;
+      background: radial-gradient(circle, color-mix(in srgb, var(--pop) 24%, transparent), transparent 65%);
+    }
+
     .hero {
+      position: relative;
       padding: 4.5rem 0 4rem;
     }
 
@@ -31,18 +88,51 @@
       background: var(--accent-soft);
       border-radius: 999px;
       padding: 0.3rem 0.85rem;
-      margin-bottom: 1.1rem;
+      margin: 0 0 1.1rem;
     }
 
     .hero h1 {
       margin-bottom: 0.35rem;
     }
 
+    @supports (background-clip: text) or (-webkit-background-clip: text) {
+      .hero h1 {
+        background: linear-gradient(90deg, var(--text) 0%, var(--accent-strong) 40%, var(--text) 70%);
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+    }
+
     .hero-tagline {
       max-width: 34em;
       font-size: 1.075rem;
       color: var(--text-muted);
+      margin-bottom: 0.9rem;
+    }
+
+    .hero-typed {
+      font-family: var(--mono);
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      min-height: 1.6em;
       margin-bottom: 1.75rem;
+    }
+
+    .hero-typed .prompt {
+      color: var(--accent);
+      font-weight: 700;
+      margin-right: 0.5ch;
+    }
+
+    .caret {
+      display: inline-block;
+      width: 0.55ch;
+      height: 1.05em;
+      margin-left: 2px;
+      background: var(--accent);
+      vertical-align: text-bottom;
     }
 
     .hero-actions {
@@ -51,8 +141,11 @@
       gap: 0.75rem;
     }
 
+    /* ---------- Sections ---------- */
+
     .section {
       padding: 3.25rem 0;
+      scroll-margin-top: 1rem;
     }
 
     .section + .section {
@@ -95,16 +188,28 @@
 
     .tool-card {
       position: relative;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
       gap: 0.75rem;
-      transition: border-color 0.15s ease, transform 0.15s ease;
+      transition: border-color 0.2s ease, transform 0.25s ease, box-shadow 0.25s ease;
     }
 
     .tool-card:hover,
     .tool-card:focus-within {
       border-color: var(--accent);
-      transform: translateY(-2px);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px color-mix(in srgb, var(--accent) 16%, transparent);
+    }
+
+    /* Shine sweep across the card on hover */
+    .tool-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(115deg, transparent 35%, color-mix(in srgb, var(--accent) 9%, transparent) 50%, transparent 65%);
+      transform: translateX(-110%);
+      pointer-events: none;
     }
 
     .tool-icon {
@@ -116,6 +221,12 @@
       border-radius: var(--radius-sm);
       background: var(--accent-soft);
       color: var(--accent-strong);
+      transition: transform 0.25s ease;
+    }
+
+    .tool-card:hover .tool-icon,
+    .tool-card:focus-within .tool-icon {
+      transform: scale(1.08) rotate(-4deg);
     }
 
     .tool-card h3 {
@@ -152,13 +263,23 @@
       color: var(--accent-strong);
     }
 
-    /* ---------- About ---------- */
+    .tool-cta::after {
+      content: "\2192";
+      display: inline-block;
+      margin-left: 0.35rem;
+      transition: transform 0.25s ease;
+    }
+
+    .tool-card:hover .tool-cta::after,
+    .tool-card:focus-within .tool-cta::after {
+      transform: translateX(5px);
+    }
+
+    /* ---------- About / Contact ---------- */
 
     .about-text {
       max-width: 44em;
     }
-
-    /* ---------- Contact ---------- */
 
     .contact-links {
       display: flex;
@@ -167,6 +288,115 @@
       list-style: none;
       margin: 0;
       padding: 0;
+    }
+
+    .btn {
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease, box-shadow 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 6px 20px color-mix(in srgb, var(--accent) 35%, transparent);
+    }
+
+    /* ============================================================
+       Motion. Everything below runs ONLY when the user has not
+       asked for reduced motion; the page is fully usable without it.
+       ============================================================ */
+
+    @media (prefers-reduced-motion: no-preference) {
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      @keyframes fade-up {
+        from { opacity: 0; transform: translateY(18px); }
+        to   { opacity: 1; transform: none; }
+      }
+
+      @keyframes shimmer {
+        to { background-position: 200% center; }
+      }
+
+      @keyframes drift-a {
+        from { transform: translate3d(0, 0, 0) scale(1); }
+        to   { transform: translate3d(-4rem, 3rem, 0) scale(1.15); }
+      }
+
+      @keyframes drift-b {
+        from { transform: translate3d(0, 0, 0) scale(1.1); }
+        to   { transform: translate3d(3rem, -2.5rem, 0) scale(0.95); }
+      }
+
+      @keyframes caret-blink {
+        50% { opacity: 0; }
+      }
+
+      @keyframes icon-draw {
+        from { stroke-dashoffset: 1; }
+        to   { stroke-dashoffset: 0; }
+      }
+
+      @keyframes shine {
+        to { transform: translateX(110%); }
+      }
+
+      .blob-1 { animation: drift-a 26s ease-in-out infinite alternate; }
+      .blob-2 { animation: drift-b 32s ease-in-out infinite alternate; }
+
+      .hero h1 { animation: shimmer 9s linear infinite; }
+
+      .caret { animation: caret-blink 1.1s steps(1) infinite; }
+
+      /* Staggered hero entrance */
+      .hero > * { animation: fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; }
+      .hero > *:nth-child(2) { animation-delay: 0.1s; }
+      .hero > *:nth-child(3) { animation-delay: 0.2s; }
+      .hero > *:nth-child(4) { animation-delay: 0.3s; }
+      .hero > *:nth-child(5) { animation-delay: 0.4s; }
+
+      .tool-card:hover::before,
+      .tool-card:focus-within::before {
+        animation: shine 0.7s ease;
+      }
+
+      .tool-card:hover .tool-icon path {
+        stroke-dasharray: 1;
+        animation: icon-draw 0.9s ease;
+      }
+
+      /* Scroll reveal — hidden state only applies when JS is on
+         (html.js), so content is never stuck invisible without JS. */
+      html.js .reveal {
+        opacity: 0;
+        transform: translateY(22px);
+        transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      html.js .reveal.in {
+        opacity: 1;
+        transform: none;
+      }
+
+      /* Accent bar grows in as its heading reveals */
+      html.js .section-heading.reveal::before {
+        transform: scaleX(0);
+        transform-origin: left center;
+        transition: transform 0.8s 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      html.js .section-heading.reveal.in::before {
+        transform: scaleX(1);
+      }
+
+      /* Stagger cards inside the grid */
+      .tool-grid .reveal:nth-child(2) { transition-delay: 0.08s; }
+      .tool-grid .reveal:nth-child(3) { transition-delay: 0.16s; }
+      .tool-grid .reveal:nth-child(4) { transition-delay: 0.24s; }
     }
 
     @media (max-width: 480px) {
@@ -178,12 +408,22 @@
 <body>
 
   <header class="site-header">
+    <div class="hero-bg" aria-hidden="true">
+      <div class="hero-grid"></div>
+      <div class="blob blob-1"></div>
+      <div class="blob blob-2"></div>
+    </div>
     <div class="container hero">
       <p class="hero-eyebrow">Software Engineer</p>
       <!-- EDITABLE: Name below was derived from git config — change it here if needed. -->
       <h1>Samba Nugraha</h1>
       <!-- PLACEHOLDER TAGLINE: personalize this line to describe your own focus. -->
       <p class="hero-tagline">I build practical software and small, useful tools — simple things that solve everyday problems.</p>
+      <p class="hero-typed">
+        <span class="prompt" aria-hidden="true">&#10095;</span>
+        <span class="visually-hidden">building simple web tools</span>
+        <span aria-hidden="true">building <span id="typed">simple web tools</span><span class="caret"></span></span>
+      </p>
       <div class="hero-actions">
         <a class="btn btn-primary" href="#tools">Browse the tools</a>
         <a class="btn" href="https://github.com/sambanf" rel="me">
@@ -198,39 +438,39 @@
 
     <!-- ============================================================
          Tools — the heart of the page. To add a new tool, copy a
-         <li class="card tool-card"> block (template in the comment
-         below) and adjust the link, icon, title, and description.
+         <li class="card tool-card reveal"> block (template in the
+         comment below) and adjust the link, icon, title, description.
          ============================================================ -->
     <section class="section" id="tools" aria-labelledby="tools-heading">
       <div class="container">
-        <h2 class="section-heading" id="tools-heading">Tools</h2>
-        <p class="section-intro">Small, self-contained web tools. Free to use, no sign-up, everything runs in your browser.</p>
+        <h2 class="section-heading reveal" id="tools-heading">Tools</h2>
+        <p class="section-intro reveal">Small, self-contained web tools. Free to use, no sign-up, everything runs in your browser.</p>
 
         <ul class="tool-grid">
 
-          <li class="card tool-card">
+          <li class="card tool-card reveal">
             <span class="tool-icon" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
-                <path d="M3 3v16a2 2 0 0 0 2 2h16"/>
-                <path d="M7 14l4-4 3 3 5-6"/>
-                <path d="M19 12V7h-5"/>
+                <path pathLength="1" d="M3 3v16a2 2 0 0 0 2 2h16"/>
+                <path pathLength="1" d="M7 14l4-4 3 3 5-6"/>
+                <path pathLength="1" d="M19 12V7h-5"/>
               </svg>
             </span>
             <h3><a href="stockavgdown/">Stock Average Down Calculator</a></h3>
             <p>Work out your new average cost when buying more shares at a lower price, and see how far your break-even moves.</p>
-            <span class="tool-cta" aria-hidden="true">Open tool &rarr;</span>
+            <span class="tool-cta" aria-hidden="true">Open tool</span>
           </li>
 
           <!-- TEMPLATE: copy this block to add a new tool card.
-          <li class="card tool-card">
+          <li class="card tool-card reveal">
             <span class="tool-icon" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
-                [inline SVG icon paths here]
+                [inline SVG icon paths here — add pathLength="1" to each <path> so the hover draw animation works]
               </svg>
             </span>
             <h3><a href="your-tool-folder/">Tool Name</a></h3>
             <p>One or two lines describing what the tool does.</p>
-            <span class="tool-cta" aria-hidden="true">Open tool &rarr;</span>
+            <span class="tool-cta" aria-hidden="true">Open tool</span>
           </li>
           -->
 
@@ -240,9 +480,9 @@
 
     <section class="section" id="about" aria-labelledby="about-heading">
       <div class="container">
-        <h2 class="section-heading" id="about-heading">About</h2>
+        <h2 class="section-heading reveal" id="about-heading">About</h2>
         <!-- PLACEHOLDER ABOUT TEXT: rewrite these sentences in your own words. -->
-        <div class="about-text">
+        <div class="about-text reveal">
           <p>I'm a software engineer who enjoys turning small, recurring annoyances into simple tools that just work.</p>
           <p>This site is where I publish those tools — each one is a plain, fast web page with no accounts and no tracking.</p>
         </div>
@@ -251,9 +491,9 @@
 
     <section class="section" id="contact" aria-labelledby="contact-heading">
       <div class="container">
-        <h2 class="section-heading" id="contact-heading">Contact</h2>
-        <p class="section-intro">Found a bug in one of the tools, or have an idea for a new one? Get in touch.</p>
-        <ul class="contact-links">
+        <h2 class="section-heading reveal" id="contact-heading">Contact</h2>
+        <p class="section-intro reveal">Found a bug in one of the tools, or have an idea for a new one? Get in touch.</p>
+        <ul class="contact-links reveal">
           <li>
             <a class="btn" href="https://github.com/sambanf" rel="me">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.42 7.42 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
@@ -261,6 +501,7 @@
             </a>
           </li>
           <li>
+            <!-- EDITABLE: contact email — swap to samba@getz.co if you prefer that address publicly. -->
             <a class="btn" href="mailto:sambanugraha@gmail.com">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7L22 7"/></svg>
               sambanugraha@gmail.com
@@ -277,6 +518,59 @@
       <p>&copy; 2026 Samba Nugraha</p>
     </div>
   </footer>
+
+  <script>
+    (function () {
+      var reduced = window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      /* ----- Scroll reveal ----- */
+      var revealEls = Array.prototype.slice.call(document.querySelectorAll('.reveal'));
+      if (!reduced && 'IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('in');
+              io.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+        revealEls.forEach(function (el) { io.observe(el); });
+      } else {
+        revealEls.forEach(function (el) { el.classList.add('in'); });
+      }
+
+      /* ----- Typewriter line in the hero ----- */
+      var typed = document.getElementById('typed');
+      if (typed && !reduced) {
+        var WORDS = [
+          'simple web tools',
+          'a stock average calculator',
+          'things that just work'
+        ];
+        var wordIdx = 0, charIdx = WORDS[0].length, deleting = false;
+
+        function tick() {
+          var word = WORDS[wordIdx];
+          if (!deleting && charIdx === word.length) {
+            deleting = true;
+            setTimeout(tick, 2300);            // pause on the full word
+            return;
+          }
+          if (deleting && charIdx === 0) {
+            deleting = false;
+            wordIdx = (wordIdx + 1) % WORDS.length;
+            setTimeout(tick, 350);             // pause before typing next
+            return;
+          }
+          charIdx += deleting ? -1 : 1;
+          typed.textContent = word.slice(0, charIdx);
+          setTimeout(tick, deleting ? 35 : 70);
+        }
+        setTimeout(tick, 2000);                // let the entrance settle first
+      }
+    })();
+  </script>
 
 </body>
 </html>
