@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Samba Nugraha — Software Engineer</title>
+  <meta name="description" content="Portfolio of Samba Nugraha, software engineer. Practical software and small, useful web tools.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d9488'/%3E%3Ctext x='16' y='22' font-family='system-ui,sans-serif' font-size='16' font-weight='700' fill='%23ffffff' text-anchor='middle'%3ESN%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    /* ---------- Page-specific styles (landing page) ---------- */
+
+    .site-header {
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .hero {
+      padding: 4.5rem 0 4rem;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent-strong);
+      background: var(--accent-soft);
+      border-radius: 999px;
+      padding: 0.3rem 0.85rem;
+      margin-bottom: 1.1rem;
+    }
+
+    .hero h1 {
+      margin-bottom: 0.35rem;
+    }
+
+    .hero-tagline {
+      max-width: 34em;
+      font-size: 1.075rem;
+      color: var(--text-muted);
+      margin-bottom: 1.75rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .section {
+      padding: 3.25rem 0;
+    }
+
+    .section + .section {
+      border-top: 1px solid var(--border);
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: baseline;
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .section-heading::before {
+      content: "";
+      flex: none;
+      width: 1.6rem;
+      height: 3px;
+      border-radius: 2px;
+      background: var(--accent);
+      align-self: center;
+    }
+
+    .section-intro {
+      color: var(--text-muted);
+      max-width: 40em;
+      margin-bottom: 2rem;
+    }
+
+    /* ---------- Tools grid ---------- */
+
+    .tool-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
+      gap: 1.25rem;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .tool-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      transition: border-color 0.15s ease, transform 0.15s ease;
+    }
+
+    .tool-card:hover,
+    .tool-card:focus-within {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .tool-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.75rem;
+      height: 2.75rem;
+      border-radius: var(--radius-sm);
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+    }
+
+    .tool-card h3 {
+      margin: 0;
+    }
+
+    /* Make the whole card clickable via the title link */
+    .tool-card h3 a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .tool-card h3 a::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius);
+    }
+
+    .tool-card h3 a:hover {
+      color: var(--accent-strong);
+    }
+
+    .tool-card p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .tool-cta {
+      margin-top: auto;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--accent-strong);
+    }
+
+    /* ---------- About ---------- */
+
+    .about-text {
+      max-width: 44em;
+    }
+
+    /* ---------- Contact ---------- */
+
+    .contact-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    @media (max-width: 480px) {
+      .hero { padding: 3.25rem 0 3rem; }
+      .section { padding: 2.5rem 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container hero">
+      <p class="hero-eyebrow">Software Engineer</p>
+      <!-- EDITABLE: Name below was derived from git config — change it here if needed. -->
+      <h1>Samba Nugraha</h1>
+      <!-- PLACEHOLDER TAGLINE: personalize this line to describe your own focus. -->
+      <p class="hero-tagline">I build practical software and small, useful tools — simple things that solve everyday problems.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="#tools">Browse the tools</a>
+        <a class="btn" href="https://github.com/sambanf" rel="me">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.42 7.42 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+          GitHub
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ============================================================
+         Tools — the heart of the page. To add a new tool, copy a
+         <li class="card tool-card"> block (template in the comment
+         below) and adjust the link, icon, title, and description.
+         ============================================================ -->
+    <section class="section" id="tools" aria-labelledby="tools-heading">
+      <div class="container">
+        <h2 class="section-heading" id="tools-heading">Tools</h2>
+        <p class="section-intro">Small, self-contained web tools. Free to use, no sign-up, everything runs in your browser.</p>
+
+        <ul class="tool-grid">
+
+          <li class="card tool-card">
+            <span class="tool-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+                <path d="M3 3v16a2 2 0 0 0 2 2h16"/>
+                <path d="M7 14l4-4 3 3 5-6"/>
+                <path d="M19 12V7h-5"/>
+              </svg>
+            </span>
+            <h3><a href="stockavgdown/">Stock Average Down Calculator</a></h3>
+            <p>Work out your new average cost when buying more shares at a lower price, and see how far your break-even moves.</p>
+            <span class="tool-cta" aria-hidden="true">Open tool &rarr;</span>
+          </li>
+
+          <!-- TEMPLATE: copy this block to add a new tool card.
+          <li class="card tool-card">
+            <span class="tool-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+                [inline SVG icon paths here]
+              </svg>
+            </span>
+            <h3><a href="your-tool-folder/">Tool Name</a></h3>
+            <p>One or two lines describing what the tool does.</p>
+            <span class="tool-cta" aria-hidden="true">Open tool &rarr;</span>
+          </li>
+          -->
+
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" id="about" aria-labelledby="about-heading">
+      <div class="container">
+        <h2 class="section-heading" id="about-heading">About</h2>
+        <!-- PLACEHOLDER ABOUT TEXT: rewrite these sentences in your own words. -->
+        <div class="about-text">
+          <p>I'm a software engineer who enjoys turning small, recurring annoyances into simple tools that just work.</p>
+          <p>This site is where I publish those tools — each one is a plain, fast web page with no accounts and no tracking.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="contact" aria-labelledby="contact-heading">
+      <div class="container">
+        <h2 class="section-heading" id="contact-heading">Contact</h2>
+        <p class="section-intro">Found a bug in one of the tools, or have an idea for a new one? Get in touch.</p>
+        <ul class="contact-links">
+          <li>
+            <a class="btn" href="https://github.com/sambanf" rel="me">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.42 7.42 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+              github.com/sambanf
+            </a>
+          </li>
+          <li>
+            <a class="btn" href="mailto:sambanugraha@gmail.com">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7L22 7"/></svg>
+              sambanugraha@gmail.com
+            </a>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2026 Samba Nugraha</p>
+    </div>
+  </footer>
+
+</body>
+</html>

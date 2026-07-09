@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stock Average Down Calculator</title>
+  <meta name="description" content="Free stock average down calculator. Find your new average cost after buying more shares, the exact shares needed to hit a target average, and weighted averages across multiple lots.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%230d9488'/><path d='M5 9l9 9 5-4 8 8' stroke='%23ffffff' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/><path d='M27 15v7h-7' stroke='%23ffffff' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    .top-nav { padding: 1.25rem 0 2.25rem; font-size: 0.9rem; }
+    .top-nav a { color: var(--text-muted); text-decoration: none; }
+    .top-nav a:hover { color: var(--accent-strong); }
+    .lede { color: var(--text-muted); max-width: 44rem; margin-bottom: 0; }
+    .tool-card { margin: 1.75rem 0 2rem; }
+    .how-card { margin-bottom: 1rem; }
+    .how-card h3 { margin-top: 1.5rem; }
+
+    /* Tabs */
+    .tabs {
+      display: flex; gap: 0.25rem; padding: 0.25rem;
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); margin-bottom: 1.5rem;
+    }
+    .tabs [role="tab"] {
+      flex: 1 1 0; min-width: 0; padding: 0.5rem 0.4rem;
+      border: 0; border-radius: calc(var(--radius-sm) - 3px);
+      background: transparent; color: var(--text-muted);
+      font: inherit; font-size: 0.875rem; font-weight: 600; line-height: 1.3;
+      cursor: pointer;
+    }
+    .tabs [role="tab"]:hover { color: var(--text); }
+    .tabs [role="tab"][aria-selected="true"] {
+      background: var(--surface); color: var(--accent-strong); box-shadow: var(--shadow);
+    }
+
+    /* Fields */
+    .field-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+    .help { font-size: 0.8rem; color: var(--text-muted); margin: 0.3rem 0 0; }
+
+    /* Results */
+    .results {
+      margin-top: 1.5rem; padding: 1.15rem 1.25rem;
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+    }
+    .hint { margin: 0 0 0.9rem; font-size: 0.9rem; color: var(--text-muted); }
+    .key-figure { margin-bottom: 1rem; }
+    .key-label {
+      display: block; font-size: 0.75rem; font-weight: 600;
+      letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted);
+    }
+    .key-value {
+      display: block; font-family: var(--mono);
+      font-size: clamp(1.7rem, 6vw, 2.2rem); font-weight: 600;
+      line-height: 1.25; letter-spacing: -0.01em;
+    }
+    .key-delta { display: block; font-size: 0.9rem; font-weight: 600; min-height: 1.2em; }
+    .delta-down { color: var(--positive); }
+    .delta-up { color: var(--negative); }
+    .result-rows { margin: 0; display: grid; gap: 0.45rem; }
+    .result-rows > div {
+      display: flex; justify-content: space-between; align-items: baseline;
+      gap: 1rem; padding-top: 0.45rem; border-top: 1px solid var(--border);
+    }
+    .result-rows dt { font-size: 0.875rem; color: var(--text-muted); }
+    .result-rows dd { margin: 0; font-family: var(--mono); font-size: 0.95rem; text-align: right; overflow-wrap: anywhere; }
+    .note { margin: 1rem 0 0; font-size: 0.875rem; color: var(--text-muted); }
+
+    /* Notices */
+    .notice {
+      margin-top: 1.25rem; padding: 0.7rem 1rem; font-size: 0.9rem;
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-left: 3px solid var(--accent); border-radius: var(--radius-sm);
+    }
+    .notice-error { border-left-color: var(--negative); }
+
+    /* Multi-lot table */
+    .lots-head, .lot-row {
+      display: grid; grid-template-columns: 1.5rem minmax(0, 1fr) minmax(0, 1fr) 2.3rem;
+      gap: 0.5rem; align-items: center;
+    }
+    .lots-head { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.4rem; }
+    .lot-row { margin-bottom: 0.5rem; }
+    .lot-num { font-family: var(--mono); font-size: 0.85rem; color: var(--text-muted); text-align: right; }
+    .remove-btn {
+      width: 2.3rem; height: 2.3rem; display: inline-flex; align-items: center; justify-content: center;
+      font: inherit; font-size: 1.1rem; line-height: 1; color: var(--text-muted);
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); cursor: pointer;
+    }
+    .remove-btn:hover:not(:disabled) { color: var(--negative); border-color: var(--negative); }
+    .remove-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    #add-lot { margin-top: 0.25rem; }
+
+    /* Formulas */
+    .formula {
+      margin: 0.4rem 0 0.9rem; padding: 0.6rem 0.9rem;
+      font-family: var(--mono); font-size: 0.9rem;
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); overflow-x: auto; white-space: nowrap;
+    }
+    .small { font-size: 0.85rem; }
+
+    @media (max-width: 520px) {
+      .field-grid { grid-template-columns: 1fr; }
+      .card { padding: 1.1rem; }
+      .tabs [role="tab"] { font-size: 0.8rem; padding: 0.45rem 0.3rem; }
+    }
+  </style>
+</head>
+<body>
+  <header class="container">
+    <nav class="top-nav" aria-label="Site">
+      <a href="../">&#8592; samba nugraha</a>
+    </nav>
+    <h1>Stock Average Down Calculator</h1>
+    <p class="lede">See how buying more shares changes your average cost per share &mdash; average down after a buy, work backwards from a target average, or combine multiple lots.</p>
+  </header>
+
+  <main class="container">
+    <noscript>
+      <div class="notice notice-error">This calculator needs JavaScript to run. Please enable it and reload the page.</div>
+    </noscript>
+
+    <div class="card tool-card">
+      <div class="tabs" role="tablist" aria-label="Calculator mode">
+        <button type="button" role="tab" id="tab-avgdown" aria-controls="panel-avgdown" aria-selected="true">Average down</button>
+        <button type="button" role="tab" id="tab-target" aria-controls="panel-target" aria-selected="false" tabindex="-1">Target average</button>
+        <button type="button" role="tab" id="tab-lots" aria-controls="panel-lots" aria-selected="false" tabindex="-1">Multi-lot average</button>
+      </div>
+
+      <!-- Mode 1: Average down -->
+      <div role="tabpanel" id="panel-avgdown" aria-labelledby="tab-avgdown">
+        <div class="field-grid">
+          <div>
+            <label for="ad-s0">Shares owned</label>
+            <input id="ad-s0" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 100">
+          </div>
+          <div>
+            <label for="ad-a0">Average cost per share</label>
+            <input id="ad-a0" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 10.00">
+          </div>
+          <div>
+            <label for="ad-s1">Shares to buy</label>
+            <input id="ad-s1" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 100">
+          </div>
+          <div>
+            <label for="ad-p">Buy price per share</label>
+            <input id="ad-p" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 5.00">
+          </div>
+        </div>
+
+        <div class="results" aria-live="polite">
+          <p class="hint" id="ad-hint">Enter all four values above zero to see your new average.</p>
+          <div class="key-figure">
+            <span class="key-label">New average cost per share</span>
+            <span class="key-value" id="ad-newavg">&mdash;</span>
+            <span class="key-delta" id="ad-delta"></span>
+          </div>
+          <dl class="result-rows">
+            <div><dt>Total shares</dt><dd id="ad-shares">&mdash;</dd></div>
+            <div><dt>Total invested</dt><dd id="ad-invested">&mdash;</dd></div>
+            <div><dt>Additional cash needed</dt><dd id="ad-cash">&mdash;</dd></div>
+          </dl>
+          <p class="note" id="ad-breakeven"></p>
+        </div>
+      </div>
+
+      <!-- Mode 2: Target average -->
+      <div role="tabpanel" id="panel-target" aria-labelledby="tab-target" hidden>
+        <div class="field-grid">
+          <div>
+            <label for="ta-s0">Shares owned</label>
+            <input id="ta-s0" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 100">
+          </div>
+          <div>
+            <label for="ta-a0">Average cost per share</label>
+            <input id="ta-a0" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 10.00">
+          </div>
+          <div>
+            <label for="ta-p">Current price per share</label>
+            <input id="ta-p" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 5.00">
+          </div>
+          <div>
+            <label for="ta-t">Target average cost</label>
+            <input id="ta-t" type="number" min="0" step="any" inputmode="decimal" placeholder="e.g. 7.50" aria-describedby="ta-t-help">
+            <p class="help" id="ta-t-help">Must be between the current price and your average cost.</p>
+          </div>
+        </div>
+
+        <div class="notice" id="ta-notice" hidden></div>
+
+        <div class="results" aria-live="polite">
+          <p class="hint" id="ta-hint">Enter all four values above zero to see how many shares to buy.</p>
+          <div class="key-figure">
+            <span class="key-label">Shares to buy</span>
+            <span class="key-value" id="ta-buy">&mdash;</span>
+            <span class="key-delta" id="ta-buy-sub"></span>
+          </div>
+          <dl class="result-rows">
+            <div><dt>Cost of purchase</dt><dd id="ta-cost">&mdash;</dd></div>
+            <div><dt>Total shares after</dt><dd id="ta-shares">&mdash;</dd></div>
+            <div><dt>Total invested after</dt><dd id="ta-invested">&mdash;</dd></div>
+            <div><dt>Resulting average cost</dt><dd id="ta-newavg">&mdash;</dd></div>
+          </dl>
+          <p class="note">Assumes fractional shares are allowed. If your broker only trades whole shares, round up to stay at or below the target.</p>
+        </div>
+      </div>
+
+      <!-- Mode 3: Multi-lot average -->
+      <div role="tabpanel" id="panel-lots" aria-labelledby="tab-lots" hidden>
+        <div class="lots-head" aria-hidden="true">
+          <span></span><span>Shares</span><span>Price per share</span><span></span>
+        </div>
+        <div id="lot-rows"></div>
+        <button type="button" class="btn" id="add-lot">+ Add lot</button>
+        <p class="help">Rows missing a value are ignored in the average.</p>
+
+        <div class="results" aria-live="polite">
+          <p class="hint" id="lot-hint">Enter shares and price for at least one lot to see the weighted average.</p>
+          <div class="key-figure">
+            <span class="key-label">Weighted average cost per share</span>
+            <span class="key-value" id="lot-avg">&mdash;</span>
+          </div>
+          <dl class="result-rows">
+            <div><dt>Total shares</dt><dd id="lot-shares">&mdash;</dd></div>
+            <div><dt>Total cost</dt><dd id="lot-cost">&mdash;</dd></div>
+          </dl>
+        </div>
+      </div>
+    </div>
+
+    <section class="card how-card" aria-labelledby="how-heading">
+      <h2 id="how-heading">How it works</h2>
+      <p>Your average cost per share is your total money in divided by your total shares. Buying more shares below your current average pulls the average down toward the new buy price &mdash; it can never go below it.</p>
+
+      <h3>New average after a buy</h3>
+      <div class="formula">new average = (S&#8320; &times; A&#8320; + S&#8321; &times; P) &divide; (S&#8320; + S&#8321;)</div>
+      <p class="muted small">S&#8320; = shares owned, A&#8320; = current average cost, S&#8321; = shares bought, P = buy price per share.</p>
+
+      <h3>Shares needed to reach a target average</h3>
+      <div class="formula">shares to buy = S&#8320; &times; (A&#8320; &minus; T) &divide; (T &minus; P)</div>
+      <p class="muted small">T = target average. Only possible when P &lt; T &lt; A&#8320;: the target must sit between the current price and your existing average.</p>
+
+      <h3>Weighted average across lots</h3>
+      <div class="formula">average = &Sigma;(shares&#7522; &times; price&#7522;) &divide; &Sigma; shares&#7522;</div>
+
+      <h3>Break-even after averaging down</h3>
+      <div class="formula">rise needed from buy price = (new average &divide; P &minus; 1) &times; 100%</div>
+
+      <h3>Worked example</h3>
+      <p>You own 100 shares at an average of 10.00 and buy 100 more at 5.00. Total invested is 100&times;10.00 + 100&times;5.00 = 1,500 across 200 shares, so the new average is <strong class="mono">7.50</strong> &mdash; a 25.00% reduction. From the 5.00 buy price, the stock must rise 50.00% to reach the new 7.50 break-even.</p>
+
+      <p class="muted small">This tool only does the arithmetic &mdash; it is not investment advice. Averaging down increases your exposure to a falling position.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p><a href="../">&#8592; back to all tools</a> &middot; &copy; 2026 Samba Nugraha</p>
+    </div>
+  </footer>
+
+  <script>
+  (function () {
+    'use strict';
+
+    /* =====================================================
+       Pure calculation functions (no DOM access)
+       ===================================================== */
+
+    // Mode 1: new average after buying s1 shares at price p.
+    // Returns null unless all inputs are finite and > 0.
+    function avgDown(s0, a0, s1, p) {
+      if (!(isFinite(s0) && isFinite(a0) && isFinite(s1) && isFinite(p))) return null;
+      if (!(s0 > 0 && a0 > 0 && s1 > 0 && p > 0)) return null;
+      var totalShares = s0 + s1;
+      var totalCost = s0 * a0 + s1 * p;
+      var newAvg = totalCost / totalShares;
+      return {
+        newAvg: newAvg,
+        totalShares: totalShares,
+        totalCost: totalCost,
+        cashNeeded: s1 * p,
+        reductionAbs: a0 - newAvg,                    // > 0 means the average went down
+        reductionPct: ((a0 - newAvg) / a0) * 100,
+        breakEvenRisePct: (newAvg / p - 1) * 100      // % rise from p to reach newAvg
+      };
+    }
+
+    // Mode 2: shares to buy at price p so the average lands exactly on t.
+    // Valid only when p < t < a0. Returns a status object, never NaN/negative shares.
+    function sharesForTarget(s0, a0, p, t) {
+      var allFinite = isFinite(s0) && isFinite(a0) && isFinite(p) && isFinite(t);
+      if (!allFinite || !(s0 > 0 && a0 > 0 && p > 0 && t > 0)) return { status: 'incomplete' };
+      if (t >= a0) return { status: 'noPurchase' };
+      if (p >= a0) return { status: 'priceTooHigh' };
+      if (t <= p) return { status: 'targetTooLow' };
+      var shares = s0 * (a0 - t) / (t - p);
+      var cost = shares * p;
+      return {
+        status: 'ok',
+        shares: shares,
+        cost: cost,
+        totalShares: s0 + shares,
+        totalCost: s0 * a0 + cost,
+        newAvg: t
+      };
+    }
+
+    // Mode 3: weighted average over lots of {shares, price}.
+    // Caller passes only valid lots; avg is NaN when there are no shares.
+    function weightedAvg(lots) {
+      var shares = 0, cost = 0;
+      for (var i = 0; i < lots.length; i++) {
+        shares += lots[i].shares;
+        cost += lots[i].shares * lots[i].price;
+      }
+      return {
+        totalShares: shares,
+        totalCost: cost,
+        avg: shares > 0 ? cost / shares : NaN
+      };
+    }
+
+    /* ---------- Formatting (never emits NaN/Infinity) ---------- */
+
+    function fmtNum(n) {
+      if (typeof n !== 'number' || !isFinite(n)) return '—';
+      return n.toLocaleString(undefined, { maximumFractionDigits: 4 });
+    }
+
+    function fmtPct(n) {
+      if (typeof n !== 'number' || !isFinite(n)) return '—';
+      return n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
+    }
+
+    /* ---------- localStorage (safe in private browsing) ---------- */
+
+    var NS = 'stockavgdown.';
+    function loadJSON(key, fallback) {
+      try {
+        var raw = localStorage.getItem(NS + key);
+        return raw === null ? fallback : JSON.parse(raw);
+      } catch (e) { return fallback; }
+    }
+    function saveJSON(key, value) {
+      try { localStorage.setItem(NS + key, JSON.stringify(value)); } catch (e) { /* ignore */ }
+    }
+
+    /* =====================================================
+       DOM wiring
+       ===================================================== */
+
+    function $(id) { return document.getElementById(id); }
+    function readField(el) { return parseFloat(el.value); }
+
+    /* ---------- Tabs ---------- */
+
+    var tabs = [$('tab-avgdown'), $('tab-target'), $('tab-lots')];
+    var panels = [$('panel-avgdown'), $('panel-target'), $('panel-lots')];
+
+    function selectTab(idx) {
+      for (var i = 0; i < tabs.length; i++) {
+        var selected = i === idx;
+        tabs[i].setAttribute('aria-selected', selected ? 'true' : 'false');
+        tabs[i].tabIndex = selected ? 0 : -1;
+        panels[i].hidden = !selected;
+      }
+      saveJSON('tab', idx);
+    }
+
+    tabs.forEach(function (tab, i) {
+      tab.addEventListener('click', function () { selectTab(i); });
+      tab.addEventListener('keydown', function (e) {
+        var idx = null;
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') idx = (i + 1) % tabs.length;
+        else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') idx = (i - 1 + tabs.length) % tabs.length;
+        else if (e.key === 'Home') idx = 0;
+        else if (e.key === 'End') idx = tabs.length - 1;
+        if (idx !== null) {
+          e.preventDefault();
+          selectTab(idx);
+          tabs[idx].focus();
+        }
+      });
+    });
+
+    /* ---------- Mode 1: Average down ---------- */
+
+    var ad = { s0: $('ad-s0'), a0: $('ad-a0'), s1: $('ad-s1'), p: $('ad-p') };
+
+    function renderAvgDown() {
+      saveJSON('avgdown', { s0: ad.s0.value, a0: ad.a0.value, s1: ad.s1.value, p: ad.p.value });
+
+      var p = readField(ad.p);
+      var r = avgDown(readField(ad.s0), readField(ad.a0), readField(ad.s1), p);
+      $('ad-hint').hidden = !!r;
+
+      var delta = $('ad-delta');
+      if (!r) {
+        $('ad-newavg').textContent = '—';
+        delta.textContent = '';
+        delta.className = 'key-delta';
+        $('ad-shares').textContent = '—';
+        $('ad-invested').textContent = '—';
+        $('ad-cash').textContent = '—';
+        $('ad-breakeven').textContent = '';
+        return;
+      }
+
+      $('ad-newavg').textContent = fmtNum(r.newAvg);
+      if (r.reductionAbs > 0) {
+        delta.textContent = '↓ ' + fmtNum(r.reductionAbs) + ' per share (−' + fmtPct(r.reductionPct) + ')';
+        delta.className = 'key-delta delta-down';
+      } else if (r.reductionAbs < 0) {
+        delta.textContent = '↑ ' + fmtNum(-r.reductionAbs) + ' per share (+' + fmtPct(-r.reductionPct) + ')';
+        delta.className = 'key-delta delta-up';
+      } else {
+        delta.textContent = 'No change in average';
+        delta.className = 'key-delta';
+      }
+      $('ad-shares').textContent = fmtNum(r.totalShares);
+      $('ad-invested').textContent = fmtNum(r.totalCost);
+      $('ad-cash').textContent = fmtNum(r.cashNeeded);
+
+      if (r.newAvg > p) {
+        $('ad-breakeven').textContent = 'Break-even: the stock must rise ' + fmtPct(r.breakEvenRisePct) +
+          ' from the buy price of ' + fmtNum(p) + ' to reach your new average.';
+      } else {
+        $('ad-breakeven').textContent = 'Break-even: at this buy price you would already be at or above break-even — the new average is not above the buy price.';
+      }
+    }
+
+    Object.keys(ad).forEach(function (k) { ad[k].addEventListener('input', renderAvgDown); });
+
+    /* ---------- Mode 2: Target average ---------- */
+
+    var ta = { s0: $('ta-s0'), a0: $('ta-a0'), p: $('ta-p'), t: $('ta-t') };
+
+    function renderTarget() {
+      saveJSON('target', { s0: ta.s0.value, a0: ta.a0.value, p: ta.p.value, t: ta.t.value });
+
+      var p = readField(ta.p);
+      var res = sharesForTarget(readField(ta.s0), readField(ta.a0), p, readField(ta.t));
+      var notice = $('ta-notice');
+      $('ta-hint').hidden = res.status !== 'incomplete';
+      notice.hidden = true;
+      notice.className = 'notice';
+
+      if (res.status !== 'ok') {
+        $('ta-buy').textContent = '—';
+        $('ta-buy-sub').textContent = '';
+        $('ta-buy-sub').className = 'key-delta';
+        $('ta-cost').textContent = '—';
+        $('ta-shares').textContent = '—';
+        $('ta-invested').textContent = '—';
+        $('ta-newavg').textContent = '—';
+
+        if (res.status === 'noPurchase') {
+          notice.hidden = false;
+          notice.textContent = 'Good news — your average cost is already at or below the target. No purchase needed.';
+        } else if (res.status === 'priceTooHigh') {
+          notice.hidden = false;
+          notice.className = 'notice notice-error';
+          notice.textContent = 'The current price is at or above your average cost, so buying now cannot lower your average. Averaging down needs a price below your average.';
+        } else if (res.status === 'targetTooLow') {
+          notice.hidden = false;
+          notice.className = 'notice notice-error';
+          notice.textContent = 'The target must be above the current price of ' + fmtNum(p) +
+            '. Buying at that price can only pull your average down toward it — never to it or below it.';
+        }
+        return;
+      }
+
+      $('ta-buy').textContent = fmtNum(res.shares);
+      $('ta-buy-sub').textContent = 'at ' + fmtNum(p) + ' per share';
+      $('ta-buy-sub').className = 'key-delta';
+      $('ta-cost').textContent = fmtNum(res.cost);
+      $('ta-shares').textContent = fmtNum(res.totalShares);
+      $('ta-invested').textContent = fmtNum(res.totalCost);
+      $('ta-newavg').textContent = fmtNum(res.newAvg);
+    }
+
+    Object.keys(ta).forEach(function (k) { ta[k].addEventListener('input', renderTarget); });
+
+    /* ---------- Mode 3: Multi-lot average ---------- */
+
+    var lotRowsEl = $('lot-rows');
+    var MIN_LOTS = 2;
+
+    function makeLotRow(sharesVal, priceVal) {
+      var row = document.createElement('div');
+      row.className = 'lot-row';
+
+      var num = document.createElement('span');
+      num.className = 'lot-num';
+      num.setAttribute('aria-hidden', 'true');
+
+      var shares = document.createElement('input');
+      shares.type = 'number'; shares.min = '0'; shares.step = 'any';
+      shares.inputMode = 'decimal'; shares.className = 'lot-shares';
+      shares.placeholder = 'e.g. 100'; shares.value = sharesVal;
+
+      var price = document.createElement('input');
+      price.type = 'number'; price.min = '0'; price.step = 'any';
+      price.inputMode = 'decimal'; price.className = 'lot-price';
+      price.placeholder = 'e.g. 10.00'; price.value = priceVal;
+
+      var remove = document.createElement('button');
+      remove.type = 'button'; remove.className = 'remove-btn';
+      remove.textContent = '×';
+
+      row.appendChild(num); row.appendChild(shares); row.appendChild(price); row.appendChild(remove);
+      return row;
+    }
+
+    function renumberLots() {
+      var rows = lotRowsEl.querySelectorAll('.lot-row');
+      rows.forEach(function (row, i) {
+        var n = i + 1;
+        row.querySelector('.lot-num').textContent = n;
+        row.querySelector('.lot-shares').setAttribute('aria-label', 'Lot ' + n + ' shares');
+        row.querySelector('.lot-price').setAttribute('aria-label', 'Lot ' + n + ' price per share');
+        var rm = row.querySelector('.remove-btn');
+        rm.setAttribute('aria-label', 'Remove lot ' + n);
+        rm.disabled = rows.length <= MIN_LOTS;
+      });
+    }
+
+    function renderLots() {
+      var rows = lotRowsEl.querySelectorAll('.lot-row');
+      var raw = [];
+      var valid = [];
+      rows.forEach(function (row) {
+        var sEl = row.querySelector('.lot-shares');
+        var pEl = row.querySelector('.lot-price');
+        raw.push({ s: sEl.value, p: pEl.value });
+        var s = parseFloat(sEl.value), p = parseFloat(pEl.value);
+        if (isFinite(s) && isFinite(p) && s > 0 && p > 0) valid.push({ shares: s, price: p });
+      });
+      saveJSON('lots', raw);
+
+      var r = weightedAvg(valid);
+      var ok = valid.length > 0 && r.totalShares > 0;
+      $('lot-hint').hidden = ok;
+      $('lot-avg').textContent = ok ? fmtNum(r.avg) : '—';
+      $('lot-shares').textContent = ok ? fmtNum(r.totalShares) : '—';
+      $('lot-cost').textContent = ok ? fmtNum(r.totalCost) : '—';
+    }
+
+    lotRowsEl.addEventListener('input', renderLots);
+
+    lotRowsEl.addEventListener('click', function (e) {
+      var btn = e.target.closest ? e.target.closest('.remove-btn') : null;
+      if (!btn || btn.disabled) return;
+      var rows = lotRowsEl.querySelectorAll('.lot-row');
+      if (rows.length <= MIN_LOTS) return;
+      var row = btn.parentNode;
+      if (row && row.parentNode === lotRowsEl) lotRowsEl.removeChild(row);
+      renumberLots();
+      renderLots();
+    });
+
+    $('add-lot').addEventListener('click', function () {
+      var row = makeLotRow('', '');
+      lotRowsEl.appendChild(row);
+      renumberLots();
+      renderLots();
+      row.querySelector('.lot-shares').focus();
+    });
+
+    /* ---------- Restore saved state and first render ---------- */
+
+    var savedAd = loadJSON('avgdown', null);
+    if (savedAd && typeof savedAd === 'object') {
+      Object.keys(ad).forEach(function (k) {
+        if (typeof savedAd[k] === 'string') ad[k].value = savedAd[k];
+      });
+    }
+
+    var savedTa = loadJSON('target', null);
+    if (savedTa && typeof savedTa === 'object') {
+      Object.keys(ta).forEach(function (k) {
+        if (typeof savedTa[k] === 'string') ta[k].value = savedTa[k];
+      });
+    }
+
+    var savedLots = loadJSON('lots', null);
+    var initialLots = [];
+    if (Array.isArray(savedLots)) {
+      savedLots.forEach(function (l) {
+        if (l && typeof l === 'object') {
+          initialLots.push({
+            s: typeof l.s === 'string' ? l.s : '',
+            p: typeof l.p === 'string' ? l.p : ''
+          });
+        }
+      });
+    }
+    while (initialLots.length < MIN_LOTS) initialLots.push({ s: '', p: '' });
+    initialLots.forEach(function (l) { lotRowsEl.appendChild(makeLotRow(l.s, l.p)); });
+    renumberLots();
+
+    var savedTab = loadJSON('tab', 0);
+    selectTab(savedTab === 1 || savedTab === 2 ? savedTab : 0);
+
+    renderAvgDown();
+    renderTarget();
+    renderLots();
+  })();
+  </script>
+</body>
+</html>
