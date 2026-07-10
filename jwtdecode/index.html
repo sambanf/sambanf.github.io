@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>JWT Decoder</title>
+  <meta name="description" content="Free JWT decoder. Inspect a JSON Web Token's header, payload, and expiry entirely in your browser — the token is never sent or stored anywhere.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d9488'/%3E%3Cg stroke='%23ffffff' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='19' r='4.5'/%3E%3Cpath d='M15.5 15.5L24 7m-4 1l3 3'/%3E%3C/g%3E%3C/svg%3E">
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    .top-nav {
+      padding: 1.25rem 0 2.25rem; font-size: 0.9rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .top-nav a { color: var(--text-muted); text-decoration: none; }
+    .top-nav a:hover { color: var(--accent-strong); }
+    .lede { color: var(--text-muted); max-width: 44rem; margin-bottom: 0; }
+    .tool-card { margin: 1.75rem 0 2rem; }
+    .how-card { margin-bottom: 1rem; }
+
+    textarea.io {
+      width: 100%; min-height: 120px; padding: 0.85rem 1rem;
+      font-family: var(--mono); font-size: 0.9rem; line-height: 1.55; color: var(--text);
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); resize: vertical; overflow-wrap: anywhere;
+    }
+    .err { color: var(--negative); font-size: 0.9rem; min-height: 1.2em; margin: 0.75rem 0 0; }
+
+    .badge {
+      display: inline-block; padding: 0.25rem 0.75rem; border-radius: 999px;
+      font-size: 0.8rem; font-weight: 600; margin-top: 1rem;
+    }
+    .badge-ok { background: var(--accent-soft); color: var(--accent-strong); }
+    .badge-bad { background: color-mix(in srgb, var(--negative) 14%, transparent); color: var(--negative); }
+    .badge-muted { background: var(--surface-2); color: var(--text-muted); border: 1px solid var(--border); }
+
+    h2.sub { font-size: 1rem; margin: 1.5rem 0 0.5rem; }
+    pre.block {
+      margin: 0; padding: 0.85rem 1rem;
+      font-family: var(--mono); font-size: 0.85rem; line-height: 1.55;
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); overflow-x: auto;
+    }
+    .claims { margin: 0.5rem 0 0; display: grid; gap: 0.45rem; }
+    .claims > div {
+      display: flex; justify-content: space-between; align-items: baseline; gap: 1rem;
+      padding-top: 0.45rem; border-top: 1px solid var(--border); flex-wrap: wrap;
+    }
+    .claims dt { font-size: 0.875rem; color: var(--text-muted); font-family: var(--mono); flex: none; }
+    .claims dd { margin: 0; font-size: 0.9rem; text-align: right; overflow-wrap: anywhere; flex: 1; }
+    .msg { min-height: 1.2em; margin-top: 0.75rem; font-size: 0.9rem; color: var(--text-muted); }
+    .actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1rem; }
+
+    @media (max-width: 520px) { .card { padding: 1.1rem; } }
+  </style>
+</head>
+<body>
+  <header class="container">
+    <nav class="top-nav" aria-label="Site" data-i18n-attr="aria-label:nav_site">
+      <a href="../">&#8592; samba nugraha</a>
+      <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
+        <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0l60 30M60 0L0 30" stroke="#fff" stroke-width="6"/><path d="M0 0l60 30M60 0L0 30" stroke="#C8102E" stroke-width="2.5"/><path d="M30 0v30M0 15h60" stroke="#fff" stroke-width="10"/><path d="M30 0v30M0 15h60" stroke="#C8102E" stroke-width="6"/></svg>EN
+        </button>
+        <button type="button" data-lang="id" aria-pressed="false" aria-label="Bahasa Indonesia">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="15" fill="#E70011"/><rect y="15" width="60" height="15" fill="#F7F7F7"/></svg>ID
+        </button>
+      </div>
+    </nav>
+    <h1 data-i18n="h1">JWT Decoder</h1>
+    <p class="lede" data-i18n="lede">Peek inside a JSON Web Token — header, payload, and expiry — entirely in your browser. The token is never sent or stored anywhere.</p>
+  </header>
+
+  <main class="container">
+    <noscript>
+      <div class="card" style="border-left:3px solid var(--negative)">This tool needs JavaScript to run. Please enable it and reload. / Alat ini membutuhkan JavaScript. Aktifkan lalu muat ulang.</div>
+    </noscript>
+
+    <div class="card tool-card">
+      <label for="jwt-in" data-i18n="in_label">JWT</label>
+      <textarea class="io" id="jwt-in" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="eyJhbGciOi…" ></textarea>
+      <p class="err" id="jwt-err" role="alert"></p>
+      <span class="badge badge-muted" id="jwt-badge" hidden></span>
+
+      <div id="jwt-result" hidden>
+        <h2 class="sub" data-i18n="claims_title">Key claims</h2>
+        <dl class="claims" id="jwt-claims"></dl>
+
+        <h2 class="sub" data-i18n="header_title">Header</h2>
+        <pre class="block" id="jwt-header"></pre>
+
+        <h2 class="sub" data-i18n="payload_title">Payload</h2>
+        <pre class="block" id="jwt-payload"></pre>
+
+        <h2 class="sub" data-i18n="sig_title">Signature (not verified)</h2>
+        <pre class="block" id="jwt-sig"></pre>
+
+        <div class="actions">
+          <button type="button" class="btn" id="jwt-copy" data-i18n="btn_copy">Copy payload JSON</button>
+          <button type="button" class="btn" id="jwt-clear" data-i18n="btn_clear">Clear</button>
+        </div>
+        <p class="msg" id="jwt-msg" aria-live="polite"></p>
+      </div>
+    </div>
+
+    <section class="card how-card" aria-labelledby="how-heading">
+      <h2 id="how-heading" data-i18n="how_title">What this shows</h2>
+      <p data-i18n="how_1">A JWT is three Base64URL parts separated by dots: a header (algorithm and type), a payload (the claims), and a signature. This tool only decodes the first two — it does not and cannot verify the signature, so never treat a decoded token as trusted or authentic.</p>
+      <p class="muted small" data-i18n="privacy">The token is processed only on this page and is deliberately not saved anywhere — not even in this browser. Reload and it is gone.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p><a href="../" data-i18n="footer_back">&#8592; back to all tools</a> &middot; &copy; 2026 Samba Nugraha</p>
+    </div>
+  </footer>
+
+  <script src="../assets/lang.js"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    var I18N = {
+      en: {
+        _title: 'JWT Decoder',
+        _meta: "Free JWT decoder. Inspect a JSON Web Token's header, payload, and expiry entirely in your browser — the token is never sent or stored anywhere.",
+        nav_site: 'Site',
+        h1: 'JWT Decoder',
+        lede: 'Peek inside a JSON Web Token — header, payload, and expiry — entirely in your browser. The token is never sent or stored anywhere.',
+        in_label: 'JWT',
+        claims_title: 'Key claims',
+        header_title: 'Header',
+        payload_title: 'Payload',
+        sig_title: 'Signature (not verified)',
+        btn_copy: 'Copy payload JSON',
+        btn_clear: 'Clear',
+        err_parts: 'A JWT has three dot-separated parts — this input has {n}.',
+        err_b64: 'Could not decode the {part} (invalid Base64URL).',
+        err_json: 'The {part} is not valid JSON.',
+        part_header: 'header',
+        part_payload: 'payload',
+        badge_valid: 'Not expired — expires {rel}',
+        badge_expired: 'Expired {rel}',
+        badge_noexp: 'No expiry (exp) claim',
+        badge_nbf: 'Not valid yet — becomes valid {rel}',
+        claim_alg: 'Algorithm',
+        claim_typ: 'Type',
+        claim_iss: 'Issuer (iss)',
+        claim_sub: 'Subject (sub)',
+        claim_aud: 'Audience (aud)',
+        claim_iat: 'Issued at (iat)',
+        claim_nbf: 'Not before (nbf)',
+        claim_exp: 'Expires (exp)',
+        msg_copied: 'Copied to clipboard.',
+        msg_copy_fail: 'Could not copy automatically — select the text and copy it manually.',
+        msg_cleared: 'Cleared.',
+        how_title: 'What this shows',
+        how_1: 'A JWT is three Base64URL parts separated by dots: a header (algorithm and type), a payload (the claims), and a signature. This tool only decodes the first two — it does not and cannot verify the signature, so never treat a decoded token as trusted or authentic.',
+        privacy: 'The token is processed only on this page and is deliberately not saved anywhere — not even in this browser. Reload and it is gone.',
+        footer_back: '← back to all tools'
+      },
+      id: {
+        _title: 'Decoder JWT',
+        _meta: 'Decoder JWT gratis. Periksa header, payload, dan masa berlaku JSON Web Token sepenuhnya di browser Anda — token tidak pernah dikirim atau disimpan di mana pun.',
+        nav_site: 'Situs',
+        h1: 'Decoder JWT',
+        lede: 'Lihat isi JSON Web Token — header, payload, dan masa berlaku — sepenuhnya di browser Anda. Token tidak pernah dikirim atau disimpan di mana pun.',
+        in_label: 'JWT',
+        claims_title: 'Klaim penting',
+        header_title: 'Header',
+        payload_title: 'Payload',
+        sig_title: 'Signature (tidak diverifikasi)',
+        btn_copy: 'Salin JSON payload',
+        btn_clear: 'Bersihkan',
+        err_parts: 'JWT terdiri dari tiga bagian yang dipisah titik — input ini punya {n}.',
+        err_b64: 'Tidak bisa men-decode {part} (Base64URL tidak valid).',
+        err_json: '{part} bukan JSON yang valid.',
+        part_header: 'header',
+        part_payload: 'payload',
+        badge_valid: 'Belum kedaluwarsa — berakhir {rel}',
+        badge_expired: 'Kedaluwarsa {rel}',
+        badge_noexp: 'Tidak ada klaim kedaluwarsa (exp)',
+        badge_nbf: 'Belum berlaku — mulai berlaku {rel}',
+        claim_alg: 'Algoritma',
+        claim_typ: 'Tipe',
+        claim_iss: 'Penerbit (iss)',
+        claim_sub: 'Subjek (sub)',
+        claim_aud: 'Audiens (aud)',
+        claim_iat: 'Diterbitkan (iat)',
+        claim_nbf: 'Berlaku mulai (nbf)',
+        claim_exp: 'Kedaluwarsa (exp)',
+        msg_copied: 'Disalin ke clipboard.',
+        msg_copy_fail: 'Tidak bisa menyalin otomatis — pilih teksnya lalu salin manual.',
+        msg_cleared: 'Dibersihkan.',
+        how_title: 'Apa yang ditampilkan',
+        how_1: 'JWT terdiri dari tiga bagian Base64URL yang dipisah titik: header (algoritma dan tipe), payload (klaim), dan signature. Alat ini hanya men-decode dua bagian pertama — tidak bisa memverifikasi signature, jadi jangan pernah menganggap token hasil decode sebagai tepercaya atau asli.',
+        privacy: 'Token hanya diproses di halaman ini dan sengaja tidak disimpan di mana pun — bahkan di browser ini. Muat ulang dan token hilang.',
+        footer_back: '← kembali ke semua alat'
+      }
+    };
+
+    function t(key) { return window.SiteLang.t(key); }
+    function tf(key, vars) {
+      var s = t(key);
+      for (var k in vars) {
+        if (Object.prototype.hasOwnProperty.call(vars, k)) s = s.replace('{' + k + '}', vars[k]);
+      }
+      return s;
+    }
+    function $(id) { return document.getElementById(id); }
+
+    /* ---------- Pure decoding ---------- */
+
+    function b64urlToBytes(s) {
+      s = s.replace(/-/g, '+').replace(/_/g, '/');
+      var pad = s.length % 4;
+      if (pad === 1) throw new Error('bad length');
+      if (pad) s += '===='.slice(pad);
+      if (!/^[A-Za-z0-9+/]*={0,3}$/.test(s)) throw new Error('bad chars');
+      var bin = atob(s);
+      var bytes = new Uint8Array(bin.length);
+      for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      return bytes;
+    }
+
+    function decodePart(s) {
+      return JSON.parse(new TextDecoder('utf-8').decode(b64urlToBytes(s)));
+    }
+
+    function relFmt(ms) {
+      var diff = ms - Date.now();
+      var abs = Math.abs(diff) / 1000;
+      var unit, val;
+      if (abs < 60) { unit = 'second'; val = diff / 1e3; }
+      else if (abs < 3600) { unit = 'minute'; val = diff / 6e4; }
+      else if (abs < 86400) { unit = 'hour'; val = diff / 3.6e6; }
+      else if (abs < 2592000) { unit = 'day'; val = diff / 8.64e7; }
+      else if (abs < 31536000) { unit = 'month'; val = diff / 2.592e9; }
+      else { unit = 'year'; val = diff / 3.1536e10; }
+      try {
+        return new Intl.RelativeTimeFormat(window.SiteLang.locale(), { numeric: 'auto' })
+          .format(Math.round(val), unit);
+      } catch (e) { return ''; }
+    }
+
+    function fmtEpoch(sec) {
+      return new Date(sec * 1000).toLocaleString(window.SiteLang.locale(), {
+        dateStyle: 'medium', timeStyle: 'long'
+      }) + ' (' + relFmt(sec * 1000) + ')';
+    }
+
+    /* ---------- Wiring (no persistence — tokens are sensitive) ---------- */
+
+    var input = $('jwt-in'), errEl = $('jwt-err'), badge = $('jwt-badge');
+    var result = $('jwt-result');
+
+    function claimRow(dl, label, value) {
+      var div = document.createElement('div');
+      var dt = document.createElement('dt');
+      dt.textContent = label;
+      var dd = document.createElement('dd');
+      dd.textContent = value;
+      div.appendChild(dt); div.appendChild(dd);
+      dl.appendChild(div);
+    }
+
+    function render() {
+      errEl.textContent = '';
+      badge.hidden = true;
+      result.hidden = true;
+
+      var raw = input.value.trim().replace(/^Bearer\s+/i, '');
+      if (!raw) return;
+
+      var parts = raw.split('.');
+      if (parts.length !== 3) {
+        errEl.textContent = tf('err_parts', { n: parts.length });
+        return;
+      }
+
+      var header, payload;
+      try { header = decodePart(parts[0]); }
+      catch (e) {
+        errEl.textContent = tf(e instanceof SyntaxError ? 'err_json' : 'err_b64', { part: t('part_header') });
+        return;
+      }
+      try { payload = decodePart(parts[1]); }
+      catch (e) {
+        errEl.textContent = tf(e instanceof SyntaxError ? 'err_json' : 'err_b64', { part: t('part_payload') });
+        return;
+      }
+
+      $('jwt-header').textContent = JSON.stringify(header, null, 2);
+      $('jwt-payload').textContent = JSON.stringify(payload, null, 2);
+      $('jwt-sig').textContent = parts[2] || '(empty)';
+
+      var dl = $('jwt-claims');
+      dl.innerHTML = '';
+      if (header && header.alg) claimRow(dl, t('claim_alg'), String(header.alg));
+      if (header && header.typ) claimRow(dl, t('claim_typ'), String(header.typ));
+      if (payload && typeof payload === 'object') {
+        if (payload.iss) claimRow(dl, t('claim_iss'), String(payload.iss));
+        if (payload.sub) claimRow(dl, t('claim_sub'), String(payload.sub));
+        if (payload.aud) claimRow(dl, t('claim_aud'), Array.isArray(payload.aud) ? payload.aud.join(', ') : String(payload.aud));
+        if (typeof payload.iat === 'number') claimRow(dl, t('claim_iat'), fmtEpoch(payload.iat));
+        if (typeof payload.nbf === 'number') claimRow(dl, t('claim_nbf'), fmtEpoch(payload.nbf));
+        if (typeof payload.exp === 'number') claimRow(dl, t('claim_exp'), fmtEpoch(payload.exp));
+      }
+
+      badge.hidden = false;
+      var now = Date.now();
+      if (payload && typeof payload.nbf === 'number' && payload.nbf * 1000 > now) {
+        badge.className = 'badge badge-bad';
+        badge.textContent = tf('badge_nbf', { rel: relFmt(payload.nbf * 1000) });
+      } else if (payload && typeof payload.exp === 'number') {
+        var expired = payload.exp * 1000 < now;
+        badge.className = 'badge ' + (expired ? 'badge-bad' : 'badge-ok');
+        badge.textContent = tf(expired ? 'badge_expired' : 'badge_valid', { rel: relFmt(payload.exp * 1000) });
+      } else {
+        badge.className = 'badge badge-muted';
+        badge.textContent = t('badge_noexp');
+      }
+
+      result.hidden = false;
+    }
+
+    function flash(key, isError) {
+      var el = $('jwt-msg');
+      el.textContent = t(key);
+      el.style.color = isError ? 'var(--negative)' : 'var(--text-muted)';
+    }
+
+    input.addEventListener('input', render);
+
+    $('jwt-clear').addEventListener('click', function () {
+      input.value = '';
+      render();
+      input.focus();
+    });
+
+    $('jwt-copy').addEventListener('click', function () {
+      var val = $('jwt-payload').textContent;
+      if (!val) return;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(val).then(
+          function () { flash('msg_copied', false); },
+          function () { flash('msg_copy_fail', true); }
+        );
+      } else { flash('msg_copy_fail', true); }
+    });
+
+    window.SiteLang.init(I18N, function () { render(); });
+  })();
+  </script>
+</body>
+</html>

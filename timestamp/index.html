@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Unix Timestamp Converter</title>
+  <meta name="description" content="Free Unix timestamp converter. Turn epoch seconds or milliseconds into readable dates in your timezone or UTC, and dates back into timestamps — all in your browser.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d9488'/%3E%3Cg stroke='%23ffffff' stroke-width='2.4' fill='none' stroke-linecap='round'%3E%3Ccircle cx='16' cy='16' r='9'/%3E%3Cpath d='M16 11v5l3.5 2.5'/%3E%3C/g%3E%3C/svg%3E">
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    .top-nav {
+      padding: 1.25rem 0 2.25rem; font-size: 0.9rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .top-nav a { color: var(--text-muted); text-decoration: none; }
+    .top-nav a:hover { color: var(--accent-strong); }
+    .lede { color: var(--text-muted); max-width: 44rem; margin-bottom: 0; }
+    .tool-card { margin: 1.75rem 0 1.25rem; }
+    .how-card { margin-bottom: 1rem; }
+
+    .now-grid { display: grid; gap: 0.85rem; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); }
+    .now-box {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 0.9rem 1rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
+    }
+    .now-box div span { display: block; font-size: 0.8rem; color: var(--text-muted); }
+    .now-box div b { font-family: var(--mono); font-size: 1.25rem; font-weight: 600; overflow-wrap: anywhere; }
+    .btn-sm { padding: 0.35rem 0.7rem; font-size: 0.8rem; }
+
+    .field-row { display: grid; gap: 1rem; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); align-items: end; }
+    .results { margin-top: 1.25rem; display: grid; gap: 0.45rem; }
+    .results > div {
+      display: flex; justify-content: space-between; align-items: baseline; gap: 1rem;
+      padding-top: 0.45rem; border-top: 1px solid var(--border); flex-wrap: wrap;
+    }
+    .results dt { font-size: 0.875rem; color: var(--text-muted); flex: none; }
+    .results dd { margin: 0; font-family: var(--mono); font-size: 0.95rem; text-align: right; overflow-wrap: anywhere; flex: 1; }
+    .err { color: var(--negative); font-size: 0.9rem; min-height: 1.2em; margin: 0.75rem 0 0; }
+    .msg { min-height: 1.2em; margin-top: 0.75rem; font-size: 0.9rem; color: var(--text-muted); }
+    .opt { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.9rem; font-size: 0.9rem; }
+    .opt input { width: auto; }
+    h2.sub { font-size: 1.05rem; margin: 0 0 1rem; }
+
+    @media (max-width: 520px) {
+      .card { padding: 1.1rem; }
+      .field-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="container">
+    <nav class="top-nav" aria-label="Site" data-i18n-attr="aria-label:nav_site">
+      <a href="../">&#8592; samba nugraha</a>
+      <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
+        <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0l60 30M60 0L0 30" stroke="#fff" stroke-width="6"/><path d="M0 0l60 30M60 0L0 30" stroke="#C8102E" stroke-width="2.5"/><path d="M30 0v30M0 15h60" stroke="#fff" stroke-width="10"/><path d="M30 0v30M0 15h60" stroke="#C8102E" stroke-width="6"/></svg>EN
+        </button>
+        <button type="button" data-lang="id" aria-pressed="false" aria-label="Bahasa Indonesia">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="15" fill="#E70011"/><rect y="15" width="60" height="15" fill="#F7F7F7"/></svg>ID
+        </button>
+      </div>
+    </nav>
+    <h1 data-i18n="h1">Unix Timestamp Converter</h1>
+    <p class="lede" data-i18n="lede">Convert Unix timestamps (epoch seconds or milliseconds) into readable dates — in your timezone or UTC — and dates back into timestamps.</p>
+  </header>
+
+  <main class="container">
+    <noscript>
+      <div class="card" style="border-left:3px solid var(--negative)">This tool needs JavaScript to run. Please enable it and reload. / Alat ini membutuhkan JavaScript. Aktifkan lalu muat ulang.</div>
+    </noscript>
+
+    <div class="card tool-card">
+      <h2 class="sub" data-i18n="now_title">Right now</h2>
+      <div class="now-grid">
+        <div class="now-box">
+          <div><span data-i18n="now_s">Unix seconds</span><b id="now-s">—</b></div>
+          <button type="button" class="btn btn-sm" data-copy="now-s" data-i18n="btn_copy">Copy</button>
+        </div>
+        <div class="now-box">
+          <div><span data-i18n="now_ms">Unix milliseconds</span><b id="now-ms">—</b></div>
+          <button type="button" class="btn btn-sm" data-copy="now-ms" data-i18n="btn_copy">Copy</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card tool-card">
+      <h2 class="sub" data-i18n="ts2date_title">Timestamp → date</h2>
+      <div class="field-row">
+        <div>
+          <label for="ts-in" data-i18n="ts_label">Unix timestamp</label>
+          <input id="ts-in" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" placeholder="e.g. 1783765432" data-i18n-attr="placeholder:ts_ph">
+        </div>
+        <div>
+          <label for="ts-unit" data-i18n="unit_label">Unit</label>
+          <select id="ts-unit">
+            <option value="auto" data-i18n="unit_auto">Auto-detect</option>
+            <option value="s" data-i18n="unit_s">Seconds</option>
+            <option value="ms" data-i18n="unit_ms">Milliseconds</option>
+          </select>
+        </div>
+      </div>
+      <p class="err" id="ts-err"></p>
+      <dl class="results">
+        <div><dt data-i18n="res_utc">UTC (ISO 8601)</dt><dd id="ts-utc">—</dd></div>
+        <div><dt data-i18n="res_local">Your local time</dt><dd id="ts-local">—</dd></div>
+        <div><dt data-i18n="res_rel">Relative</dt><dd id="ts-rel">—</dd></div>
+      </dl>
+    </div>
+
+    <div class="card tool-card">
+      <h2 class="sub" data-i18n="date2ts_title">Date → timestamp</h2>
+      <label for="dt-in" data-i18n="dt_label">Date and time</label>
+      <input id="dt-in" type="datetime-local" step="1">
+      <label class="opt" for="dt-utc">
+        <input type="checkbox" id="dt-utc">
+        <span data-i18n="dt_utc">Interpret as UTC instead of my local time</span>
+      </label>
+      <dl class="results">
+        <div><dt data-i18n="res_s">Unix seconds</dt><dd id="dt-s">—</dd></div>
+        <div><dt data-i18n="res_ms">Unix milliseconds</dt><dd id="dt-ms">—</dd></div>
+      </dl>
+      <div class="opt">
+        <button type="button" class="btn btn-sm" data-copy="dt-s" data-i18n="copy_s">Copy seconds</button>
+        <button type="button" class="btn btn-sm" data-copy="dt-ms" data-i18n="copy_ms">Copy milliseconds</button>
+      </div>
+      <p class="msg" id="ts-msg" aria-live="polite"></p>
+    </div>
+
+    <section class="card how-card" aria-labelledby="how-heading">
+      <h2 id="how-heading" data-i18n="how_title">About Unix timestamps</h2>
+      <p data-i18n="how_1">A Unix timestamp counts the seconds since 1 January 1970, 00:00 UTC (the "epoch"). Many systems use milliseconds instead — 13 digits instead of 10. Auto-detect guesses from the digit count: up to 11 digits is treated as seconds, up to 14 as milliseconds, and longer values as micro- or nanoseconds.</p>
+      <p class="muted small" data-i18n="privacy">Everything runs in your browser — nothing is uploaded and nothing is tracked.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p><a href="../" data-i18n="footer_back">&#8592; back to all tools</a> &middot; &copy; 2026 Samba Nugraha</p>
+    </div>
+  </footer>
+
+  <script src="../assets/lang.js"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    var I18N = {
+      en: {
+        _title: 'Unix Timestamp Converter',
+        _meta: 'Free Unix timestamp converter. Turn epoch seconds or milliseconds into readable dates in your timezone or UTC, and dates back into timestamps — all in your browser.',
+        nav_site: 'Site',
+        h1: 'Unix Timestamp Converter',
+        lede: 'Convert Unix timestamps (epoch seconds or milliseconds) into readable dates — in your timezone or UTC — and dates back into timestamps.',
+        now_title: 'Right now',
+        now_s: 'Unix seconds',
+        now_ms: 'Unix milliseconds',
+        btn_copy: 'Copy',
+        ts2date_title: 'Timestamp → date',
+        ts_label: 'Unix timestamp',
+        ts_ph: 'e.g. 1783765432',
+        unit_label: 'Unit',
+        unit_auto: 'Auto-detect',
+        unit_s: 'Seconds',
+        unit_ms: 'Milliseconds',
+        res_utc: 'UTC (ISO 8601)',
+        res_local: 'Your local time',
+        res_rel: 'Relative',
+        err_ts: 'Enter a whole number, e.g. 1783765432.',
+        err_range: 'That timestamp is outside the representable date range.',
+        date2ts_title: 'Date → timestamp',
+        dt_label: 'Date and time',
+        dt_utc: 'Interpret as UTC instead of my local time',
+        res_s: 'Unix seconds',
+        res_ms: 'Unix milliseconds',
+        copy_s: 'Copy seconds',
+        copy_ms: 'Copy milliseconds',
+        msg_copied: 'Copied to clipboard.',
+        msg_copy_empty: 'Nothing to copy yet.',
+        msg_copy_fail: 'Could not copy automatically — select the value and copy it manually.',
+        how_title: 'About Unix timestamps',
+        how_1: 'A Unix timestamp counts the seconds since 1 January 1970, 00:00 UTC (the "epoch"). Many systems use milliseconds instead — 13 digits instead of 10. Auto-detect guesses from the digit count: up to 11 digits is treated as seconds, up to 14 as milliseconds, and longer values as micro- or nanoseconds.',
+        privacy: 'Everything runs in your browser — nothing is uploaded and nothing is tracked.',
+        footer_back: '← back to all tools'
+      },
+      id: {
+        _title: 'Konverter Unix Timestamp',
+        _meta: 'Konverter Unix timestamp gratis. Ubah epoch detik atau milidetik menjadi tanggal yang mudah dibaca dalam zona waktu Anda atau UTC, dan sebaliknya — semuanya di browser Anda.',
+        nav_site: 'Situs',
+        h1: 'Konverter Unix Timestamp',
+        lede: 'Ubah Unix timestamp (epoch detik atau milidetik) menjadi tanggal yang mudah dibaca — dalam zona waktu Anda atau UTC — dan tanggal kembali menjadi timestamp.',
+        now_title: 'Saat ini',
+        now_s: 'Detik Unix',
+        now_ms: 'Milidetik Unix',
+        btn_copy: 'Salin',
+        ts2date_title: 'Timestamp → tanggal',
+        ts_label: 'Unix timestamp',
+        ts_ph: 'mis. 1783765432',
+        unit_label: 'Satuan',
+        unit_auto: 'Deteksi otomatis',
+        unit_s: 'Detik',
+        unit_ms: 'Milidetik',
+        res_utc: 'UTC (ISO 8601)',
+        res_local: 'Waktu lokal Anda',
+        res_rel: 'Relatif',
+        err_ts: 'Masukkan bilangan bulat, mis. 1783765432.',
+        err_range: 'Timestamp itu di luar rentang tanggal yang dapat ditampilkan.',
+        date2ts_title: 'Tanggal → timestamp',
+        dt_label: 'Tanggal dan waktu',
+        dt_utc: 'Anggap sebagai UTC, bukan waktu lokal saya',
+        res_s: 'Detik Unix',
+        res_ms: 'Milidetik Unix',
+        copy_s: 'Salin detik',
+        copy_ms: 'Salin milidetik',
+        msg_copied: 'Disalin ke clipboard.',
+        msg_copy_empty: 'Belum ada yang bisa disalin.',
+        msg_copy_fail: 'Tidak bisa menyalin otomatis — pilih nilainya lalu salin manual.',
+        how_title: 'Tentang Unix timestamp',
+        how_1: 'Unix timestamp menghitung detik sejak 1 Januari 1970, 00:00 UTC ("epoch"). Banyak sistem memakai milidetik — 13 digit alih-alih 10. Deteksi otomatis menebak dari jumlah digit: sampai 11 digit dianggap detik, sampai 14 milidetik, dan yang lebih panjang mikro- atau nanodetik.',
+        privacy: 'Semuanya berjalan di browser Anda — tidak ada yang diunggah dan tidak ada pelacakan.',
+        footer_back: '← kembali ke semua alat'
+      }
+    };
+
+    function t(key) { return window.SiteLang.t(key); }
+    function $(id) { return document.getElementById(id); }
+
+    /* ---------- Pure conversion ---------- */
+
+    // Returns milliseconds, or null when unparseable / out of range.
+    function parseTs(raw, unit) {
+      var s = (raw || '').trim();
+      if (!/^-?\d+$/.test(s)) return null;
+      var n = parseInt(s, 10);
+      if (!isFinite(n)) return null;
+      var digits = s.replace('-', '').length;
+      var ms;
+      if (unit === 's') ms = n * 1000;
+      else if (unit === 'ms') ms = n;
+      else if (digits <= 11) ms = n * 1000;         // seconds
+      else if (digits <= 14) ms = n;                // milliseconds
+      else if (digits <= 17) ms = Math.floor(n / 1e3);   // microseconds
+      else ms = Math.floor(n / 1e6);                // nanoseconds
+      if (!isFinite(ms) || Math.abs(ms) > 8.64e15) return 'range';
+      return ms;
+    }
+
+    function parseDtLocal(v, asUtc) {
+      if (!v) return null;
+      var m = v.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?/);
+      if (!m) return null;
+      var ms = asUtc
+        ? Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +(m[6] || 0))
+        : new Date(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +(m[6] || 0)).getTime();
+      return isFinite(ms) ? ms : null;
+    }
+
+    function relFmt(ms) {
+      var diff = ms - Date.now();
+      var abs = Math.abs(diff) / 1000;
+      var unit, val;
+      if (abs < 60) { unit = 'second'; val = diff / 1e3; }
+      else if (abs < 3600) { unit = 'minute'; val = diff / 6e4; }
+      else if (abs < 86400) { unit = 'hour'; val = diff / 3.6e6; }
+      else if (abs < 2592000) { unit = 'day'; val = diff / 8.64e7; }
+      else if (abs < 31536000) { unit = 'month'; val = diff / 2.592e9; }
+      else { unit = 'year'; val = diff / 3.1536e10; }
+      try {
+        return new Intl.RelativeTimeFormat(window.SiteLang.locale(), { numeric: 'auto' })
+          .format(Math.round(val), unit);
+      } catch (e) { return ''; }
+    }
+
+    /* ---------- localStorage ---------- */
+
+    var NS = 'timestamp.';
+    function save(key, value) { try { localStorage.setItem(NS + key, value); } catch (e) { /* ignore */ } }
+    function load(key) { try { return localStorage.getItem(NS + key); } catch (e) { return null; } }
+
+    /* ---------- Now ticker ---------- */
+
+    function tickNow() {
+      var now = Date.now();
+      $('now-s').textContent = String(Math.floor(now / 1000));
+      $('now-ms').textContent = String(now);
+    }
+    tickNow();
+    setInterval(tickNow, 1000);
+
+    /* ---------- Timestamp -> date ---------- */
+
+    var tsIn = $('ts-in'), tsUnit = $('ts-unit');
+
+    function renderTs() {
+      save('ts', tsIn.value);
+      save('unit', tsUnit.value);
+      var err = $('ts-err');
+      err.textContent = '';
+      var empty = tsIn.value.trim() === '';
+      var ms = empty ? null : parseTs(tsIn.value, tsUnit.value);
+      if (empty || ms === null || ms === 'range') {
+        $('ts-utc').textContent = '—';
+        $('ts-local').textContent = '—';
+        $('ts-rel').textContent = '—';
+        if (!empty) err.textContent = t(ms === 'range' ? 'err_range' : 'err_ts');
+        return;
+      }
+      var d = new Date(ms);
+      $('ts-utc').textContent = d.toISOString();
+      $('ts-local').textContent = d.toLocaleString(window.SiteLang.locale(), {
+        dateStyle: 'full', timeStyle: 'long'
+      });
+      $('ts-rel').textContent = relFmt(ms);
+    }
+
+    tsIn.addEventListener('input', renderTs);
+    tsUnit.addEventListener('change', renderTs);
+
+    /* ---------- Date -> timestamp ---------- */
+
+    var dtIn = $('dt-in'), dtUtc = $('dt-utc');
+
+    function renderDt() {
+      save('dt', dtIn.value);
+      save('dtUtc', dtUtc.checked ? '1' : '0');
+      var ms = parseDtLocal(dtIn.value, dtUtc.checked);
+      $('dt-s').textContent = ms === null ? '—' : String(Math.floor(ms / 1000));
+      $('dt-ms').textContent = ms === null ? '—' : String(ms);
+    }
+
+    dtIn.addEventListener('input', renderDt);
+    dtUtc.addEventListener('change', renderDt);
+
+    /* ---------- Copy buttons ---------- */
+
+    function flash(key, isError) {
+      var el = $('ts-msg');
+      el.textContent = t(key);
+      el.style.color = isError ? 'var(--negative)' : 'var(--text-muted)';
+    }
+
+    document.querySelectorAll('[data-copy]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var val = $(btn.getAttribute('data-copy')).textContent;
+        if (!val || val === '—') { flash('msg_copy_empty', true); return; }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(val).then(
+            function () { flash('msg_copied', false); },
+            function () { flash('msg_copy_fail', true); }
+          );
+        } else { flash('msg_copy_fail', true); }
+      });
+    });
+
+    /* ---------- Restore, then first render ---------- */
+
+    var savedUnit = load('unit');
+    if (savedUnit === 's' || savedUnit === 'ms' || savedUnit === 'auto') tsUnit.value = savedUnit;
+    var savedTs = load('ts');
+    if (typeof savedTs === 'string') tsIn.value = savedTs;
+    var savedDt = load('dt');
+    if (typeof savedDt === 'string') dtIn.value = savedDt;
+    if (load('dtUtc') === '1') dtUtc.checked = true;
+
+    window.SiteLang.init(I18N, function () { renderTs(); renderDt(); });
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>URL Encoder &amp; Decoder</title>
+  <meta name="description" content="Free URL encoder and decoder. Percent-encode text for URLs and decode it back, with component and form-data (+) modes — everything runs in your browser.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d9488'/%3E%3Ctext x='16' y='23' font-family='ui-monospace,monospace' font-size='18' font-weight='700' fill='%23ffffff' text-anchor='middle'%3E%25%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    .top-nav {
+      padding: 1.25rem 0 2.25rem; font-size: 0.9rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .top-nav a { color: var(--text-muted); text-decoration: none; }
+    .top-nav a:hover { color: var(--accent-strong); }
+    .lede { color: var(--text-muted); max-width: 44rem; margin-bottom: 0; }
+    .tool-card { margin: 1.75rem 0 2rem; }
+    .how-card { margin-bottom: 1rem; }
+
+    .seg {
+      display: inline-flex; gap: 0.25rem; padding: 0.25rem; margin-bottom: 1.25rem;
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    }
+    .seg button {
+      border: 0; background: transparent; color: var(--text-muted);
+      font: inherit; font-weight: 600; font-size: 0.9rem;
+      padding: 0.5rem 1.1rem; border-radius: calc(var(--radius-sm) - 3px); cursor: pointer;
+    }
+    .seg button:hover { color: var(--text); }
+    .seg button[aria-pressed="true"] { background: var(--surface); color: var(--accent-strong); box-shadow: var(--shadow); }
+
+    textarea.io {
+      width: 100%; min-height: 130px; padding: 0.85rem 1rem; margin-bottom: 1rem;
+      font-family: var(--mono); font-size: 0.9rem; line-height: 1.55; color: var(--text);
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); resize: vertical; overflow-wrap: anywhere;
+    }
+    textarea.io[readonly] { background: var(--surface-2); }
+    .opt { display: flex; align-items: center; gap: 0.5rem; margin: 0 0 0.6rem; font-size: 0.9rem; }
+    .opt input { width: auto; }
+    .opt .hint { color: var(--text-muted); }
+    .err { color: var(--negative); font-size: 0.9rem; min-height: 1.2em; margin: 0 0 0.75rem; }
+    .actions { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+    .msg { min-height: 1.2em; margin-top: 0.75rem; font-size: 0.9rem; color: var(--text-muted); }
+
+    @media (max-width: 520px) { .card { padding: 1.1rem; } }
+  </style>
+</head>
+<body>
+  <header class="container">
+    <nav class="top-nav" aria-label="Site" data-i18n-attr="aria-label:nav_site">
+      <a href="../">&#8592; samba nugraha</a>
+      <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
+        <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0l60 30M60 0L0 30" stroke="#fff" stroke-width="6"/><path d="M0 0l60 30M60 0L0 30" stroke="#C8102E" stroke-width="2.5"/><path d="M30 0v30M0 15h60" stroke="#fff" stroke-width="10"/><path d="M30 0v30M0 15h60" stroke="#C8102E" stroke-width="6"/></svg>EN
+        </button>
+        <button type="button" data-lang="id" aria-pressed="false" aria-label="Bahasa Indonesia">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="15" fill="#E70011"/><rect y="15" width="60" height="15" fill="#F7F7F7"/></svg>ID
+        </button>
+      </div>
+    </nav>
+    <h1 data-i18n="h1">URL Encoder &amp; Decoder</h1>
+    <p class="lede" data-i18n="lede">Percent-encode text so it can travel safely inside a URL, and decode it back. Everything runs in your browser.</p>
+  </header>
+
+  <main class="container">
+    <noscript>
+      <div class="card" style="border-left:3px solid var(--negative)">This tool needs JavaScript to run. Please enable it and reload. / Alat ini membutuhkan JavaScript. Aktifkan lalu muat ulang.</div>
+    </noscript>
+
+    <div class="card tool-card">
+      <div class="seg" role="group" aria-label="Mode" data-i18n-attr="aria-label:mode_aria">
+        <button type="button" id="mode-encode" aria-pressed="true" data-i18n="mode_encode">Encode</button>
+        <button type="button" id="mode-decode" aria-pressed="false" data-i18n="mode_decode">Decode</button>
+      </div>
+
+      <label for="ue-input" id="ue-in-label">Text to encode</label>
+      <textarea class="io" id="ue-input" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+
+      <label class="opt" for="ue-component">
+        <input type="checkbox" id="ue-component" checked>
+        <span data-i18n="opt_component">Component mode</span>
+        <span class="hint" data-i18n="opt_component_hint">— also encodes / ? &amp; = # (for values inside a URL)</span>
+      </label>
+      <label class="opt" for="ue-plus">
+        <input type="checkbox" id="ue-plus">
+        <span data-i18n="opt_plus">Treat + as space</span>
+        <span class="hint" data-i18n="opt_plus_hint">— for form data (application/x-www-form-urlencoded)</span>
+      </label>
+
+      <label for="ue-output" id="ue-out-label">Encoded result</label>
+      <textarea class="io" id="ue-output" readonly aria-live="polite"></textarea>
+      <p class="err" id="ue-error" role="alert"></p>
+
+      <div class="actions">
+        <button type="button" class="btn btn-primary" id="ue-copy" data-i18n="btn_copy">Copy result</button>
+        <button type="button" class="btn" id="ue-swap" data-i18n="btn_swap">Use result as input</button>
+        <button type="button" class="btn" id="ue-clear" data-i18n="btn_clear">Clear</button>
+      </div>
+      <p class="msg" id="ue-msg" aria-live="polite"></p>
+    </div>
+
+    <section class="card how-card" aria-labelledby="how-heading">
+      <h2 id="how-heading" data-i18n="how_title">Component vs. full URL</h2>
+      <p data-i18n="how_1">Component mode (encodeURIComponent) encodes every reserved character, including / ? &amp; = and # — use it for a single value like a query parameter. With it off (encodeURI), URL structure characters are kept, so you can encode a whole URL without breaking it. "Treat + as space" matches how HTML forms encode spaces.</p>
+      <p class="muted small" data-i18n="privacy">Everything runs in your browser — nothing is uploaded and nothing is tracked. Your last input is remembered only in this browser.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p><a href="../" data-i18n="footer_back">&#8592; back to all tools</a> &middot; &copy; 2026 Samba Nugraha</p>
+    </div>
+  </footer>
+
+  <script src="../assets/lang.js"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    var I18N = {
+      en: {
+        _title: 'URL Encoder & Decoder',
+        _meta: 'Free URL encoder and decoder. Percent-encode text for URLs and decode it back, with component and form-data (+) modes — everything runs in your browser.',
+        nav_site: 'Site',
+        h1: 'URL Encoder & Decoder',
+        lede: 'Percent-encode text so it can travel safely inside a URL, and decode it back. Everything runs in your browser.',
+        mode_aria: 'Mode',
+        mode_encode: 'Encode',
+        mode_decode: 'Decode',
+        opt_component: 'Component mode',
+        opt_component_hint: '— also encodes / ? & = # (for values inside a URL)',
+        opt_plus: 'Treat + as space',
+        opt_plus_hint: '— for form data (application/x-www-form-urlencoded)',
+        in_label_encode: 'Text to encode',
+        in_label_decode: 'Encoded text to decode',
+        out_label_encode: 'Encoded result',
+        out_label_decode: 'Decoded text',
+        in_ph_encode: 'Type or paste text…',
+        in_ph_decode: 'Paste percent-encoded text here…',
+        btn_copy: 'Copy result',
+        btn_swap: 'Use result as input',
+        btn_clear: 'Clear',
+        err_decode: 'That is not valid percent-encoding — check for stray or incomplete % sequences.',
+        err_encode: 'This text cannot be encoded (it contains an unpaired surrogate character).',
+        msg_copied: 'Copied to clipboard.',
+        msg_copy_empty: 'Nothing to copy yet.',
+        msg_copy_fail: 'Could not copy automatically — select the text and copy it manually.',
+        msg_cleared: 'Cleared.',
+        how_title: 'Component vs. full URL',
+        how_1: 'Component mode (encodeURIComponent) encodes every reserved character, including / ? & = and # — use it for a single value like a query parameter. With it off (encodeURI), URL structure characters are kept, so you can encode a whole URL without breaking it. "Treat + as space" matches how HTML forms encode spaces.',
+        privacy: 'Everything runs in your browser — nothing is uploaded and nothing is tracked. Your last input is remembered only in this browser.',
+        footer_back: '← back to all tools'
+      },
+      id: {
+        _title: 'Encoder & Decoder URL',
+        _meta: 'Encoder dan decoder URL gratis. Encode teks untuk URL (percent-encoding) dan decode kembali, dengan mode komponen dan form-data (+) — semuanya berjalan di browser Anda.',
+        nav_site: 'Situs',
+        h1: 'Encoder & Decoder URL',
+        lede: 'Encode teks dengan percent-encoding agar aman berada di dalam URL, dan decode kembali. Semuanya berjalan di browser Anda.',
+        mode_aria: 'Mode',
+        mode_encode: 'Encode',
+        mode_decode: 'Decode',
+        opt_component: 'Mode komponen',
+        opt_component_hint: '— ikut meng-encode / ? & = # (untuk nilai di dalam URL)',
+        opt_plus: 'Anggap + sebagai spasi',
+        opt_plus_hint: '— untuk form data (application/x-www-form-urlencoded)',
+        in_label_encode: 'Teks untuk di-encode',
+        in_label_decode: 'Teks ter-encode untuk di-decode',
+        out_label_encode: 'Hasil encode',
+        out_label_decode: 'Teks hasil decode',
+        in_ph_encode: 'Ketik atau tempel teks…',
+        in_ph_decode: 'Tempel teks percent-encoded di sini…',
+        btn_copy: 'Salin hasil',
+        btn_swap: 'Jadikan hasil sebagai input',
+        btn_clear: 'Bersihkan',
+        err_decode: 'Ini bukan percent-encoding yang valid — periksa urutan % yang salah atau tidak lengkap.',
+        err_encode: 'Teks ini tidak bisa di-encode (mengandung karakter surrogate yang tidak berpasangan).',
+        msg_copied: 'Disalin ke clipboard.',
+        msg_copy_empty: 'Belum ada yang bisa disalin.',
+        msg_copy_fail: 'Tidak bisa menyalin otomatis — pilih teksnya lalu salin manual.',
+        msg_cleared: 'Dibersihkan.',
+        how_title: 'Komponen vs. URL utuh',
+        how_1: 'Mode komponen (encodeURIComponent) meng-encode semua karakter khusus, termasuk / ? & = dan # — pakai untuk satu nilai seperti parameter query. Jika dimatikan (encodeURI), karakter struktur URL dibiarkan, jadi Anda bisa meng-encode URL utuh tanpa merusaknya. "Anggap + sebagai spasi" mengikuti cara form HTML meng-encode spasi.',
+        privacy: 'Semuanya berjalan di browser Anda — tidak ada yang diunggah dan tidak ada pelacakan. Input terakhir Anda hanya diingat di browser ini.',
+        footer_back: '← kembali ke semua alat'
+      }
+    };
+
+    function t(key) { return window.SiteLang.t(key); }
+    function $(id) { return document.getElementById(id); }
+
+    /* ---------- localStorage ---------- */
+
+    var NS = 'urlencode.';
+    function save(key, value) { try { localStorage.setItem(NS + key, value); } catch (e) { /* ignore */ } }
+    function load(key) { try { return localStorage.getItem(NS + key); } catch (e) { return null; } }
+
+    /* ---------- Wiring ---------- */
+
+    var input = $('ue-input'), output = $('ue-output'), errEl = $('ue-error');
+    var component = $('ue-component'), plus = $('ue-plus');
+    var mode = 'encode';
+
+    function convert() {
+      errEl.textContent = '';
+      var s = input.value;
+      if (s === '') { output.value = ''; return; }
+      try {
+        if (mode === 'encode') {
+          var r = component.checked ? encodeURIComponent(s) : encodeURI(s);
+          if (plus.checked) r = r.replace(/%20/g, '+');
+          output.value = r;
+        } else {
+          var d = plus.checked ? s.replace(/\+/g, '%20') : s;
+          output.value = decodeURIComponent(d);
+        }
+      } catch (e) {
+        output.value = '';
+        errEl.textContent = t(mode === 'encode' ? 'err_encode' : 'err_decode');
+      }
+    }
+
+    function render() {
+      var enc = mode === 'encode';
+      $('mode-encode').setAttribute('aria-pressed', enc ? 'true' : 'false');
+      $('mode-decode').setAttribute('aria-pressed', enc ? 'false' : 'true');
+      $('ue-in-label').textContent = t(enc ? 'in_label_encode' : 'in_label_decode');
+      $('ue-out-label').textContent = t(enc ? 'out_label_encode' : 'out_label_decode');
+      input.placeholder = t(enc ? 'in_ph_encode' : 'in_ph_decode');
+      convert();
+    }
+
+    function setMode(m) {
+      if (m === mode) return;
+      mode = m;
+      save('mode', mode);
+      render();
+    }
+
+    function flash(key, isError) {
+      var el = $('ue-msg');
+      el.textContent = t(key);
+      el.style.color = isError ? 'var(--negative)' : 'var(--text-muted)';
+    }
+
+    input.addEventListener('input', function () { save('input', input.value); convert(); $('ue-msg').textContent = ''; });
+    component.addEventListener('change', function () { save('component', component.checked ? '1' : '0'); convert(); });
+    plus.addEventListener('change', function () { save('plus', plus.checked ? '1' : '0'); convert(); });
+    $('mode-encode').addEventListener('click', function () { setMode('encode'); });
+    $('mode-decode').addEventListener('click', function () { setMode('decode'); });
+
+    $('ue-swap').addEventListener('click', function () {
+      input.value = output.value;
+      mode = mode === 'encode' ? 'decode' : 'encode';
+      save('mode', mode);
+      save('input', input.value);
+      render();
+      input.focus();
+    });
+
+    $('ue-clear').addEventListener('click', function () {
+      input.value = '';
+      save('input', '');
+      convert();
+      flash('msg_cleared', false);
+      input.focus();
+    });
+
+    $('ue-copy').addEventListener('click', function () {
+      if (!output.value) { flash('msg_copy_empty', true); return; }
+      var fallback = function () { output.focus(); output.select(); flash('msg_copy_fail', true); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(output.value).then(function () { flash('msg_copied', false); }, fallback);
+      } else {
+        try {
+          output.focus(); output.select();
+          if (document.execCommand('copy')) flash('msg_copied', false); else fallback();
+        } catch (e) { fallback(); }
+      }
+    });
+
+    /* ---------- Restore, then first render ---------- */
+
+    var savedMode = load('mode');
+    if (savedMode === 'encode' || savedMode === 'decode') mode = savedMode;
+    if (load('component') === '0') component.checked = false;
+    if (load('plus') === '1') plus.checked = true;
+    var savedInput = load('input');
+    if (typeof savedInput === 'string') input.value = savedInput;
+
+    window.SiteLang.init(I18N, function () { render(); });
+  })();
+  </script>
+</body>
+</html>

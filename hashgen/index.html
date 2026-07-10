@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hash &amp; UUID Generator</title>
+  <meta name="description" content="Free SHA-1, SHA-256, SHA-384, and SHA-512 hash calculator plus random UUID (v4) generator — everything computed locally in your browser.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d9488'/%3E%3Ctext x='16' y='23' font-family='ui-monospace,monospace' font-size='19' font-weight='700' fill='%23ffffff' text-anchor='middle'%3E%23%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    .top-nav {
+      padding: 1.25rem 0 2.25rem; font-size: 0.9rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .top-nav a { color: var(--text-muted); text-decoration: none; }
+    .top-nav a:hover { color: var(--accent-strong); }
+    .lede { color: var(--text-muted); max-width: 44rem; margin-bottom: 0; }
+    .tool-card { margin: 1.75rem 0 1.25rem; }
+    .how-card { margin-bottom: 1rem; }
+    h2.sub { font-size: 1.05rem; margin: 0 0 1rem; }
+
+    textarea.io {
+      width: 100%; min-height: 120px; padding: 0.85rem 1rem;
+      font-family: var(--mono); font-size: 0.9rem; line-height: 1.55; color: var(--text);
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); resize: vertical; overflow-wrap: anywhere;
+    }
+    textarea.io[readonly] { background: var(--surface-2); }
+
+    .hash-rows { margin-top: 1.25rem; display: grid; gap: 0.85rem; }
+    .hash-row {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 0.75rem 1rem;
+      display: flex; align-items: center; gap: 0.85rem;
+    }
+    .hash-row .algo { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); flex: none; width: 4.6rem; }
+    .hash-row code { flex: 1; font-size: 0.82rem; overflow-wrap: anywhere; word-break: break-all; }
+    .btn-sm { padding: 0.35rem 0.7rem; font-size: 0.8rem; flex: none; }
+
+    .uuid-bar { display: flex; flex-wrap: wrap; gap: 1rem; align-items: end; margin-bottom: 1rem; }
+    .uuid-bar label { margin-bottom: 0.3rem; }
+    .uuid-bar .count-field { width: 6.5rem; }
+    .opt { display: inline-flex; align-items: center; gap: 0.45rem; font-size: 0.9rem; padding-bottom: 0.55rem; }
+    .opt input { width: auto; }
+    .msg { min-height: 1.2em; margin-top: 0.75rem; font-size: 0.9rem; color: var(--text-muted); }
+    .actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.9rem; }
+
+    @media (max-width: 520px) {
+      .card { padding: 1.1rem; }
+      .hash-row { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+  <header class="container">
+    <nav class="top-nav" aria-label="Site" data-i18n-attr="aria-label:nav_site">
+      <a href="../">&#8592; samba nugraha</a>
+      <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
+        <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0l60 30M60 0L0 30" stroke="#fff" stroke-width="6"/><path d="M0 0l60 30M60 0L0 30" stroke="#C8102E" stroke-width="2.5"/><path d="M30 0v30M0 15h60" stroke="#fff" stroke-width="10"/><path d="M30 0v30M0 15h60" stroke="#C8102E" stroke-width="6"/></svg>EN
+        </button>
+        <button type="button" data-lang="id" aria-pressed="false" aria-label="Bahasa Indonesia">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="15" fill="#E70011"/><rect y="15" width="60" height="15" fill="#F7F7F7"/></svg>ID
+        </button>
+      </div>
+    </nav>
+    <h1 data-i18n="h1">Hash &amp; UUID Generator</h1>
+    <p class="lede" data-i18n="lede">SHA hashes of any text, plus random UUIDs — all generated locally by your browser's built-in crypto.</p>
+  </header>
+
+  <main class="container">
+    <noscript>
+      <div class="card" style="border-left:3px solid var(--negative)">This tool needs JavaScript to run. Please enable it and reload. / Alat ini membutuhkan JavaScript. Aktifkan lalu muat ulang.</div>
+    </noscript>
+
+    <div class="card tool-card">
+      <h2 class="sub" data-i18n="hash_title">Text hashes</h2>
+      <label for="hg-in" data-i18n="in_label">Text to hash</label>
+      <textarea class="io" id="hg-in" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="Type or paste text…" data-i18n-attr="placeholder:in_ph"></textarea>
+      <p class="msg" id="hg-unsupported" hidden></p>
+      <div class="hash-rows">
+        <div class="hash-row"><span class="algo">SHA-1</span><code id="h-sha1">—</code><button type="button" class="btn btn-sm" data-copy="h-sha1" data-i18n="btn_copy">Copy</button></div>
+        <div class="hash-row"><span class="algo">SHA-256</span><code id="h-sha256">—</code><button type="button" class="btn btn-sm" data-copy="h-sha256" data-i18n="btn_copy">Copy</button></div>
+        <div class="hash-row"><span class="algo">SHA-384</span><code id="h-sha384">—</code><button type="button" class="btn btn-sm" data-copy="h-sha384" data-i18n="btn_copy">Copy</button></div>
+        <div class="hash-row"><span class="algo">SHA-512</span><code id="h-sha512">—</code><button type="button" class="btn btn-sm" data-copy="h-sha512" data-i18n="btn_copy">Copy</button></div>
+      </div>
+      <p class="msg" id="hg-msg" aria-live="polite"></p>
+    </div>
+
+    <div class="card tool-card">
+      <h2 class="sub" data-i18n="uuid_title">Random UUIDs (v4)</h2>
+      <div class="uuid-bar">
+        <div class="count-field">
+          <label for="uu-count" data-i18n="count_label">How many</label>
+          <input id="uu-count" type="number" min="1" max="100" step="1" value="5" inputmode="numeric">
+        </div>
+        <label class="opt" for="uu-upper">
+          <input type="checkbox" id="uu-upper">
+          <span data-i18n="opt_upper">UPPERCASE</span>
+        </label>
+        <label class="opt" for="uu-nohyphen">
+          <input type="checkbox" id="uu-nohyphen">
+          <span data-i18n="opt_nohyphen">Without hyphens</span>
+        </label>
+        <button type="button" class="btn btn-primary" id="uu-gen" data-i18n="btn_gen">Generate</button>
+      </div>
+      <label for="uu-out" data-i18n="uuid_out_label">Result (one per line)</label>
+      <textarea class="io" id="uu-out" readonly aria-live="polite"></textarea>
+      <div class="actions">
+        <button type="button" class="btn" id="uu-copy" data-i18n="btn_copy_all">Copy all</button>
+      </div>
+      <p class="msg" id="uu-msg" aria-live="polite"></p>
+    </div>
+
+    <section class="card how-card" aria-labelledby="how-heading">
+      <h2 id="how-heading" data-i18n="how_title">Notes</h2>
+      <p data-i18n="how_1">Hashes are computed from the UTF-8 bytes of your text using the browser's Web Crypto API, so results match tools like sha256sum. MD5 is not offered — browsers do not implement it because it is broken; prefer SHA-256. A hash is one-way: it cannot be "decrypted" back into the text.</p>
+      <p data-i18n="how_2">UUIDs are version 4 — 122 random bits from a cryptographically secure generator. The chance of two ever colliding is negligible.</p>
+      <p class="muted small" data-i18n="privacy">Everything is computed on this page. The text you hash is deliberately not saved anywhere — not even in this browser.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p><a href="../" data-i18n="footer_back">&#8592; back to all tools</a> &middot; &copy; 2026 Samba Nugraha</p>
+    </div>
+  </footer>
+
+  <script src="../assets/lang.js"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    var I18N = {
+      en: {
+        _title: 'Hash & UUID Generator',
+        _meta: 'Free SHA-1, SHA-256, SHA-384, and SHA-512 hash calculator plus random UUID (v4) generator — everything computed locally in your browser.',
+        nav_site: 'Site',
+        h1: 'Hash & UUID Generator',
+        lede: "SHA hashes of any text, plus random UUIDs — all generated locally by your browser's built-in crypto.",
+        hash_title: 'Text hashes',
+        in_label: 'Text to hash',
+        in_ph: 'Type or paste text…',
+        btn_copy: 'Copy',
+        err_unsupported: 'Hashing needs a secure context (https) — it is unavailable on this connection.',
+        uuid_title: 'Random UUIDs (v4)',
+        count_label: 'How many',
+        opt_upper: 'UPPERCASE',
+        opt_nohyphen: 'Without hyphens',
+        btn_gen: 'Generate',
+        uuid_out_label: 'Result (one per line)',
+        btn_copy_all: 'Copy all',
+        msg_copied: 'Copied to clipboard.',
+        msg_copy_empty: 'Nothing to copy yet.',
+        msg_copy_fail: 'Could not copy automatically — select the text and copy it manually.',
+        how_title: 'Notes',
+        how_1: "Hashes are computed from the UTF-8 bytes of your text using the browser's Web Crypto API, so results match tools like sha256sum. MD5 is not offered — browsers do not implement it because it is broken; prefer SHA-256. A hash is one-way: it cannot be \"decrypted\" back into the text.",
+        how_2: 'UUIDs are version 4 — 122 random bits from a cryptographically secure generator. The chance of two ever colliding is negligible.',
+        privacy: 'Everything is computed on this page. The text you hash is deliberately not saved anywhere — not even in this browser.',
+        footer_back: '← back to all tools'
+      },
+      id: {
+        _title: 'Generator Hash & UUID',
+        _meta: 'Kalkulator hash SHA-1, SHA-256, SHA-384, dan SHA-512 gratis plus generator UUID acak (v4) — semuanya dihitung secara lokal di browser Anda.',
+        nav_site: 'Situs',
+        h1: 'Generator Hash & UUID',
+        lede: 'Hash SHA dari teks apa pun, plus UUID acak — semuanya dibuat secara lokal oleh crypto bawaan browser Anda.',
+        hash_title: 'Hash teks',
+        in_label: 'Teks untuk di-hash',
+        in_ph: 'Ketik atau tempel teks…',
+        btn_copy: 'Salin',
+        err_unsupported: 'Hashing membutuhkan koneksi aman (https) — tidak tersedia pada koneksi ini.',
+        uuid_title: 'UUID acak (v4)',
+        count_label: 'Berapa banyak',
+        opt_upper: 'HURUF BESAR',
+        opt_nohyphen: 'Tanpa tanda hubung',
+        btn_gen: 'Buat',
+        uuid_out_label: 'Hasil (satu per baris)',
+        btn_copy_all: 'Salin semua',
+        msg_copied: 'Disalin ke clipboard.',
+        msg_copy_empty: 'Belum ada yang bisa disalin.',
+        msg_copy_fail: 'Tidak bisa menyalin otomatis — pilih teksnya lalu salin manual.',
+        how_title: 'Catatan',
+        how_1: 'Hash dihitung dari byte UTF-8 teks Anda memakai Web Crypto API browser, jadi hasilnya sama dengan alat seperti sha256sum. MD5 tidak disediakan — browser tidak mengimplementasikannya karena sudah tidak aman; gunakan SHA-256. Hash bersifat satu arah: tidak bisa "didekripsi" kembali menjadi teks.',
+        how_2: 'UUID adalah versi 4 — 122 bit acak dari generator yang aman secara kriptografis. Peluang dua UUID bertabrakan bisa diabaikan.',
+        privacy: 'Semuanya dihitung di halaman ini. Teks yang Anda hash sengaja tidak disimpan di mana pun — bahkan di browser ini.',
+        footer_back: '← kembali ke semua alat'
+      }
+    };
+
+    function t(key) { return window.SiteLang.t(key); }
+    function $(id) { return document.getElementById(id); }
+
+    /* ---------- Hashing (Web Crypto) ---------- */
+
+    var ALGOS = [['SHA-1', 'h-sha1'], ['SHA-256', 'h-sha256'], ['SHA-384', 'h-sha384'], ['SHA-512', 'h-sha512']];
+    var subtle = window.crypto && crypto.subtle;
+    var seq = 0;
+
+    function hex(buf) {
+      var b = new Uint8Array(buf), s = '';
+      for (var i = 0; i < b.length; i++) s += (b[i] < 16 ? '0' : '') + b[i].toString(16);
+      return s;
+    }
+
+    // Sequence counter discards stale async results when typing fast.
+    function computeHashes() {
+      var text = $('hg-in').value;
+      var mySeq = ++seq;
+      if (!text || !subtle) {
+        ALGOS.forEach(function (a) { $(a[1]).textContent = '—'; });
+        return;
+      }
+      var data = new TextEncoder().encode(text);
+      ALGOS.forEach(function (a) {
+        subtle.digest(a[0], data).then(function (buf) {
+          if (mySeq === seq) $(a[1]).textContent = hex(buf);
+        }, function () {
+          if (mySeq === seq) $(a[1]).textContent = '—';
+        });
+      });
+    }
+
+    /* ---------- UUIDs ---------- */
+
+    function uuidv4() {
+      if (crypto.randomUUID) return crypto.randomUUID();
+      var b = crypto.getRandomValues(new Uint8Array(16));
+      b[6] = (b[6] & 15) | 64;   // version 4
+      b[8] = (b[8] & 63) | 128;  // variant 10
+      var h = [];
+      for (var i = 0; i < 16; i++) h.push((b[i] < 16 ? '0' : '') + b[i].toString(16));
+      return h.slice(0, 4).join('') + '-' + h.slice(4, 6).join('') + '-' + h.slice(6, 8).join('') +
+        '-' + h.slice(8, 10).join('') + '-' + h.slice(10, 16).join('');
+    }
+
+    /* ---------- localStorage (UUID options only — hash input is never saved) ---------- */
+
+    var NS = 'hashgen.';
+    function save(key, value) { try { localStorage.setItem(NS + key, value); } catch (e) { /* ignore */ } }
+    function load(key) { try { return localStorage.getItem(NS + key); } catch (e) { return null; } }
+
+    /* ---------- Wiring ---------- */
+
+    var debounceTimer = null;
+    $('hg-in').addEventListener('input', function () {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(computeHashes, 120);
+    });
+
+    if (!subtle) {
+      var un = $('hg-unsupported');
+      un.hidden = false;
+      un.style.color = 'var(--negative)';
+    }
+
+    function flashEl(msgId, key, isError) {
+      var el = $(msgId);
+      el.textContent = t(key);
+      el.style.color = isError ? 'var(--negative)' : 'var(--text-muted)';
+    }
+
+    function copyText(val, msgId) {
+      if (!val || val === '—') { flashEl(msgId, 'msg_copy_empty', true); return; }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(val).then(
+          function () { flashEl(msgId, 'msg_copied', false); },
+          function () { flashEl(msgId, 'msg_copy_fail', true); }
+        );
+      } else { flashEl(msgId, 'msg_copy_fail', true); }
+    }
+
+    document.querySelectorAll('[data-copy]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        copyText($(btn.getAttribute('data-copy')).textContent, 'hg-msg');
+      });
+    });
+
+    var count = $('uu-count'), upper = $('uu-upper'), nohyph = $('uu-nohyphen'), uuOut = $('uu-out');
+
+    $('uu-gen').addEventListener('click', function () {
+      var n = Math.min(100, Math.max(1, parseInt(count.value, 10) || 1));
+      count.value = n;
+      save('count', String(n));
+      save('upper', upper.checked ? '1' : '0');
+      save('nohyphen', nohyph.checked ? '1' : '0');
+      var list = [];
+      for (var i = 0; i < n; i++) {
+        var u = uuidv4();
+        if (upper.checked) u = u.toUpperCase();
+        if (nohyph.checked) u = u.replace(/-/g, '');
+        list.push(u);
+      }
+      uuOut.value = list.join('\n');
+      $('uu-msg').textContent = '';
+    });
+
+    $('uu-copy').addEventListener('click', function () { copyText(uuOut.value, 'uu-msg'); });
+
+    /* ---------- Restore, then first render ---------- */
+
+    var savedCount = parseInt(load('count'), 10);
+    if (savedCount >= 1 && savedCount <= 100) count.value = savedCount;
+    if (load('upper') === '1') upper.checked = true;
+    if (load('nohyphen') === '1') nohyph.checked = true;
+
+    window.SiteLang.init(I18N, function () {
+      if (!subtle) $('hg-unsupported').textContent = t('err_unsupported');
+      computeHashes();
+    });
+  })();
+  </script>
+</body>
+</html>

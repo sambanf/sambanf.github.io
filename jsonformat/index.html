@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>JSON Formatter &amp; Validator</title>
+  <meta name="description" content="Free JSON formatter, minifier, and validator. Pretty-print JSON, sort keys, and get clear error messages with line and column — everything runs in your browser.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d9488'/%3E%3Ctext x='16' y='22' font-family='ui-monospace,monospace' font-size='15' font-weight='700' fill='%23ffffff' text-anchor='middle'%3E%7B%7D%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    .top-nav {
+      padding: 1.25rem 0 2.25rem; font-size: 0.9rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .top-nav a { color: var(--text-muted); text-decoration: none; }
+    .top-nav a:hover { color: var(--accent-strong); }
+    .lede { color: var(--text-muted); max-width: 44rem; margin-bottom: 0; }
+    .tool-card { margin: 1.75rem 0 2rem; }
+    .how-card { margin-bottom: 1rem; }
+
+    textarea.io {
+      width: 100%; min-height: 170px; padding: 0.85rem 1rem;
+      font-family: var(--mono); font-size: 0.9rem; line-height: 1.55; color: var(--text);
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); resize: vertical; overflow-wrap: anywhere;
+      tab-size: 4;
+    }
+    textarea.io[readonly] { background: var(--surface-2); }
+    .status { min-height: 1.3em; margin: 0.6rem 0 1rem; font-size: 0.9rem; font-family: var(--mono); }
+    .status.ok { color: var(--positive); }
+    .status.bad { color: var(--negative); }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; margin-bottom: 1rem; }
+    .toolbar label { margin: 0; font-weight: 600; font-size: 0.875rem; }
+    .toolbar select { width: auto; }
+    .opt { display: inline-flex; align-items: center; gap: 0.45rem; font-size: 0.9rem; }
+    .opt input { width: auto; }
+    .spacer { flex: 1 1 auto; }
+    .msg { min-height: 1.2em; margin-top: 0.75rem; font-size: 0.9rem; color: var(--text-muted); }
+
+    @media (max-width: 520px) { .card { padding: 1.1rem; } }
+  </style>
+</head>
+<body>
+  <header class="container">
+    <nav class="top-nav" aria-label="Site" data-i18n-attr="aria-label:nav_site">
+      <a href="../">&#8592; samba nugraha</a>
+      <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
+        <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0l60 30M60 0L0 30" stroke="#fff" stroke-width="6"/><path d="M0 0l60 30M60 0L0 30" stroke="#C8102E" stroke-width="2.5"/><path d="M30 0v30M0 15h60" stroke="#fff" stroke-width="10"/><path d="M30 0v30M0 15h60" stroke="#C8102E" stroke-width="6"/></svg>EN
+        </button>
+        <button type="button" data-lang="id" aria-pressed="false" aria-label="Bahasa Indonesia">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="15" fill="#E70011"/><rect y="15" width="60" height="15" fill="#F7F7F7"/></svg>ID
+        </button>
+      </div>
+    </nav>
+    <h1 data-i18n="h1">JSON Formatter &amp; Validator</h1>
+    <p class="lede" data-i18n="lede">Pretty-print, minify, and validate JSON with clear error messages that point at the exact line and column. Everything runs in your browser.</p>
+  </header>
+
+  <main class="container">
+    <noscript>
+      <div class="card" style="border-left:3px solid var(--negative)">This tool needs JavaScript to run. Please enable it and reload. / Alat ini membutuhkan JavaScript. Aktifkan lalu muat ulang.</div>
+    </noscript>
+
+    <div class="card tool-card">
+      <label for="jf-in" data-i18n="in_label">JSON input</label>
+      <textarea class="io" id="jf-in" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder='{"paste": "your JSON here"}' data-i18n-attr="placeholder:in_ph"></textarea>
+      <p class="status" id="jf-status" aria-live="polite"></p>
+
+      <div class="toolbar">
+        <label for="jf-indent" data-i18n="indent_label">Indent</label>
+        <select id="jf-indent">
+          <option value="2" data-i18n="indent_2">2 spaces</option>
+          <option value="4" data-i18n="indent_4">4 spaces</option>
+          <option value="tab" data-i18n="indent_tab">Tabs</option>
+        </select>
+        <label class="opt" for="jf-sort">
+          <input type="checkbox" id="jf-sort">
+          <span data-i18n="sort_label">Sort keys A→Z</span>
+        </label>
+        <span class="spacer"></span>
+        <button type="button" class="btn btn-primary" id="jf-format" data-i18n="btn_format">Format</button>
+        <button type="button" class="btn" id="jf-minify" data-i18n="btn_minify">Minify</button>
+      </div>
+
+      <label for="jf-out" data-i18n="out_label">Result</label>
+      <textarea class="io" id="jf-out" readonly aria-live="polite"></textarea>
+
+      <div class="toolbar" style="margin: 0.9rem 0 0;">
+        <button type="button" class="btn" id="jf-copy" data-i18n="btn_copy">Copy result</button>
+        <button type="button" class="btn" id="jf-use" data-i18n="btn_use">Use result as input</button>
+        <button type="button" class="btn" id="jf-clear" data-i18n="btn_clear">Clear</button>
+      </div>
+      <p class="msg" id="jf-msg" aria-live="polite"></p>
+    </div>
+
+    <section class="card how-card" aria-labelledby="how-heading">
+      <h2 id="how-heading" data-i18n="how_title">Notes</h2>
+      <p data-i18n="how_1">Validation runs as you type using the browser's own JSON parser, so what passes here is exactly what JSON.parse accepts: double-quoted strings, no trailing commas, no comments. "Sort keys" reorders object keys alphabetically at every level — useful for comparing two JSON documents.</p>
+      <p class="muted small" data-i18n="privacy">Your JSON never leaves this page — no server, no upload, no tracking. The input is remembered only in this browser.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p><a href="../" data-i18n="footer_back">&#8592; back to all tools</a> &middot; &copy; 2026 Samba Nugraha</p>
+    </div>
+  </footer>
+
+  <script src="../assets/lang.js"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    var I18N = {
+      en: {
+        _title: 'JSON Formatter & Validator',
+        _meta: 'Free JSON formatter, minifier, and validator. Pretty-print JSON, sort keys, and get clear error messages with line and column — everything runs in your browser.',
+        nav_site: 'Site',
+        h1: 'JSON Formatter & Validator',
+        lede: 'Pretty-print, minify, and validate JSON with clear error messages that point at the exact line and column. Everything runs in your browser.',
+        in_label: 'JSON input',
+        in_ph: '{"paste": "your JSON here"}',
+        out_label: 'Result',
+        indent_label: 'Indent',
+        indent_2: '2 spaces',
+        indent_4: '4 spaces',
+        indent_tab: 'Tabs',
+        sort_label: 'Sort keys A→Z',
+        btn_format: 'Format',
+        btn_minify: 'Minify',
+        btn_copy: 'Copy result',
+        btn_use: 'Use result as input',
+        btn_clear: 'Clear',
+        status_empty: '',
+        status_ok: 'Valid JSON — {desc}, {chars} characters',
+        status_err: 'Line {line}, column {col} — {msg}',
+        desc_object: 'object with {n} keys',
+        desc_array: 'array with {n} items',
+        desc_string: 'a string',
+        desc_number: 'a number',
+        desc_boolean: 'a boolean',
+        desc_null: 'null',
+        msg_copied: 'Copied to clipboard.',
+        msg_copy_empty: 'Nothing to copy yet.',
+        msg_copy_fail: 'Could not copy automatically — select the text and copy it manually.',
+        msg_cleared: 'Cleared.',
+        msg_fix_first: 'Fix the JSON error first — see the message under the input.',
+        how_title: 'Notes',
+        how_1: 'Validation runs as you type using the browser’s own JSON parser, so what passes here is exactly what JSON.parse accepts: double-quoted strings, no trailing commas, no comments. "Sort keys" reorders object keys alphabetically at every level — useful for comparing two JSON documents.',
+        privacy: 'Your JSON never leaves this page — no server, no upload, no tracking. The input is remembered only in this browser.',
+        footer_back: '← back to all tools'
+      },
+      id: {
+        _title: 'Formatter & Validator JSON',
+        _meta: 'Formatter, minifier, dan validator JSON gratis. Rapikan JSON, urutkan key, dan dapatkan pesan error yang jelas dengan baris dan kolom — semuanya berjalan di browser Anda.',
+        nav_site: 'Situs',
+        h1: 'Formatter & Validator JSON',
+        lede: 'Rapikan, minify, dan validasi JSON dengan pesan error yang jelas menunjuk baris dan kolom persisnya. Semuanya berjalan di browser Anda.',
+        in_label: 'Input JSON',
+        in_ph: '{"tempel": "JSON Anda di sini"}',
+        out_label: 'Hasil',
+        indent_label: 'Indentasi',
+        indent_2: '2 spasi',
+        indent_4: '4 spasi',
+        indent_tab: 'Tab',
+        sort_label: 'Urutkan key A→Z',
+        btn_format: 'Format',
+        btn_minify: 'Minify',
+        btn_copy: 'Salin hasil',
+        btn_use: 'Jadikan hasil sebagai input',
+        btn_clear: 'Bersihkan',
+        status_empty: '',
+        status_ok: 'JSON valid — {desc}, {chars} karakter',
+        status_err: 'Baris {line}, kolom {col} — {msg}',
+        desc_object: 'objek dengan {n} key',
+        desc_array: 'array dengan {n} item',
+        desc_string: 'sebuah string',
+        desc_number: 'sebuah angka',
+        desc_boolean: 'sebuah boolean',
+        desc_null: 'null',
+        msg_copied: 'Disalin ke clipboard.',
+        msg_copy_empty: 'Belum ada yang bisa disalin.',
+        msg_copy_fail: 'Tidak bisa menyalin otomatis — pilih teksnya lalu salin manual.',
+        msg_cleared: 'Dibersihkan.',
+        msg_fix_first: 'Perbaiki dulu error JSON-nya — lihat pesan di bawah input.',
+        how_title: 'Catatan',
+        how_1: 'Validasi berjalan saat Anda mengetik memakai parser JSON bawaan browser, jadi yang lolos di sini persis yang diterima JSON.parse: string berkutip ganda, tanpa koma di akhir, tanpa komentar. "Urutkan key" menyusun ulang key objek secara alfabetis di setiap tingkat — berguna untuk membandingkan dua dokumen JSON.',
+        privacy: 'JSON Anda tidak pernah keluar dari halaman ini — tanpa server, tanpa unggahan, tanpa pelacakan. Input hanya diingat di browser ini.',
+        footer_back: '← kembali ke semua alat'
+      }
+    };
+
+    function t(key) { return window.SiteLang.t(key); }
+    function tf(key, vars) {
+      var s = t(key);
+      for (var k in vars) {
+        if (Object.prototype.hasOwnProperty.call(vars, k)) s = s.replace('{' + k + '}', vars[k]);
+      }
+      return s;
+    }
+    function fmt(n) { return n.toLocaleString(window.SiteLang.locale()); }
+    function $(id) { return document.getElementById(id); }
+
+    /* ---------- Pure helpers ---------- */
+
+    function sortKeys(v) {
+      if (Array.isArray(v)) return v.map(sortKeys);
+      if (v && typeof v === 'object') {
+        var o = {};
+        Object.keys(v).sort().forEach(function (k) { o[k] = sortKeys(v[k]); });
+        return o;
+      }
+      return v;
+    }
+
+    function describe(v) {
+      if (Array.isArray(v)) return tf('desc_array', { n: fmt(v.length) });
+      if (v !== null && typeof v === 'object') return tf('desc_object', { n: fmt(Object.keys(v).length) });
+      if (typeof v === 'string') return t('desc_string');
+      if (typeof v === 'number') return t('desc_number');
+      if (typeof v === 'boolean') return t('desc_boolean');
+      return t('desc_null');
+    }
+
+    function lineColFromPos(text, pos) {
+      var upto = text.slice(0, Math.min(pos, text.length));
+      var line = upto.split('\n').length;
+      var col = pos - upto.lastIndexOf('\n');
+      return { line: line, col: col };
+    }
+
+    function errorInfo(e, text) {
+      var msg = String((e && e.message) || e);
+      var m = msg.match(/line (\d+) column (\d+)/i);
+      if (m) return { line: +m[1], col: +m[2], msg: msg };
+      m = msg.match(/at position (\d+)/i);
+      if (m) {
+        var lc = lineColFromPos(text, +m[1]);
+        return { line: lc.line, col: lc.col, msg: msg };
+      }
+      // No position info in this browser's message — don't invent one.
+      return { line: null, col: null, msg: msg };
+    }
+
+    /* ---------- localStorage ---------- */
+
+    var NS = 'jsonformat.';
+    function save(key, value) { try { localStorage.setItem(NS + key, value); } catch (e) { /* ignore */ } }
+    function load(key) { try { return localStorage.getItem(NS + key); } catch (e) { return null; } }
+
+    /* ---------- Wiring ---------- */
+
+    var input = $('jf-in'), output = $('jf-out'), status = $('jf-status');
+    var indentSel = $('jf-indent'), sortChk = $('jf-sort');
+    var debounceTimer = null;
+
+    // Live validation only; formatting happens on button press.
+    function validate() {
+      save('input', input.value);
+      var text = input.value;
+      if (text.trim() === '') {
+        status.textContent = '';
+        status.className = 'status';
+        return null;
+      }
+      try {
+        var v = JSON.parse(text);
+        status.textContent = tf('status_ok', { desc: describe(v), chars: fmt(text.length) });
+        status.className = 'status ok';
+        return v;
+      } catch (e) {
+        var info = errorInfo(e, text);
+        status.textContent = info.line === null
+          ? info.msg
+          : tf('status_err', { line: fmt(info.line), col: fmt(info.col), msg: info.msg });
+        status.className = 'status bad';
+        return null;
+      }
+    }
+
+    function flash(key, isError) {
+      var el = $('jf-msg');
+      el.textContent = t(key);
+      el.style.color = isError ? 'var(--negative)' : 'var(--text-muted)';
+    }
+
+    function run(minify) {
+      var text = input.value;
+      if (text.trim() === '') { output.value = ''; return; }
+      var v;
+      try { v = JSON.parse(text); } catch (e) { validate(); flash('msg_fix_first', true); return; }
+      if (sortChk.checked) v = sortKeys(v);
+      var indent = minify ? undefined : (indentSel.value === 'tab' ? '\t' : +indentSel.value);
+      output.value = JSON.stringify(v, null, indent);
+      $('jf-msg').textContent = '';
+    }
+
+    input.addEventListener('input', function () {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(validate, 200);
+      $('jf-msg').textContent = '';
+    });
+    indentSel.addEventListener('change', function () { save('indent', indentSel.value); });
+    sortChk.addEventListener('change', function () { save('sort', sortChk.checked ? '1' : '0'); });
+
+    $('jf-format').addEventListener('click', function () { run(false); });
+    $('jf-minify').addEventListener('click', function () { run(true); });
+
+    $('jf-use').addEventListener('click', function () {
+      if (!output.value) { flash('msg_copy_empty', true); return; }
+      input.value = output.value;
+      save('input', input.value);
+      validate();
+      input.focus();
+    });
+
+    $('jf-clear').addEventListener('click', function () {
+      input.value = ''; output.value = '';
+      save('input', '');
+      validate();
+      flash('msg_cleared', false);
+      input.focus();
+    });
+
+    $('jf-copy').addEventListener('click', function () {
+      if (!output.value) { flash('msg_copy_empty', true); return; }
+      var fallback = function () { output.focus(); output.select(); flash('msg_copy_fail', true); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(output.value).then(function () { flash('msg_copied', false); }, fallback);
+      } else {
+        try {
+          output.focus(); output.select();
+          if (document.execCommand('copy')) flash('msg_copied', false); else fallback();
+        } catch (e) { fallback(); }
+      }
+    });
+
+    /* ---------- Restore, then first render ---------- */
+
+    var savedIndent = load('indent');
+    if (savedIndent === '2' || savedIndent === '4' || savedIndent === 'tab') indentSel.value = savedIndent;
+    if (load('sort') === '1') sortChk.checked = true;
+    var savedInput = load('input');
+    if (typeof savedInput === 'string') input.value = savedInput;
+
+    window.SiteLang.init(I18N, function () { validate(); });
+  })();
+  </script>
+</body>
+</html>
