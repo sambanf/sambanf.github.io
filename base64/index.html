@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Base64 Encoder &amp; Decoder</title>
+  <meta name="description" content="Free online Base64 encoder and decoder. Convert text to Base64 and back with full UTF-8 and URL-safe support — everything runs in your browser.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d9488'/%3E%3Cg stroke='%23ffffff' stroke-width='2.6' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M13 11l-5 5 5 5'/%3E%3Cpath d='M19 11l5 5-5 5'/%3E%3C/g%3E%3C/svg%3E">
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    .top-nav {
+      padding: 1.25rem 0 2.25rem; font-size: 0.9rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .top-nav a { color: var(--text-muted); text-decoration: none; }
+    .top-nav a:hover { color: var(--accent-strong); }
+    .lede { color: var(--text-muted); max-width: 44rem; margin-bottom: 0; }
+    .tool-card { margin: 1.75rem 0 2rem; }
+    .how-card { margin-bottom: 1rem; }
+    .how-card h3 { margin-top: 1.25rem; }
+
+    .seg {
+      display: inline-flex; gap: 0.25rem; padding: 0.25rem; margin-bottom: 1.25rem;
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    }
+    .seg button {
+      border: 0; background: transparent; color: var(--text-muted);
+      font: inherit; font-weight: 600; font-size: 0.9rem;
+      padding: 0.5rem 1.1rem; border-radius: calc(var(--radius-sm) - 3px); cursor: pointer;
+    }
+    .seg button:hover { color: var(--text); }
+    .seg button[aria-pressed="true"] { background: var(--surface); color: var(--accent-strong); box-shadow: var(--shadow); }
+
+    .io-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+    textarea.io {
+      width: 100%; min-height: 150px; padding: 0.85rem 1rem; margin-bottom: 1rem;
+      font-family: var(--mono); font-size: 0.9rem; line-height: 1.55; color: var(--text);
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); resize: vertical; overflow-wrap: anywhere;
+    }
+    textarea.io[readonly] { background: var(--surface-2); }
+    .opt { display: flex; align-items: center; gap: 0.5rem; margin: 0 0 1rem; font-size: 0.9rem; }
+    .opt input { width: auto; }
+    .opt .hint { color: var(--text-muted); }
+    .b64-error { color: var(--negative); font-size: 0.9rem; min-height: 1.2em; margin: 0 0 0.75rem; }
+    .actions { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+    .msg { min-height: 1.2em; margin-top: 0.75rem; font-size: 0.9rem; color: var(--text-muted); }
+
+    @media (max-width: 520px) { .card { padding: 1.1rem; } }
+  </style>
+</head>
+<body>
+  <header class="container">
+    <nav class="top-nav" aria-label="Site" data-i18n-attr="aria-label:nav_site">
+      <a href="../">&#8592; samba nugraha</a>
+      <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
+        <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0l60 30M60 0L0 30" stroke="#fff" stroke-width="6"/><path d="M0 0l60 30M60 0L0 30" stroke="#C8102E" stroke-width="2.5"/><path d="M30 0v30M0 15h60" stroke="#fff" stroke-width="10"/><path d="M30 0v30M0 15h60" stroke="#C8102E" stroke-width="6"/></svg>EN
+        </button>
+        <button type="button" data-lang="id" aria-pressed="false" aria-label="Bahasa Indonesia">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="15" fill="#E70011"/><rect y="15" width="60" height="15" fill="#F7F7F7"/></svg>ID
+        </button>
+      </div>
+    </nav>
+    <h1 data-i18n="h1">Base64 Encoder &amp; Decoder</h1>
+    <p class="lede" data-i18n="lede">Convert text to Base64 and back. Full Unicode (UTF-8) support, an optional URL-safe mode, and everything runs in your browser.</p>
+  </header>
+
+  <main class="container">
+    <noscript>
+      <div class="card" style="border-left:3px solid var(--negative)">This tool needs JavaScript to run. Please enable it and reload. / Alat ini membutuhkan JavaScript. Aktifkan lalu muat ulang.</div>
+    </noscript>
+
+    <div class="card tool-card">
+      <div class="seg" role="group" aria-label="Mode" data-i18n-attr="aria-label:mode_aria">
+        <button type="button" id="mode-encode" aria-pressed="true" data-i18n="mode_encode">Encode</button>
+        <button type="button" id="mode-decode" aria-pressed="false" data-i18n="mode_decode">Decode</button>
+      </div>
+
+      <div class="io-head">
+        <label for="b64-input" id="b64-in-label">Text to encode</label>
+      </div>
+      <textarea class="io" id="b64-input" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+
+      <label class="opt" for="b64-urlsafe">
+        <input type="checkbox" id="b64-urlsafe">
+        <span data-i18n="urlsafe">URL-safe</span>
+        <span class="hint" data-i18n="urlsafe_hint">— uses - and _ instead of + and /, no padding</span>
+      </label>
+
+      <div class="io-head">
+        <label for="b64-output" id="b64-out-label">Base64 result</label>
+      </div>
+      <textarea class="io" id="b64-output" readonly aria-live="polite"></textarea>
+      <p class="b64-error" id="b64-error" role="alert"></p>
+
+      <div class="actions">
+        <button type="button" class="btn btn-primary" id="b64-copy" data-i18n="btn_copy">Copy result</button>
+        <button type="button" class="btn" id="b64-swap" data-i18n="btn_swap">Use result as input</button>
+        <button type="button" class="btn" id="b64-clear" data-i18n="btn_clear">Clear</button>
+      </div>
+      <p class="msg" id="b64-msg" aria-live="polite"></p>
+    </div>
+
+    <section class="card how-card" aria-labelledby="how-heading">
+      <h2 id="how-heading" data-i18n="how_title">About Base64</h2>
+      <p data-i18n="how_1">Base64 rewrites any data using 64 safe characters (A–Z, a–z, 0–9, + and /) so it can travel through systems that only expect text — for example inside data URIs, JSON, or email. It is an encoding, not encryption: anyone can decode it, so never use it to hide secrets.</p>
+      <p data-i18n="how_2">Text is handled as UTF-8, so emoji and accented or non-Latin characters round-trip correctly. Turn on URL-safe when the result must sit inside a URL or filename.</p>
+      <p class="muted small" data-i18n="privacy">All conversion happens on this page — nothing is uploaded and nothing is tracked. Your last input is remembered only in this browser.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p><a href="../" data-i18n="footer_back">&#8592; back to all tools</a> &middot; &copy; 2026 Samba Nugraha</p>
+    </div>
+  </footer>
+
+  <script src="../assets/lang.js"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    var I18N = {
+      en: {
+        _title: 'Base64 Encoder & Decoder',
+        _meta: 'Free online Base64 encoder and decoder. Convert text to Base64 and back with full UTF-8 and URL-safe support — everything runs in your browser.',
+        nav_site: 'Site',
+        h1: 'Base64 Encoder & Decoder',
+        lede: 'Convert text to Base64 and back. Full Unicode (UTF-8) support, an optional URL-safe mode, and everything runs in your browser.',
+        mode_aria: 'Mode',
+        mode_encode: 'Encode',
+        mode_decode: 'Decode',
+        urlsafe: 'URL-safe',
+        urlsafe_hint: '— uses - and _ instead of + and /, no padding',
+        in_label_encode: 'Text to encode',
+        in_label_decode: 'Base64 to decode',
+        out_label_encode: 'Base64 result',
+        out_label_decode: 'Decoded text',
+        in_ph_encode: 'Type or paste text…',
+        in_ph_decode: 'Paste Base64 here…',
+        btn_copy: 'Copy result',
+        btn_swap: 'Use result as input',
+        btn_clear: 'Clear',
+        err_decode: 'That does not look like valid Base64. Check for stray or missing characters.',
+        msg_copied: 'Copied to clipboard.',
+        msg_copy_empty: 'Nothing to copy yet.',
+        msg_copy_fail: 'Could not copy automatically — select the text and copy it manually.',
+        msg_cleared: 'Cleared.',
+        how_title: 'About Base64',
+        how_1: 'Base64 rewrites any data using 64 safe characters (A–Z, a–z, 0–9, + and /) so it can travel through systems that only expect text — for example inside data URIs, JSON, or email. It is an encoding, not encryption: anyone can decode it, so never use it to hide secrets.',
+        how_2: 'Text is handled as UTF-8, so emoji and accented or non-Latin characters round-trip correctly. Turn on URL-safe when the result must sit inside a URL or filename.',
+        privacy: 'All conversion happens on this page — nothing is uploaded and nothing is tracked. Your last input is remembered only in this browser.',
+        footer_back: '← back to all tools'
+      },
+      id: {
+        _title: 'Encoder & Decoder Base64',
+        _meta: 'Encoder dan decoder Base64 online gratis. Ubah teks ke Base64 dan sebaliknya dengan dukungan penuh UTF-8 dan mode URL-safe — semuanya berjalan di browser Anda.',
+        nav_site: 'Situs',
+        h1: 'Encoder & Decoder Base64',
+        lede: 'Ubah teks ke Base64 dan sebaliknya. Dukungan penuh Unicode (UTF-8), mode URL-safe opsional, dan semuanya berjalan di browser Anda.',
+        mode_aria: 'Mode',
+        mode_encode: 'Encode',
+        mode_decode: 'Decode',
+        urlsafe: 'URL-safe',
+        urlsafe_hint: '— memakai - dan _ alih-alih + dan /, tanpa padding',
+        in_label_encode: 'Teks untuk di-encode',
+        in_label_decode: 'Base64 untuk di-decode',
+        out_label_encode: 'Hasil Base64',
+        out_label_decode: 'Teks hasil decode',
+        in_ph_encode: 'Ketik atau tempel teks…',
+        in_ph_decode: 'Tempel Base64 di sini…',
+        btn_copy: 'Salin hasil',
+        btn_swap: 'Jadikan hasil sebagai input',
+        btn_clear: 'Bersihkan',
+        err_decode: 'Ini tidak tampak seperti Base64 yang valid. Periksa karakter yang salah atau kurang.',
+        msg_copied: 'Disalin ke clipboard.',
+        msg_copy_empty: 'Belum ada yang bisa disalin.',
+        msg_copy_fail: 'Tidak bisa menyalin otomatis — pilih teksnya lalu salin manual.',
+        msg_cleared: 'Dibersihkan.',
+        how_title: 'Tentang Base64',
+        how_1: 'Base64 menulis ulang data apa pun memakai 64 karakter aman (A–Z, a–z, 0–9, + dan /) agar bisa melewati sistem yang hanya menerima teks — misalnya di dalam data URI, JSON, atau email. Ini adalah encoding, bukan enkripsi: siapa pun bisa men-decode-nya, jadi jangan gunakan untuk menyembunyikan rahasia.',
+        how_2: 'Teks diproses sebagai UTF-8, sehingga emoji dan karakter beraksen atau non-Latin tetap utuh bolak-balik. Aktifkan URL-safe bila hasilnya harus berada di dalam URL atau nama berkas.',
+        privacy: 'Semua konversi terjadi di halaman ini — tidak ada yang diunggah dan tidak ada pelacakan. Input terakhir Anda hanya diingat di browser ini.',
+        footer_back: '← kembali ke semua alat'
+      }
+    };
+
+    function t(key) { return window.SiteLang.t(key); }
+    function $(id) { return document.getElementById(id); }
+
+    /* ---------- Pure Base64 (UTF-8 safe) ---------- */
+
+    function bytesToB64(bytes) {
+      var bin = '', chunk = 0x8000;
+      for (var i = 0; i < bytes.length; i += chunk) {
+        bin += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+      }
+      return btoa(bin);
+    }
+    function b64ToBytes(b64) {
+      var bin = atob(b64);
+      var bytes = new Uint8Array(bin.length);
+      for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      return bytes;
+    }
+    function encodeText(str, urlSafe) {
+      var b64 = bytesToB64(new TextEncoder().encode(str));
+      if (urlSafe) b64 = b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+      return b64;
+    }
+    // Throws on invalid input; caller shows a friendly error.
+    function decodeText(input) {
+      var s = input.replace(/\s+/g, '');
+      if (s === '') return '';
+      s = s.replace(/-/g, '+').replace(/_/g, '/');       // tolerate URL-safe input
+      var pad = s.length % 4;
+      if (pad === 1) throw new Error('bad length');       // never valid Base64
+      if (pad) s += new Array(5 - pad).join('=');
+      if (!/^[A-Za-z0-9+/]*={0,2}$/.test(s)) throw new Error('bad chars');
+      return new TextDecoder('utf-8', { fatal: false }).decode(b64ToBytes(s));
+    }
+
+    /* ---------- localStorage ---------- */
+
+    var NS = 'base64.';
+    function save(key, value) { try { localStorage.setItem(NS + key, value); } catch (e) { /* ignore */ } }
+    function load(key) { try { return localStorage.getItem(NS + key); } catch (e) { return null; } }
+
+    /* ---------- Wiring ---------- */
+
+    var input = $('b64-input'), output = $('b64-output'), errEl = $('b64-error');
+    var urlSafe = $('b64-urlsafe');
+    var mode = 'encode';
+
+    function convert() {
+      errEl.textContent = '';
+      var src = input.value;
+      if (src === '') { output.value = ''; return; }
+      if (mode === 'encode') {
+        output.value = encodeText(src, urlSafe.checked);
+      } else {
+        try {
+          output.value = decodeText(src);
+        } catch (e) {
+          output.value = '';
+          errEl.textContent = t('err_decode');
+        }
+      }
+    }
+
+    function render() {
+      var enc = mode === 'encode';
+      $('mode-encode').setAttribute('aria-pressed', enc ? 'true' : 'false');
+      $('mode-decode').setAttribute('aria-pressed', enc ? 'false' : 'true');
+      $('b64-in-label').textContent = t(enc ? 'in_label_encode' : 'in_label_decode');
+      $('b64-out-label').textContent = t(enc ? 'out_label_encode' : 'out_label_decode');
+      input.placeholder = t(enc ? 'in_ph_encode' : 'in_ph_decode');
+      convert();
+    }
+
+    function setMode(m) {
+      if (m === mode) return;
+      mode = m;
+      save('mode', mode);
+      render();
+    }
+
+    function flash(key, isError) {
+      var el = $('b64-msg');
+      el.textContent = t(key);
+      el.style.color = isError ? 'var(--negative)' : 'var(--text-muted)';
+    }
+
+    input.addEventListener('input', function () { save('input', input.value); convert(); $('b64-msg').textContent = ''; });
+    urlSafe.addEventListener('change', function () { save('urlsafe', urlSafe.checked ? '1' : '0'); convert(); });
+    $('mode-encode').addEventListener('click', function () { setMode('encode'); });
+    $('mode-decode').addEventListener('click', function () { setMode('decode'); });
+
+    $('b64-swap').addEventListener('click', function () {
+      input.value = output.value;
+      mode = mode === 'encode' ? 'decode' : 'encode';
+      save('mode', mode);
+      save('input', input.value);
+      render();
+      input.focus();
+    });
+
+    $('b64-clear').addEventListener('click', function () {
+      input.value = '';
+      save('input', '');
+      convert();
+      flash('msg_cleared', false);
+      input.focus();
+    });
+
+    $('b64-copy').addEventListener('click', function () {
+      if (!output.value) { flash('msg_copy_empty', true); return; }
+      var fallback = function () { output.focus(); output.select(); flash('msg_copy_fail', true); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(output.value).then(function () { flash('msg_copied', false); }, fallback);
+      } else {
+        try {
+          output.focus(); output.select();
+          if (document.execCommand('copy')) flash('msg_copied', false); else fallback();
+        } catch (e) { fallback(); }
+      }
+    });
+
+    /* ---------- Restore, then first render ---------- */
+
+    var savedMode = load('mode');
+    if (savedMode === 'encode' || savedMode === 'decode') mode = savedMode;
+    if (load('urlsafe') === '1') urlSafe.checked = true;
+    var savedInput = load('input');
+    if (typeof savedInput === 'string') input.value = savedInput;
+
+    window.SiteLang.init(I18N, function () { render(); });
+  })();
+  </script>
+</body>
+</html>

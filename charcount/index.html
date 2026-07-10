@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Character &amp; Word Counter</title>
+  <meta name="description" content="Free online character and word counter. Count characters, words, sentences, lines, paragraphs, and reading time as you type — nothing leaves your browser.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d9488'/%3E%3Cg stroke='%23ffffff' stroke-width='2.6' stroke-linecap='round'%3E%3Cpath d='M8 11h16'/%3E%3Cpath d='M8 16h16'/%3E%3Cpath d='M8 21h10'/%3E%3C/g%3E%3C/svg%3E">
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    .top-nav {
+      padding: 1.25rem 0 2.25rem; font-size: 0.9rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .top-nav a { color: var(--text-muted); text-decoration: none; }
+    .top-nav a:hover { color: var(--accent-strong); }
+    .lede { color: var(--text-muted); max-width: 44rem; margin-bottom: 0; }
+    .tool-card { margin: 1.75rem 0 2rem; }
+    .how-card { margin-bottom: 1rem; }
+    .how-card h3 { margin-top: 1.25rem; }
+
+    textarea#cc-text {
+      width: 100%; min-height: 240px; padding: 0.85rem 1rem;
+      font: inherit; line-height: 1.6; color: var(--text);
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); resize: vertical;
+    }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; margin-top: 0.85rem; }
+    .toolbar .spacer { flex: 1 1 auto; }
+    .limit-field { display: flex; align-items: center; gap: 0.5rem; }
+    .limit-field label { margin: 0; white-space: nowrap; }
+    .limit-field input { width: 7.5rem; }
+    .remaining { margin: 0.75rem 0 0; font-family: var(--mono); font-size: 0.9rem; color: var(--text-muted); }
+    .remaining.over { color: var(--negative); font-weight: 600; }
+
+    .stats {
+      margin: 1.5rem 0 0; padding: 0; list-style: none;
+      display: grid; gap: 0.85rem;
+      grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr));
+    }
+    .stat {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 0.9rem 1rem;
+    }
+    .stat b { display: block; font-family: var(--mono); font-size: 1.6rem; font-weight: 600; line-height: 1.2; letter-spacing: -0.01em; }
+    .stat span { font-size: 0.8rem; color: var(--text-muted); }
+    .msg { min-height: 1.2em; margin-top: 0.75rem; font-size: 0.9rem; color: var(--text-muted); }
+
+    @media (max-width: 520px) { .card { padding: 1.1rem; } }
+  </style>
+</head>
+<body>
+  <header class="container">
+    <nav class="top-nav" aria-label="Site" data-i18n-attr="aria-label:nav_site">
+      <a href="../">&#8592; samba nugraha</a>
+      <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
+        <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0l60 30M60 0L0 30" stroke="#fff" stroke-width="6"/><path d="M0 0l60 30M60 0L0 30" stroke="#C8102E" stroke-width="2.5"/><path d="M30 0v30M0 15h60" stroke="#fff" stroke-width="10"/><path d="M30 0v30M0 15h60" stroke="#C8102E" stroke-width="6"/></svg>EN
+        </button>
+        <button type="button" data-lang="id" aria-pressed="false" aria-label="Bahasa Indonesia">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="15" fill="#E70011"/><rect y="15" width="60" height="15" fill="#F7F7F7"/></svg>ID
+        </button>
+      </div>
+    </nav>
+    <h1 data-i18n="h1">Character &amp; Word Counter</h1>
+    <p class="lede" data-i18n="lede">Count characters, words, sentences, lines, paragraphs, and reading time as you type. Everything runs in your browser.</p>
+  </header>
+
+  <main class="container">
+    <noscript>
+      <div class="card" style="border-left:3px solid var(--negative)">This tool needs JavaScript to run. Please enable it and reload. / Alat ini membutuhkan JavaScript. Aktifkan lalu muat ulang.</div>
+    </noscript>
+
+    <div class="card tool-card">
+      <label for="cc-text" data-i18n="input_label">Your text</label>
+      <textarea id="cc-text" spellcheck="true" placeholder="Type or paste your text here…" data-i18n-attr="placeholder:input_ph"></textarea>
+
+      <div class="toolbar">
+        <div class="limit-field">
+          <label for="cc-limit" data-i18n="limit_label">Character limit (optional)</label>
+          <input id="cc-limit" type="number" min="0" step="1" inputmode="numeric" placeholder="e.g. 280" data-i18n-attr="placeholder:limit_ph">
+        </div>
+        <span class="spacer"></span>
+        <button type="button" class="btn" id="cc-copy" data-i18n="btn_copy">Copy</button>
+        <button type="button" class="btn" id="cc-clear" data-i18n="btn_clear">Clear</button>
+      </div>
+      <p class="remaining" id="cc-remaining" aria-live="polite" hidden></p>
+      <p class="msg" id="cc-msg" aria-live="polite"></p>
+
+      <ul class="stats" aria-label="Statistics" data-i18n-attr="aria-label:stats_aria">
+        <li class="stat"><b id="s-chars">0</b><span data-i18n="stat_chars">Characters</span></li>
+        <li class="stat"><b id="s-nospace">0</b><span data-i18n="stat_nospace">Characters (no spaces)</span></li>
+        <li class="stat"><b id="s-words">0</b><span data-i18n="stat_words">Words</span></li>
+        <li class="stat"><b id="s-sentences">0</b><span data-i18n="stat_sentences">Sentences</span></li>
+        <li class="stat"><b id="s-lines">0</b><span data-i18n="stat_lines">Lines</span></li>
+        <li class="stat"><b id="s-paras">0</b><span data-i18n="stat_paras">Paragraphs</span></li>
+        <li class="stat"><b id="s-read">0</b><span data-i18n="stat_read">Read time (≈200 wpm)</span></li>
+      </ul>
+    </div>
+
+    <section class="card how-card" aria-labelledby="how-heading">
+      <h2 id="how-heading" data-i18n="how_title">How the counts work</h2>
+      <p data-i18n="how_1">Characters count every symbol including spaces and line breaks (emoji and accented letters count as one). "Characters (no spaces)" strips all whitespace. Words are runs of non-space characters, sentences end at . ! ? or …, and paragraphs are blocks separated by a blank line.</p>
+      <p class="muted small" data-i18n="privacy">Your text never leaves this page — there is no server, no upload, and no tracking. It is remembered only in this browser so it is still here when you come back.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p><a href="../" data-i18n="footer_back">&#8592; back to all tools</a> &middot; &copy; 2026 Samba Nugraha</p>
+    </div>
+  </footer>
+
+  <script src="../assets/lang.js"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    var I18N = {
+      en: {
+        _title: 'Character & Word Counter',
+        _meta: 'Free online character and word counter. Count characters, words, sentences, lines, paragraphs, and reading time as you type — nothing leaves your browser.',
+        nav_site: 'Site',
+        h1: 'Character & Word Counter',
+        lede: 'Count characters, words, sentences, lines, paragraphs, and reading time as you type. Everything runs in your browser.',
+        input_label: 'Your text',
+        input_ph: 'Type or paste your text here…',
+        limit_label: 'Character limit (optional)',
+        limit_ph: 'e.g. 280',
+        btn_copy: 'Copy',
+        btn_clear: 'Clear',
+        stats_aria: 'Statistics',
+        stat_chars: 'Characters',
+        stat_nospace: 'Characters (no spaces)',
+        stat_words: 'Words',
+        stat_sentences: 'Sentences',
+        stat_lines: 'Lines',
+        stat_paras: 'Paragraphs',
+        stat_read: 'Read time (≈200 wpm)',
+        read_unit: 'min',
+        remaining_under: '{used} / {limit} · {remaining} left',
+        remaining_over: '{used} / {limit} · {over} over the limit',
+        msg_copied: 'Copied to clipboard.',
+        msg_copy_empty: 'Nothing to copy yet.',
+        msg_copy_fail: 'Could not copy automatically — select the text and copy it manually.',
+        msg_cleared: 'Cleared.',
+        how_title: 'How the counts work',
+        how_1: 'Characters count every symbol including spaces and line breaks (emoji and accented letters count as one). "Characters (no spaces)" strips all whitespace. Words are runs of non-space characters, sentences end at . ! ? or …, and paragraphs are blocks separated by a blank line.',
+        privacy: 'Your text never leaves this page — there is no server, no upload, and no tracking. It is remembered only in this browser so it is still here when you come back.',
+        footer_back: '← back to all tools'
+      },
+      id: {
+        _title: 'Penghitung Karakter & Kata',
+        _meta: 'Penghitung karakter dan kata online gratis. Hitung karakter, kata, kalimat, baris, paragraf, dan waktu baca saat Anda mengetik — tidak ada data yang keluar dari browser Anda.',
+        nav_site: 'Situs',
+        h1: 'Penghitung Karakter & Kata',
+        lede: 'Hitung karakter, kata, kalimat, baris, paragraf, dan waktu baca secara langsung saat Anda mengetik. Semuanya berjalan di browser Anda.',
+        input_label: 'Teks Anda',
+        input_ph: 'Ketik atau tempel teks Anda di sini…',
+        limit_label: 'Batas karakter (opsional)',
+        limit_ph: 'mis. 280',
+        btn_copy: 'Salin',
+        btn_clear: 'Bersihkan',
+        stats_aria: 'Statistik',
+        stat_chars: 'Karakter',
+        stat_nospace: 'Karakter (tanpa spasi)',
+        stat_words: 'Kata',
+        stat_sentences: 'Kalimat',
+        stat_lines: 'Baris',
+        stat_paras: 'Paragraf',
+        stat_read: 'Waktu baca (≈200 kpm)',
+        read_unit: 'mnt',
+        remaining_under: '{used} / {limit} · sisa {remaining}',
+        remaining_over: '{used} / {limit} · {over} melebihi batas',
+        msg_copied: 'Disalin ke clipboard.',
+        msg_copy_empty: 'Belum ada yang bisa disalin.',
+        msg_copy_fail: 'Tidak bisa menyalin otomatis — pilih teksnya lalu salin manual.',
+        msg_cleared: 'Dibersihkan.',
+        how_title: 'Cara penghitungan',
+        how_1: 'Karakter menghitung setiap simbol termasuk spasi dan baris baru (emoji dan huruf beraksen dihitung sebagai satu). "Karakter (tanpa spasi)" menghapus semua spasi. Kata adalah rangkaian karakter tanpa spasi, kalimat berakhir di . ! ? atau …, dan paragraf adalah blok yang dipisahkan baris kosong.',
+        privacy: 'Teks Anda tidak pernah keluar dari halaman ini — tidak ada server, tidak ada unggahan, dan tidak ada pelacakan. Teks hanya diingat di browser ini sehingga masih ada saat Anda kembali.',
+        footer_back: '← kembali ke semua alat'
+      }
+    };
+
+    function t(key) { return window.SiteLang.t(key); }
+    function tf(key, vars) {
+      var s = t(key);
+      for (var k in vars) {
+        if (Object.prototype.hasOwnProperty.call(vars, k)) s = s.replace('{' + k + '}', vars[k]);
+      }
+      return s;
+    }
+    function fmt(n) { return n.toLocaleString(window.SiteLang.locale()); }
+    function $(id) { return document.getElementById(id); }
+
+    /* ---------- Pure counting (no DOM) ---------- */
+
+    function countChars(text) { return Array.from(text).length; }
+    function countNoSpace(text) { return Array.from(text.replace(/\s+/g, '')).length; }
+    function countWords(text) { return (text.trim().match(/\S+/g) || []).length; }
+    function countLines(text) { return text === '' ? 0 : text.split(/\r\n|\r|\n/).length; }
+    function countParagraphs(text) {
+      var s = text.trim();
+      if (!s) return 0;
+      return s.split(/\n[ \t]*\n/).filter(function (b) { return b.trim().length; }).length;
+    }
+    function countSentences(text) {
+      var s = text.trim();
+      if (!s) return 0;
+      var term = (s.match(/[.!?…]+/g) || []).length;
+      var endsTerm = /[.!?…]+$/.test(s);
+      return term + (endsTerm ? 0 : 1);
+    }
+    function readMinutes(words) { return words > 0 ? Math.max(1, Math.ceil(words / 200)) : 0; }
+
+    /* ---------- localStorage (safe in private browsing) ---------- */
+
+    var NS = 'charcount.';
+    function save(key, value) { try { localStorage.setItem(NS + key, value); } catch (e) { /* ignore */ } }
+    function load(key) { try { return localStorage.getItem(NS + key); } catch (e) { return null; } }
+
+    /* ---------- Wiring ---------- */
+
+    var ta = $('cc-text');
+    var limitEl = $('cc-limit');
+
+    function renderRemaining(chars) {
+      var el = $('cc-remaining');
+      var lim = parseInt(limitEl.value, 10);
+      if (!isFinite(lim) || lim <= 0) {
+        el.hidden = true; el.textContent = ''; el.classList.remove('over');
+        return;
+      }
+      el.hidden = false;
+      var remaining = lim - chars;
+      if (remaining >= 0) {
+        el.classList.remove('over');
+        el.textContent = tf('remaining_under', { used: fmt(chars), limit: fmt(lim), remaining: fmt(remaining) });
+      } else {
+        el.classList.add('over');
+        el.textContent = tf('remaining_over', { used: fmt(chars), limit: fmt(lim), over: fmt(-remaining) });
+      }
+    }
+
+    function render() {
+      var text = ta.value;
+      save('text', text);
+      save('limit', limitEl.value);
+
+      var chars = countChars(text);
+      $('s-chars').textContent = fmt(chars);
+      $('s-nospace').textContent = fmt(countNoSpace(text));
+      var words = countWords(text);
+      $('s-words').textContent = fmt(words);
+      $('s-sentences').textContent = fmt(countSentences(text));
+      $('s-lines').textContent = fmt(countLines(text));
+      $('s-paras').textContent = fmt(countParagraphs(text));
+      $('s-read').textContent = fmt(readMinutes(words)) + ' ' + t('read_unit');
+
+      renderRemaining(chars);
+    }
+
+    function flash(key, isError) {
+      var m = $('cc-msg');
+      m.textContent = t(key);
+      m.style.color = isError ? 'var(--negative)' : 'var(--text-muted)';
+    }
+
+    ta.addEventListener('input', function () { render(); $('cc-msg').textContent = ''; });
+    limitEl.addEventListener('input', render);
+
+    $('cc-clear').addEventListener('click', function () {
+      ta.value = '';
+      render();
+      flash('msg_cleared', false);
+      ta.focus();
+    });
+
+    $('cc-copy').addEventListener('click', function () {
+      if (!ta.value) { flash('msg_copy_empty', true); return; }
+      var fallback = function () { ta.focus(); ta.select(); flash('msg_copy_fail', true); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(ta.value).then(function () { flash('msg_copied', false); }, fallback);
+      } else {
+        try {
+          ta.focus(); ta.select();
+          if (document.execCommand('copy')) flash('msg_copied', false); else fallback();
+        } catch (e) { fallback(); }
+      }
+    });
+
+    /* ---------- Restore, then first render (also re-renders on language switch) ---------- */
+
+    var savedText = load('text');
+    if (typeof savedText === 'string') ta.value = savedText;
+    var savedLimit = load('limit');
+    if (typeof savedLimit === 'string') limitEl.value = savedLimit;
+
+    window.SiteLang.init(I18N, function () { render(); });
+  })();
+  </script>
+</body>
+</html>

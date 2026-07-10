@@ -4,6 +4,8 @@ Personal site and simple tools, served by [GitHub Pages](https://pages.github.co
 
 - **`/`** — portfolio landing page ([index.html](index.html))
 - **`/stockavgdown/`** — stock average calculator ([stockavgdown/index.html](stockavgdown/index.html))
+- **`/charcount/`** — character & word counter ([charcount/index.html](charcount/index.html))
+- **`/base64/`** — Base64 encoder & decoder ([base64/index.html](base64/index.html))
 - **`/assets/style.css`** — shared design tokens and base styles used by every page
 - **`/assets/lang.js`** — shared English/Indonesian language switcher
 
