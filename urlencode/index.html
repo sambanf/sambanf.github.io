@@ -7,6 +7,7 @@
   <meta name="description" content="Free URL encoder and decoder. Percent-encode text for URLs and decode it back, with component and form-data (+) modes — everything runs in your browser.">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d9488'/%3E%3Ctext x='16' y='23' font-family='ui-monospace,monospace' font-size='18' font-weight='700' fill='%23ffffff' text-anchor='middle'%3E%25%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="../assets/style.css">
+  <script src="../assets/theme.js"></script>
   <style>
     .top-nav {
       padding: 1.25rem 0 2.25rem; font-size: 0.9rem;
@@ -51,6 +52,7 @@
   <header class="container">
     <nav class="top-nav" aria-label="Site" data-i18n-attr="aria-label:nav_site">
       <a href="../">&#8592; samba nugraha</a>
+      <div class="nav-actions">
       <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
         <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
           <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0l60 30M60 0L0 30" stroke="#fff" stroke-width="6"/><path d="M0 0l60 30M60 0L0 30" stroke="#C8102E" stroke-width="2.5"/><path d="M30 0v30M0 15h60" stroke="#fff" stroke-width="10"/><path d="M30 0v30M0 15h60" stroke="#C8102E" stroke-width="6"/></svg>EN
@@ -58,6 +60,11 @@
         <button type="button" data-lang="id" aria-pressed="false" aria-label="Bahasa Indonesia">
           <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="15" fill="#E70011"/><rect y="15" width="60" height="15" fill="#F7F7F7"/></svg>ID
         </button>
+      </div>
+      <button type="button" class="theme-toggle" aria-label="Dark mode / Mode gelap" aria-pressed="false">
+        <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
       </div>
     </nav>
     <h1 data-i18n="h1">URL Encoder &amp; Decoder</h1>

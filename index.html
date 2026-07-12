@@ -7,14 +7,16 @@
   <meta name="description" content="Portfolio of Samba Nugraha, software engineer. Practical software and small, useful web tools.">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d9488'/%3E%3Ctext x='16' y='22' font-family='system-ui,sans-serif' font-size='16' font-weight='700' fill='%23ffffff' text-anchor='middle'%3ESN%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="assets/style.css">
+  <script src="assets/theme.js"></script>
   <script>document.documentElement.className += ' js';</script>
   <style>
     /* ---------- Page-specific styles (landing page) ---------- */
 
     :root { --pop: #6366f1; }
     @media (prefers-color-scheme: dark) {
-      :root { --pop: #818cf8; }
+      :root:not([data-theme="light"]) { --pop: #818cf8; }
     }
+    :root[data-theme="dark"] { --pop: #818cf8; }
 
     .visually-hidden {
       position: absolute;
@@ -75,7 +77,9 @@
       position: relative;
       z-index: 1;
       display: flex;
+      align-items: center;
       justify-content: flex-end;
+      gap: 0.5rem;
       padding-top: 1.25rem;
     }
 
@@ -468,6 +472,10 @@
           <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="15" fill="#E70011"/><rect y="15" width="60" height="15" fill="#F7F7F7"/></svg>ID
         </button>
       </div>
+      <button type="button" class="theme-toggle" aria-label="Dark mode / Mode gelap" aria-pressed="false">
+        <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
     </div>
     <div class="container hero">
       <p class="hero-eyebrow">Software Engineer</p>

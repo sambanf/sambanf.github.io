@@ -24,8 +24,10 @@
   --mono: ui-monospace, "Cascadia Code", Consolas, "SF Mono", monospace;
 }
 
+/* System dark mode — unless the user explicitly chose light via the
+   theme toggle (data-theme is set by assets/theme.js). */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: #0c0a09;
     --surface: #1c1917;
     --surface-2: #292524;
@@ -41,6 +43,29 @@
     --shadow: 0 1px 3px rgb(0 0 0 / 0.4), 0 4px 16px rgb(0 0 0 / 0.4);
   }
 }
+
+/* Explicit dark choice — same tokens as the media query above.
+   Keep the two blocks in sync when changing colors. */
+:root[data-theme="dark"] {
+  --bg: #0c0a09;
+  --surface: #1c1917;
+  --surface-2: #292524;
+  --text: #e7e5e4;
+  --text-muted: #a8a29e;
+  --border: #33302c;
+  --accent: #2dd4bf;
+  --accent-strong: #5eead4;
+  --accent-soft: #134e4a;
+  --accent-contrast: #042f2e;
+  --positive: #4ade80;
+  --negative: #f87171;
+  --shadow: 0 1px 3px rgb(0 0 0 / 0.4), 0 4px 16px rgb(0 0 0 / 0.4);
+}
+
+/* Native form controls, scrollbars, etc. follow the effective theme. */
+:root { color-scheme: light dark; }
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
 
 *, *::before, *::after { box-sizing: border-box; }
 
@@ -185,6 +210,47 @@ input::placeholder { color: var(--text-muted); opacity: 0.7; }
   border-radius: 2px;
   box-shadow: 0 0 0 1px var(--border);
 }
+
+/* ---------- Theme (dark mode) toggle ---------- */
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.15rem;
+  height: 2.15rem;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.theme-toggle:hover {
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+.theme-toggle svg { display: block; }
+
+/* Show the moon in light mode, the sun in dark mode */
+.theme-toggle .icon-sun { display: none; }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme-toggle .icon-sun { display: block; }
+  :root:not([data-theme="light"]) .theme-toggle .icon-moon { display: none; }
+}
+
+:root[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+:root[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
 
 /* ---------- Misc ---------- */
 
