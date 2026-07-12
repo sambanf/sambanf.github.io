@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Password Generator</title>
+  <meta name="description" content="Free password generator. Strong random passwords created locally with your browser's secure crypto — length, character options, and a strength meter. Nothing leaves your device.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d9488'/%3E%3Cg stroke='%23ffffff' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='8' y='14' width='16' height='11' rx='2'/%3E%3Cpath d='M11 14v-3a5 5 0 0 1 10 0v3'/%3E%3C/g%3E%3C/svg%3E">
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    .top-nav {
+      padding: 1.25rem 0 2.25rem; font-size: 0.9rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .top-nav a { color: var(--text-muted); text-decoration: none; }
+    .top-nav a:hover { color: var(--accent-strong); }
+    .lede { color: var(--text-muted); max-width: 44rem; margin-bottom: 0; }
+    .tool-card { margin: 1.75rem 0 2rem; }
+    .how-card { margin-bottom: 1rem; }
+
+    :root { --warn: #d97706; }
+    @media (prefers-color-scheme: dark) { :root { --warn: #fbbf24; } }
+
+    .pw-out-row { display: flex; gap: 0.6rem; align-items: stretch; }
+    #pw-out {
+      flex: 1; padding: 0.85rem 1rem;
+      font-family: var(--mono); font-size: 1.05rem; letter-spacing: 0.02em;
+      color: var(--text); background: var(--surface-2);
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      overflow-wrap: anywhere; word-break: break-all;
+    }
+    .pw-out-row .btn { flex: none; }
+
+    .strength { margin: 1rem 0 1.5rem; }
+    .strength-bar {
+      height: 6px; border-radius: 3px; background: var(--surface-2);
+      border: 1px solid var(--border); overflow: hidden;
+    }
+    .strength-bar > div { height: 100%; width: 0; border-radius: 3px; transition: width 0.25s ease; }
+    .strength-label { font-size: 0.875rem; margin-top: 0.4rem; color: var(--text-muted); }
+    .strength-label b { font-weight: 700; }
+    .s-weak > div { background: var(--negative); }
+    .s-fair > div { background: var(--warn); }
+    .s-good > div { background: var(--accent); }
+    .s-strong > div { background: var(--positive); }
+    .s-weak .strength-label b { color: var(--negative); }
+    .s-fair .strength-label b { color: var(--warn); }
+    .s-good .strength-label b { color: var(--accent-strong); }
+    .s-strong .strength-label b { color: var(--positive); }
+
+    .len-row { display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem; }
+    .len-row input[type="range"] { flex: 1; padding: 0; }
+    .len-row input[type="number"] { width: 5.5rem; }
+    .opts { display: grid; gap: 0.6rem; grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 1fr)); }
+    .opt { display: flex; align-items: center; gap: 0.55rem; font-size: 0.9rem; }
+    .opt input { width: auto; }
+    .opt code { color: var(--text-muted); font-size: 0.8rem; }
+    .err { color: var(--negative); font-size: 0.9rem; min-height: 1.2em; margin: 0.9rem 0 0; }
+    .msg { min-height: 1.2em; margin-top: 0.75rem; font-size: 0.9rem; color: var(--text-muted); }
+
+    @media (max-width: 520px) {
+      .card { padding: 1.1rem; }
+      .pw-out-row { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <header class="container">
+    <nav class="top-nav" aria-label="Site" data-i18n-attr="aria-label:nav_site">
+      <a href="../">&#8592; samba nugraha</a>
+      <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
+        <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0l60 30M60 0L0 30" stroke="#fff" stroke-width="6"/><path d="M0 0l60 30M60 0L0 30" stroke="#C8102E" stroke-width="2.5"/><path d="M30 0v30M0 15h60" stroke="#fff" stroke-width="10"/><path d="M30 0v30M0 15h60" stroke="#C8102E" stroke-width="6"/></svg>EN
+        </button>
+        <button type="button" data-lang="id" aria-pressed="false" aria-label="Bahasa Indonesia">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="15" fill="#E70011"/><rect y="15" width="60" height="15" fill="#F7F7F7"/></svg>ID
+        </button>
+      </div>
+    </nav>
+    <h1 data-i18n="h1">Password Generator</h1>
+    <p class="lede" data-i18n="lede">Strong random passwords, generated locally by your browser's secure crypto. Nothing is sent or saved anywhere.</p>
+  </header>
+
+  <main class="container">
+    <noscript>
+      <div class="card" style="border-left:3px solid var(--negative)">This tool needs JavaScript to run. Please enable it and reload. / Alat ini membutuhkan JavaScript. Aktifkan lalu muat ulang.</div>
+    </noscript>
+
+    <div class="card tool-card">
+      <label for="pw-out" data-i18n="out_label">Your password</label>
+      <div class="pw-out-row">
+        <output id="pw-out" aria-live="polite">—</output>
+        <button type="button" class="btn btn-primary" id="pw-copy" data-i18n="btn_copy">Copy</button>
+        <button type="button" class="btn" id="pw-regen" data-i18n="btn_regen">Regenerate</button>
+      </div>
+
+      <div class="strength" id="pw-strength">
+        <div class="strength-bar"><div id="pw-bar"></div></div>
+        <p class="strength-label" id="pw-label"></p>
+      </div>
+
+      <div class="len-row">
+        <label for="pw-len-num" style="margin:0" data-i18n="len_label">Length</label>
+        <input type="range" id="pw-len" min="4" max="64" value="20" aria-hidden="true" tabindex="-1">
+        <input type="number" id="pw-len-num" min="4" max="128" step="1" value="20" inputmode="numeric" data-i18n-attr="aria-label:len_label">
+      </div>
+
+      <div class="opts">
+        <label class="opt" for="pw-lower"><input type="checkbox" id="pw-lower" checked><span data-i18n="opt_lower">Lowercase</span> <code>abc</code></label>
+        <label class="opt" for="pw-upper"><input type="checkbox" id="pw-upper" checked><span data-i18n="opt_upper">Uppercase</span> <code>ABC</code></label>
+        <label class="opt" for="pw-digits"><input type="checkbox" id="pw-digits" checked><span data-i18n="opt_digits">Digits</span> <code>123</code></label>
+        <label class="opt" for="pw-symbols"><input type="checkbox" id="pw-symbols" checked><span data-i18n="opt_symbols">Symbols</span> <code>!@#$%</code></label>
+        <label class="opt" for="pw-noambig"><input type="checkbox" id="pw-noambig"><span data-i18n="opt_noambig">Avoid ambiguous characters</span> <code>Il1O0o</code></label>
+      </div>
+
+      <p class="err" id="pw-err" role="alert"></p>
+      <p class="msg" id="pw-msg" aria-live="polite"></p>
+    </div>
+
+    <section class="card how-card" aria-labelledby="how-heading">
+      <h2 id="how-heading" data-i18n="how_title">How strength is measured</h2>
+      <p data-i18n="how_1">Every character is drawn with the browser's cryptographically secure random generator (with rejection sampling, so no character is more likely than another), and at least one character from each selected set is guaranteed. Strength is estimated as entropy: length × log₂(pool size). Around 60 bits is reasonable, 80+ bits is strong for anything important.</p>
+      <p data-i18n="how_2">The best password is one you never type or remember: use a password manager, and use a unique password for every account.</p>
+      <p class="muted small" data-i18n="privacy">Passwords are generated on this page and deliberately never saved anywhere — not even in this browser. Only your option settings are remembered.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p><a href="../" data-i18n="footer_back">&#8592; back to all tools</a> &middot; &copy; 2026 Samba Nugraha</p>
+    </div>
+  </footer>
+
+  <script src="../assets/lang.js"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    var I18N = {
+      en: {
+        _title: 'Password Generator',
+        _meta: "Free password generator. Strong random passwords created locally with your browser's secure crypto — length, character options, and a strength meter. Nothing leaves your device.",
+        nav_site: 'Site',
+        h1: 'Password Generator',
+        lede: "Strong random passwords, generated locally by your browser's secure crypto. Nothing is sent or saved anywhere.",
+        out_label: 'Your password',
+        btn_copy: 'Copy',
+        btn_regen: 'Regenerate',
+        len_label: 'Length',
+        opt_lower: 'Lowercase',
+        opt_upper: 'Uppercase',
+        opt_digits: 'Digits',
+        opt_symbols: 'Symbols',
+        opt_noambig: 'Avoid ambiguous characters',
+        strength_prefix: 'Strength:',
+        s_weak: 'Weak',
+        s_fair: 'Fair',
+        s_good: 'Good',
+        s_strong: 'Strong',
+        bits: '{n} bits of entropy',
+        err_nosets: 'Select at least one character set.',
+        err_insecure: 'Secure random numbers are unavailable on this connection (needs https).',
+        msg_copied: 'Copied to clipboard.',
+        msg_copy_fail: 'Could not copy automatically — select the password and copy it manually.',
+        how_title: 'How strength is measured',
+        how_1: "Every character is drawn with the browser's cryptographically secure random generator (with rejection sampling, so no character is more likely than another), and at least one character from each selected set is guaranteed. Strength is estimated as entropy: length × log₂(pool size). Around 60 bits is reasonable, 80+ bits is strong for anything important.",
+        how_2: 'The best password is one you never type or remember: use a password manager, and use a unique password for every account.',
+        privacy: 'Passwords are generated on this page and deliberately never saved anywhere — not even in this browser. Only your option settings are remembered.',
+        footer_back: '← back to all tools'
+      },
+      id: {
+        _title: 'Generator Password',
+        _meta: 'Generator password gratis. Password acak yang kuat dibuat secara lokal dengan crypto aman browser Anda — panjang, opsi karakter, dan pengukur kekuatan. Tidak ada yang keluar dari perangkat Anda.',
+        nav_site: 'Situs',
+        h1: 'Generator Password',
+        lede: 'Password acak yang kuat, dibuat secara lokal oleh crypto aman browser Anda. Tidak ada yang dikirim atau disimpan di mana pun.',
+        out_label: 'Password Anda',
+        btn_copy: 'Salin',
+        btn_regen: 'Buat ulang',
+        len_label: 'Panjang',
+        opt_lower: 'Huruf kecil',
+        opt_upper: 'Huruf besar',
+        opt_digits: 'Angka',
+        opt_symbols: 'Simbol',
+        opt_noambig: 'Hindari karakter ambigu',
+        strength_prefix: 'Kekuatan:',
+        s_weak: 'Lemah',
+        s_fair: 'Cukup',
+        s_good: 'Baik',
+        s_strong: 'Kuat',
+        bits: '{n} bit entropi',
+        err_nosets: 'Pilih minimal satu set karakter.',
+        err_insecure: 'Angka acak yang aman tidak tersedia pada koneksi ini (butuh https).',
+        msg_copied: 'Disalin ke clipboard.',
+        msg_copy_fail: 'Tidak bisa menyalin otomatis — pilih password-nya lalu salin manual.',
+        how_title: 'Cara mengukur kekuatan',
+        how_1: 'Setiap karakter diambil dengan generator acak browser yang aman secara kriptografis (dengan rejection sampling, sehingga tidak ada karakter yang lebih mungkin muncul), dan minimal satu karakter dari setiap set yang dipilih dijamin ada. Kekuatan diperkirakan sebagai entropi: panjang × log₂(ukuran pool). Sekitar 60 bit cukup wajar, 80+ bit kuat untuk hal yang penting.',
+        how_2: 'Password terbaik adalah yang tidak pernah Anda ketik atau hafal: gunakan password manager, dan pakai password unik untuk setiap akun.',
+        privacy: 'Password dibuat di halaman ini dan sengaja tidak pernah disimpan di mana pun — bahkan di browser ini. Hanya pengaturan opsi Anda yang diingat.',
+        footer_back: '← kembali ke semua alat'
+      }
+    };
+
+    function t(key) { return window.SiteLang.t(key); }
+    function tf(key, vars) {
+      var s = t(key);
+      for (var k in vars) {
+        if (Object.prototype.hasOwnProperty.call(vars, k)) s = s.replace('{' + k + '}', vars[k]);
+      }
+      return s;
+    }
+    function $(id) { return document.getElementById(id); }
+
+    /* ---------- Pure generation (crypto-secure, unbiased) ---------- */
+
+    var SETS = {
+      lower: 'abcdefghijklmnopqrstuvwxyz',
+      upper: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+      digits: '0123456789',
+      symbols: '!@#$%^&*()-_=+[]{};:,.<>?/~'
+    };
+    var AMBIGUOUS = 'Il1O0o';
+
+    var secure = !!(window.crypto && crypto.getRandomValues);
+
+    // Uniform integer in [0, max) via rejection sampling — no modulo bias.
+    function randInt(max) {
+      var lim = Math.floor(4294967296 / max) * max;
+      var buf = new Uint32Array(1);
+      do { crypto.getRandomValues(buf); } while (buf[0] >= lim);
+      return buf[0] % max;
+    }
+
+    function activeSets() {
+      var keys = ['lower', 'upper', 'digits', 'symbols'];
+      var noAmbig = $('pw-noambig').checked;
+      var out = [];
+      keys.forEach(function (k) {
+        if (!$('pw-' + k).checked) return;
+        var s = SETS[k];
+        if (noAmbig) {
+          s = s.split('').filter(function (c) { return AMBIGUOUS.indexOf(c) === -1; }).join('');
+        }
+        if (s) out.push(s);
+      });
+      return out;
+    }
+
+    function generate(length, sets) {
+      var pool = sets.join('');
+      var chars = [];
+      // one guaranteed character from each selected set (as far as length allows)
+      for (var i = 0; i < sets.length && i < length; i++) {
+        chars.push(sets[i][randInt(sets[i].length)]);
+      }
+      while (chars.length < length) chars.push(pool[randInt(pool.length)]);
+      // Fisher–Yates shuffle so the guaranteed characters aren't predictable up front
+      for (var j = chars.length - 1; j > 0; j--) {
+        var r = randInt(j + 1);
+        var tmp = chars[j]; chars[j] = chars[r]; chars[r] = tmp;
+      }
+      return chars.join('');
+    }
+
+    /* ---------- localStorage (options only — never the password) ---------- */
+
+    var NS = 'password.';
+    function save(key, value) { try { localStorage.setItem(NS + key, value); } catch (e) { /* ignore */ } }
+    function load(key) { try { return localStorage.getItem(NS + key); } catch (e) { return null; } }
+
+    /* ---------- Wiring ---------- */
+
+    var lenRange = $('pw-len'), lenNum = $('pw-len-num');
+    var current = '';
+
+    function clampLen(v) {
+      v = parseInt(v, 10);
+      if (!isFinite(v)) return 20;
+      return Math.min(128, Math.max(4, v));
+    }
+
+    function renderStrength(length, poolSize) {
+      var wrap = $('pw-strength'), bar = $('pw-bar'), label = $('pw-label');
+      if (!poolSize) { bar.style.width = '0'; label.textContent = ''; return; }
+      var bits = Math.round(length * Math.log2(poolSize));
+      var cls, key;
+      if (bits < 45) { cls = 's-weak'; key = 's_weak'; }
+      else if (bits < 60) { cls = 's-fair'; key = 's_fair'; }
+      else if (bits < 80) { cls = 's-good'; key = 's_good'; }
+      else { cls = 's-strong'; key = 's_strong'; }
+      wrap.className = 'strength ' + cls;
+      bar.style.width = Math.min(100, Math.round(bits / 100 * 100)) + '%';
+      label.innerHTML = '';
+      var prefix = document.createTextNode(t('strength_prefix') + ' ');
+      var b = document.createElement('b');
+      b.textContent = t(key);
+      var rest = document.createTextNode(' · ' + tf('bits', { n: bits }));
+      label.appendChild(prefix); label.appendChild(b); label.appendChild(rest);
+    }
+
+    function regen() {
+      var err = $('pw-err');
+      err.textContent = '';
+      $('pw-msg').textContent = '';
+      if (!secure) {
+        err.textContent = t('err_insecure');
+        $('pw-out').textContent = '—';
+        renderStrength(0, 0);
+        return;
+      }
+      var sets = activeSets();
+      if (!sets.length) {
+        err.textContent = t('err_nosets');
+        $('pw-out').textContent = '—';
+        current = '';
+        renderStrength(0, 0);
+        return;
+      }
+      var length = clampLen(lenNum.value);
+      current = generate(length, sets);
+      $('pw-out').textContent = current;
+      renderStrength(length, sets.join('').length);
+    }
+
+    function saveOpts() {
+      save('len', lenNum.value);
+      ['lower', 'upper', 'digits', 'symbols', 'noambig'].forEach(function (k) {
+        save(k, $('pw-' + k).checked ? '1' : '0');
+      });
+    }
+
+    lenRange.addEventListener('input', function () {
+      lenNum.value = lenRange.value;
+      saveOpts(); regen();
+    });
+    lenNum.addEventListener('input', function () {
+      var v = clampLen(lenNum.value);
+      lenRange.value = Math.min(64, v);
+      saveOpts(); regen();
+    });
+    ['lower', 'upper', 'digits', 'symbols', 'noambig'].forEach(function (k) {
+      $('pw-' + k).addEventListener('change', function () { saveOpts(); regen(); });
+    });
+    $('pw-regen').addEventListener('click', regen);
+
+    $('pw-copy').addEventListener('click', function () {
+      if (!current) return;
+      function ok() {
+        var el = $('pw-msg');
+        el.textContent = t('msg_copied');
+        el.style.color = 'var(--text-muted)';
+      }
+      function fail() {
+        var el = $('pw-msg');
+        el.textContent = t('msg_copy_fail');
+        el.style.color = 'var(--negative)';
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(current).then(ok, fail);
+      } else { fail(); }
+    });
+
+    /* ---------- Restore options, then generate ---------- */
+
+    var savedLen = clampLen(load('len'));
+    if (load('len') !== null) { lenNum.value = savedLen; lenRange.value = Math.min(64, savedLen); }
+    ['lower', 'upper', 'digits', 'symbols', 'noambig'].forEach(function (k) {
+      var v = load(k);
+      if (v === '1') $('pw-' + k).checked = true;
+      else if (v === '0') $('pw-' + k).checked = false;
+    });
+
+    var first = true;
+    window.SiteLang.init(I18N, function () {
+      if (first) { first = false; regen(); }
+      else {
+        // re-render translated strength label without discarding the password
+        var sets = activeSets();
+        if (current && sets.length) renderStrength(clampLen(lenNum.value), sets.join('').length);
+      }
+    });
+  })();
+  </script>
+</body>
+</html>

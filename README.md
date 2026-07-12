@@ -11,6 +11,7 @@ Personal site and simple tools, served by [GitHub Pages](https://pages.github.co
 - **`/urlencode/`** — URL encoder & decoder ([urlencode/index.html](urlencode/index.html))
 - **`/jwtdecode/`** — JWT decoder ([jwtdecode/index.html](jwtdecode/index.html))
 - **`/hashgen/`** — hash & UUID generator ([hashgen/index.html](hashgen/index.html))
+- **`/password/`** — password generator ([password/index.html](password/index.html))
 - **`/assets/style.css`** — shared design tokens and base styles used by every page
 - **`/assets/lang.js`** — shared English/Indonesian language switcher
 

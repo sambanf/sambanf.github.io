@@ -183,6 +183,44 @@
       margin-bottom: 2rem;
     }
 
+    /* ---------- Tools: search + groups ---------- */
+
+    .tools-search {
+      position: relative;
+      max-width: 26rem;
+      margin-bottom: 2.25rem;
+    }
+
+    .tools-search svg {
+      position: absolute;
+      left: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .tools-search input {
+      padding-left: 2.6rem;
+    }
+
+    .tool-group + .tool-group {
+      margin-top: 2.25rem;
+    }
+
+    .tool-group-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin: 0 0 0.9rem;
+    }
+
+    #no-results {
+      margin-top: 1.5rem;
+    }
+
     /* ---------- Tools grid ---------- */
 
     .tool-grid {
@@ -464,9 +502,16 @@
         <h2 class="section-heading reveal" id="tools-heading" data-i18n="toolsHeading">Tools</h2>
         <p class="section-intro reveal" data-i18n="toolsIntro">Small, self-contained web tools. Free to use, no sign-up, everything runs in your browser.</p>
 
-        <ul class="tool-grid">
+        <div class="tools-search reveal">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="search" id="tool-search" autocomplete="off" placeholder="Search tools&hellip;" data-i18n-attr="placeholder:searchPh;aria-label:searchPh">
+        </div>
 
-          <li class="card tool-card reveal">
+        <div class="tool-group">
+          <h3 class="tool-group-title reveal" data-i18n="catFinance">Finance</h3>
+          <ul class="tool-grid">
+
+          <li class="card tool-card reveal" data-tags="stock saham average down calculator kalkulator invest investasi portfolio portofolio break-even finance keuangan lot">
             <span class="tool-icon" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
                 <path pathLength="1" d="M3 3v16a2 2 0 0 0 2 2h16"/>
@@ -479,7 +524,14 @@
             <span class="tool-cta" aria-hidden="true" data-i18n="openTool">Open tool</span>
           </li>
 
-          <li class="card tool-card reveal">
+          </ul>
+        </div>
+
+        <div class="tool-group">
+          <h3 class="tool-group-title reveal" data-i18n="catEveryday">Everyday</h3>
+          <ul class="tool-grid">
+
+          <li class="card tool-card reveal" data-tags="character karakter word kata counter penghitung count hitung text teks sentence kalimat paragraph paragraf limit batas twitter">
             <span class="tool-icon" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
                 <path pathLength="1" d="M4 7V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2"/>
@@ -492,7 +544,26 @@
             <span class="tool-cta" aria-hidden="true" data-i18n="openTool">Open tool</span>
           </li>
 
-          <li class="card tool-card reveal">
+          <li class="card tool-card reveal" data-tags="password kata sandi generator random acak secure aman kuat strong security keamanan login">
+            <span class="tool-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+                <path pathLength="1" d="M5 11h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1z"/>
+                <path pathLength="1" d="M8 11V7a4 4 0 0 1 8 0v4"/>
+              </svg>
+            </span>
+            <h3><a href="password/" data-i18n="toolPwTitle">Password Generator</a></h3>
+            <p data-i18n="toolPwDesc">Generate strong random passwords locally, with length and character options and a strength meter.</p>
+            <span class="tool-cta" aria-hidden="true" data-i18n="openTool">Open tool</span>
+          </li>
+
+          </ul>
+        </div>
+
+        <div class="tool-group">
+          <h3 class="tool-group-title reveal" data-i18n="catDev">Developer</h3>
+          <ul class="tool-grid">
+
+          <li class="card tool-card reveal" data-tags="base64 encode decode encoder decoder utf-8 data uri url-safe text teks">
             <span class="tool-icon" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
                 <path pathLength="1" d="M9 8l-4 4 4 4"/>
@@ -504,7 +575,7 @@
             <span class="tool-cta" aria-hidden="true" data-i18n="openTool">Open tool</span>
           </li>
 
-          <li class="card tool-card reveal">
+          <li class="card tool-card reveal" data-tags="unix timestamp epoch time waktu date tanggal converter konverter seconds detik milliseconds milidetik utc iso">
             <span class="tool-icon" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
                 <path pathLength="1" d="M12 3a9 9 0 1 0 0 18 9 9 0 1 0 0-18"/>
@@ -516,7 +587,7 @@
             <span class="tool-cta" aria-hidden="true" data-i18n="openTool">Open tool</span>
           </li>
 
-          <li class="card tool-card reveal">
+          <li class="card tool-card reveal" data-tags="json format formatter validator validate validasi minify pretty print rapikan sort urutkan parse error">
             <span class="tool-icon" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
                 <path pathLength="1" d="M8 4c-2 0-3 1-3 3v2c0 1.2-.8 2.2-2 2.5v1c1.2.3 2 1.3 2 2.5v2c0 2 1 3 3 3"/>
@@ -528,7 +599,7 @@
             <span class="tool-cta" aria-hidden="true" data-i18n="openTool">Open tool</span>
           </li>
 
-          <li class="card tool-card reveal">
+          <li class="card tool-card reveal" data-tags="url encode decode percent encoding uri query parameter form link tautan">
             <span class="tool-icon" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
                 <path pathLength="1" d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
@@ -540,7 +611,7 @@
             <span class="tool-cta" aria-hidden="true" data-i18n="openTool">Open tool</span>
           </li>
 
-          <li class="card tool-card reveal">
+          <li class="card tool-card reveal" data-tags="jwt json web token decode decoder claim expiry kedaluwarsa auth login bearer session">
             <span class="tool-icon" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
                 <path pathLength="1" d="M14 10.5a4.5 4.5 0 1 1-6.36 6.36 4.5 4.5 0 0 1 6.36-6.36z"/>
@@ -552,7 +623,7 @@
             <span class="tool-cta" aria-hidden="true" data-i18n="openTool">Open tool</span>
           </li>
 
-          <li class="card tool-card reveal">
+          <li class="card tool-card reveal" data-tags="hash sha sha-256 sha-512 checksum uuid guid random acak generator crypto digest">
             <span class="tool-icon" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
                 <path pathLength="1" d="M4 9h16"/>
@@ -566,7 +637,14 @@
             <span class="tool-cta" aria-hidden="true" data-i18n="openTool">Open tool</span>
           </li>
 
-          <!-- TEMPLATE: copy this block to add a new tool card.
+          </ul>
+        </div>
+
+        <p class="muted" id="no-results" hidden data-i18n="noResults">No tools match your search.</p>
+
+        <!-- TEMPLATE: copy this block to add a new tool card inside one
+             of the .tool-group <ul>s above. Give it a data-tags attribute
+             with search keywords in both English and Indonesian.
           <li class="card tool-card reveal">
             <span class="tool-icon" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
@@ -579,7 +657,6 @@
           </li>
           -->
 
-        </ul>
       </div>
     </section>
 
@@ -673,6 +750,13 @@
           toolJwtDesc: 'Peek inside a JSON Web Token — header, payload, and expiry — without sending it anywhere.',
           toolHashTitle: 'Hash & UUID Generator',
           toolHashDesc: 'SHA-1/256/384/512 hashes of any text plus random UUIDs, generated locally by your browser.',
+          toolPwTitle: 'Password Generator',
+          toolPwDesc: 'Generate strong random passwords locally, with length and character options and a strength meter.',
+          searchPh: 'Search tools…',
+          catFinance: 'Finance',
+          catEveryday: 'Everyday',
+          catDev: 'Developer',
+          noResults: 'No tools match your search.',
           openTool: 'Open tool',
           aboutHeading: 'About',
           about1: "I'm a software engineer who enjoys turning small, recurring annoyances into simple tools that just work.",
@@ -705,6 +789,13 @@
           toolJwtDesc: 'Lihat isi JSON Web Token — header, payload, dan masa berlaku — tanpa mengirimnya ke mana pun.',
           toolHashTitle: 'Generator Hash & UUID',
           toolHashDesc: 'Hash SHA-1/256/384/512 dari teks apa pun plus UUID acak, dibuat secara lokal oleh browser Anda.',
+          toolPwTitle: 'Generator Password',
+          toolPwDesc: 'Buat password acak yang kuat secara lokal, dengan opsi panjang dan karakter serta pengukur kekuatan.',
+          searchPh: 'Cari alat…',
+          catFinance: 'Keuangan',
+          catEveryday: 'Sehari-hari',
+          catDev: 'Developer',
+          noResults: 'Tidak ada alat yang cocok dengan pencarian Anda.',
           openTool: 'Buka alat',
           aboutHeading: 'Tentang',
           about1: 'Saya software engineer yang senang mengubah gangguan kecil sehari-hari menjadi alat sederhana yang benar-benar berfungsi.',
@@ -751,6 +842,28 @@
           twTimer = setTimeout(tick, deleting ? 35 : 70);
         }
         twTimer = setTimeout(tick, 600);
+      }
+
+      /* ----- Tool search (matches visible text + bilingual data-tags) ----- */
+      var searchEl = document.getElementById('tool-search');
+      if (searchEl) {
+        var filterTools = function () {
+          var terms = searchEl.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+          var total = 0;
+          document.querySelectorAll('.tool-group').forEach(function (group) {
+            var visible = 0;
+            group.querySelectorAll('.tool-card').forEach(function (card) {
+              var hay = (card.textContent + ' ' + (card.getAttribute('data-tags') || '')).toLowerCase();
+              var show = terms.every(function (term) { return hay.indexOf(term) !== -1; });
+              card.hidden = !show;
+              if (show) visible++;
+            });
+            group.hidden = visible === 0;
+            total += visible;
+          });
+          document.getElementById('no-results').hidden = total > 0;
+        };
+        searchEl.addEventListener('input', filterTools);
       }
 
       SiteLang.init(I18N, startTypewriter);

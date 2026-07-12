@@ -122,6 +122,7 @@ label {
 
 input[type="number"],
 input[type="text"],
+input[type="search"],
 select {
   width: 100%;
   padding: 0.55rem 0.75rem;
