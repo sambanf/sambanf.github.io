@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Text Diff Checker</title>
+  <meta name="description" content="Free text diff checker. Compare two texts line by line with highlighted additions, removals, and in-line changes — everything runs in your browser.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d9488'/%3E%3Cg stroke='%23ffffff' stroke-width='2.4' fill='none' stroke-linecap='round'%3E%3Cpath d='M10 7v7M6.5 10.5h7'/%3E%3Cpath d='M18.5 21.5h7'/%3E%3Cpath d='M6 26L26 6'/%3E%3C/g%3E%3C/svg%3E">
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../assets/theme.js"></script>
+  <style>
+    .top-nav {
+      padding: 1.25rem 0 2.25rem; font-size: 0.9rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .top-nav a { color: var(--text-muted); text-decoration: none; }
+    .top-nav a:hover { color: var(--accent-strong); }
+    .lede { color: var(--text-muted); max-width: 44rem; margin-bottom: 0; }
+    .tool-card { margin: 1.75rem 0 1.25rem; }
+    .how-card { margin-bottom: 1rem; }
+
+    .panes { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .panes textarea {
+      width: 100%; min-height: 180px; padding: 0.75rem 0.9rem;
+      font-family: var(--mono); font-size: 0.85rem; line-height: 1.55; color: var(--text);
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); resize: vertical; white-space: pre; overflow-x: auto;
+    }
+    .opts { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; margin: 1rem 0; }
+    .opt { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; }
+    .opt input { width: auto; }
+
+    .stats { min-height: 1.3em; margin: 0 0 0.75rem; font-size: 0.9rem; font-family: var(--mono); }
+    .stats .add { color: var(--positive); font-weight: 700; }
+    .stats .del { color: var(--negative); font-weight: 700; }
+    .err { color: var(--negative); font-size: 0.9rem; min-height: 1.2em; margin: 0 0 0.75rem; }
+
+    .diff-out {
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      background: var(--surface); overflow-x: auto;
+      font-family: var(--mono); font-size: 0.82rem; line-height: 1.6;
+    }
+    .diff-out[hidden] { display: none; }
+    .dline { display: flex; white-space: pre; min-width: max-content; }
+    .dline .ln {
+      flex: none; width: 3.2em; padding: 0 0.5em; text-align: right;
+      color: var(--text-muted); background: var(--surface-2);
+      border-right: 1px solid var(--border); user-select: none;
+    }
+    .dline .sign { flex: none; width: 1.4em; text-align: center; user-select: none; }
+    .dline .txt { padding-right: 1em; }
+    .dline.add { background: color-mix(in srgb, var(--positive) 11%, transparent); }
+    .dline.add .sign { color: var(--positive); font-weight: 700; }
+    .dline.del { background: color-mix(in srgb, var(--negative) 11%, transparent); }
+    .dline.del .sign { color: var(--negative); font-weight: 700; }
+    .dline .chg { border-radius: 3px; }
+    .dline.add .chg { background: color-mix(in srgb, var(--positive) 30%, transparent); }
+    .dline.del .chg { background: color-mix(in srgb, var(--negative) 30%, transparent); }
+
+    @media (max-width: 640px) { .panes { grid-template-columns: 1fr; } }
+    @media (max-width: 520px) { .card { padding: 1.1rem; } }
+  </style>
+</head>
+<body>
+  <header class="container">
+    <nav class="top-nav" aria-label="Site" data-i18n-attr="aria-label:nav_site">
+      <a href="../">&#8592; samba nugraha</a>
+      <div class="nav-actions">
+      <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
+        <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0l60 30M60 0L0 30" stroke="#fff" stroke-width="6"/><path d="M0 0l60 30M60 0L0 30" stroke="#C8102E" stroke-width="2.5"/><path d="M30 0v30M0 15h60" stroke="#fff" stroke-width="10"/><path d="M30 0v30M0 15h60" stroke="#C8102E" stroke-width="6"/></svg>EN
+        </button>
+        <button type="button" data-lang="id" aria-pressed="false" aria-label="Bahasa Indonesia">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="15" fill="#E70011"/><rect y="15" width="60" height="15" fill="#F7F7F7"/></svg>ID
+        </button>
+      </div>
+      <button type="button" class="theme-toggle" aria-label="Dark mode / Mode gelap" aria-pressed="false">
+        <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+      </div>
+    </nav>
+    <h1 data-i18n="h1">Text Diff Checker</h1>
+    <p class="lede" data-i18n="lede">Compare two texts line by line. Additions, removals, and in-line changes are highlighted — everything runs in your browser.</p>
+  </header>
+
+  <main class="container">
+    <noscript>
+      <div class="card" style="border-left:3px solid var(--negative)">This tool needs JavaScript to run. Please enable it and reload. / Alat ini membutuhkan JavaScript. Aktifkan lalu muat ulang.</div>
+    </noscript>
+
+    <div class="card tool-card">
+      <div class="panes">
+        <div>
+          <label for="df-a" data-i18n="a_label">Original text</label>
+          <textarea id="df-a" spellcheck="false" autocomplete="off"></textarea>
+        </div>
+        <div>
+          <label for="df-b" data-i18n="b_label">Changed text</label>
+          <textarea id="df-b" spellcheck="false" autocomplete="off"></textarea>
+        </div>
+      </div>
+
+      <div class="opts">
+        <label class="opt" for="df-trim">
+          <input type="checkbox" id="df-trim">
+          <span data-i18n="opt_trim">Ignore leading/trailing whitespace</span>
+        </label>
+        <label class="opt" for="df-case">
+          <input type="checkbox" id="df-case">
+          <span data-i18n="opt_case">Ignore case</span>
+        </label>
+      </div>
+
+      <p class="stats" id="df-stats" aria-live="polite"></p>
+      <p class="err" id="df-err"></p>
+      <div class="diff-out" id="df-out" hidden></div>
+    </div>
+
+    <section class="card how-card" aria-labelledby="how-heading">
+      <h2 id="how-heading" data-i18n="how_title">How it compares</h2>
+      <p data-i18n="how_1">The two texts are compared line by line using the longest-common-subsequence algorithm — the same idea behind git diff. Removed lines are red with a −, added lines green with a +, and when a line was modified, the changed part inside it is highlighted more strongly. Line numbers show where each line sits in the original (left) and changed (right) text.</p>
+      <p class="muted small" data-i18n="privacy">Both texts stay in your browser — nothing is uploaded and nothing is tracked. They are remembered only on this device.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p><a href="../" data-i18n="footer_back">&#8592; back to all tools</a> &middot; &copy; 2026 Samba Nugraha</p>
+    </div>
+  </footer>
+
+  <script src="../assets/lang.js"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    var I18N = {
+      en: {
+        _title: 'Text Diff Checker',
+        _meta: 'Free text diff checker. Compare two texts line by line with highlighted additions, removals, and in-line changes — everything runs in your browser.',
+        nav_site: 'Site',
+        h1: 'Text Diff Checker',
+        lede: 'Compare two texts line by line. Additions, removals, and in-line changes are highlighted — everything runs in your browser.',
+        a_label: 'Original text',
+        b_label: 'Changed text',
+        opt_trim: 'Ignore leading/trailing whitespace',
+        opt_case: 'Ignore case',
+        stats: '{a} added · {d} removed · {s} unchanged',
+        stats_same: 'The texts are identical.',
+        err_large: 'These texts are too large to compare here (try under ~2,000 differing lines).',
+        how_title: 'How it compares',
+        how_1: 'The two texts are compared line by line using the longest-common-subsequence algorithm — the same idea behind git diff. Removed lines are red with a −, added lines green with a +, and when a line was modified, the changed part inside it is highlighted more strongly. Line numbers show where each line sits in the original (left) and changed (right) text.',
+        privacy: 'Both texts stay in your browser — nothing is uploaded and nothing is tracked. They are remembered only on this device.',
+        footer_back: '← back to all tools'
+      },
+      id: {
+        _title: 'Pembanding Teks (Diff)',
+        _meta: 'Pembanding teks (diff) gratis. Bandingkan dua teks baris per baris dengan sorotan penambahan, penghapusan, dan perubahan di dalam baris — semuanya berjalan di browser Anda.',
+        nav_site: 'Situs',
+        h1: 'Pembanding Teks (Diff)',
+        lede: 'Bandingkan dua teks baris per baris. Penambahan, penghapusan, dan perubahan di dalam baris disorot — semuanya berjalan di browser Anda.',
+        a_label: 'Teks asli',
+        b_label: 'Teks yang diubah',
+        opt_trim: 'Abaikan spasi di awal/akhir baris',
+        opt_case: 'Abaikan besar kecil huruf',
+        stats: '{a} ditambah · {d} dihapus · {s} tidak berubah',
+        stats_same: 'Kedua teks identik.',
+        err_large: 'Teks terlalu besar untuk dibandingkan di sini (usahakan di bawah ~2.000 baris yang berbeda).',
+        how_title: 'Cara membandingkan',
+        how_1: 'Kedua teks dibandingkan baris per baris memakai algoritme longest common subsequence — ide yang sama di balik git diff. Baris yang dihapus berwarna merah dengan −, baris yang ditambah hijau dengan +, dan jika sebuah baris diubah, bagian yang berubah di dalamnya disorot lebih kuat. Nomor baris menunjukkan posisi tiap baris di teks asli (kiri) dan teks yang diubah (kanan).',
+        privacy: 'Kedua teks tetap di browser Anda — tidak ada yang diunggah dan tidak ada pelacakan. Teks hanya diingat di perangkat ini.',
+        footer_back: '← kembali ke semua alat'
+      }
+    };
+
+    function t(key) { return window.SiteLang.t(key); }
+    function tf(key, vars) {
+      var s = t(key);
+      for (var k in vars) {
+        if (Object.prototype.hasOwnProperty.call(vars, k)) s = s.replace('{' + k + '}', vars[k]);
+      }
+      return s;
+    }
+    function fmt(n) { return n.toLocaleString(window.SiteLang.locale()); }
+    function $(id) { return document.getElementById(id); }
+
+    /* ---------- Pure diff (LCS with prefix/suffix trimming) ----------
+       Returns ops [{t:'='|'-'|'+', a?, b?}] with 0-based line indexes,
+       or null when the middle section is too large. */
+
+    function diffLines(a, b, an, bn) {
+      var start = 0;
+      while (start < a.length && start < b.length && an[start] === bn[start]) start++;
+      var endA = a.length, endB = b.length;
+      while (endA > start && endB > start && an[endA - 1] === bn[endB - 1]) { endA--; endB--; }
+      var n = endA - start, m = endB - start;
+      if (n * m > 4000000) return null;
+
+      var W = m + 1;
+      var dp = new Int32Array((n + 1) * W);
+      for (var i = n - 1; i >= 0; i--) {
+        for (var j = m - 1; j >= 0; j--) {
+          dp[i * W + j] = an[start + i] === bn[start + j]
+            ? dp[(i + 1) * W + j + 1] + 1
+            : Math.max(dp[(i + 1) * W + j], dp[i * W + j + 1]);
+        }
+      }
+
+      var ops = [];
+      var k;
+      for (k = 0; k < start; k++) ops.push({ t: '=', a: k, b: k });
+      var x = 0, y = 0;
+      while (x < n && y < m) {
+        if (an[start + x] === bn[start + y]) { ops.push({ t: '=', a: start + x, b: start + y }); x++; y++; }
+        else if (dp[(x + 1) * W + y] >= dp[x * W + y + 1]) { ops.push({ t: '-', a: start + x }); x++; }
+        else { ops.push({ t: '+', b: start + y }); y++; }
+      }
+      while (x < n) { ops.push({ t: '-', a: start + x }); x++; }
+      while (y < m) { ops.push({ t: '+', b: start + y }); y++; }
+      for (k = 0; k < a.length - endA; k++) ops.push({ t: '=', a: endA + k, b: endB + k });
+      return ops;
+    }
+
+    // Common prefix/suffix split for paired changed lines.
+    function charSplit(oldS, newS) {
+      var p = 0;
+      var max = Math.min(oldS.length, newS.length);
+      while (p < max && oldS[p] === newS[p]) p++;
+      var s = 0;
+      while (s < max - p && oldS[oldS.length - 1 - s] === newS[newS.length - 1 - s]) s++;
+      return { p: p, s: s };
+    }
+
+    /* ---------- localStorage ---------- */
+
+    var NS = 'diff.';
+    function save(key, value) { try { localStorage.setItem(NS + key, value); } catch (e) { /* ignore */ } }
+    function load(key) { try { return localStorage.getItem(NS + key); } catch (e) { return null; } }
+
+    /* ---------- Rendering ---------- */
+
+    function makeLine(type, oldNo, newNo, text, chg) {
+      var row = document.createElement('div');
+      row.className = 'dline' + (type === '+' ? ' add' : type === '-' ? ' del' : '');
+      var ln1 = document.createElement('span');
+      ln1.className = 'ln';
+      ln1.textContent = oldNo === null ? '' : oldNo;
+      var ln2 = document.createElement('span');
+      ln2.className = 'ln';
+      ln2.textContent = newNo === null ? '' : newNo;
+      var sign = document.createElement('span');
+      sign.className = 'sign';
+      sign.textContent = type === '=' ? '' : type;
+      var txt = document.createElement('span');
+      txt.className = 'txt';
+      if (chg && (chg.p > 0 || chg.s > 0) && text.length > chg.p + chg.s) {
+        txt.appendChild(document.createTextNode(text.slice(0, chg.p)));
+        var mid = document.createElement('span');
+        mid.className = 'chg';
+        mid.textContent = text.slice(chg.p, text.length - chg.s);
+        txt.appendChild(mid);
+        txt.appendChild(document.createTextNode(text.slice(text.length - chg.s)));
+      } else {
+        txt.textContent = text;
+      }
+      row.appendChild(ln1); row.appendChild(ln2); row.appendChild(sign); row.appendChild(txt);
+      return row;
+    }
+
+    function render() {
+      save('a', $('df-a').value);
+      save('b', $('df-b').value);
+      save('trim', $('df-trim').checked ? '1' : '0');
+      save('case', $('df-case').checked ? '1' : '0');
+
+      var out = $('df-out'), stats = $('df-stats'), err = $('df-err');
+      err.textContent = '';
+      out.innerHTML = '';
+
+      var aText = $('df-a').value, bText = $('df-b').value;
+      if (aText === '' && bText === '') { out.hidden = true; stats.textContent = ''; return; }
+
+      var a = aText.split(/\r\n|\r|\n/);
+      var b = bText.split(/\r\n|\r|\n/);
+      var doTrim = $('df-trim').checked, noCase = $('df-case').checked;
+      var norm = function (s) {
+        var v = s;
+        if (doTrim) v = v.trim();
+        if (noCase) v = v.toLowerCase();
+        return v;
+      };
+      var ops = diffLines(a, b, a.map(norm), b.map(norm));
+      if (ops === null) { out.hidden = true; stats.textContent = ''; err.textContent = t('err_large'); return; }
+
+      var added = 0, removed = 0, same = 0;
+      ops.forEach(function (op) {
+        if (op.t === '+') added++;
+        else if (op.t === '-') removed++;
+        else same++;
+      });
+
+      if (!added && !removed) {
+        stats.textContent = t('stats_same');
+        out.hidden = true;
+        return;
+      }
+      stats.innerHTML = '';
+      var span = document.createElement('span');
+      var parts = tf('stats', { a: ' ', d: '', s: fmt(same) }).split(/[ ]/);
+      var addEl = document.createElement('span'); addEl.className = 'add'; addEl.textContent = '+' + fmt(added);
+      var delEl = document.createElement('span'); delEl.className = 'del'; delEl.textContent = '−' + fmt(removed);
+      span.appendChild(document.createTextNode(parts[0]));
+      span.appendChild(addEl);
+      span.appendChild(document.createTextNode(parts[1]));
+      span.appendChild(delEl);
+      span.appendChild(document.createTextNode(parts[2]));
+      stats.appendChild(span);
+
+      // Pair up del/add blocks for in-line change highlighting.
+      var frag = document.createDocumentFragment();
+      var i = 0;
+      while (i < ops.length) {
+        var op = ops[i];
+        if (op.t === '=') {
+          frag.appendChild(makeLine('=', op.a + 1, op.b + 1, a[op.a], null));
+          i++;
+          continue;
+        }
+        var dels = [], adds = [];
+        while (i < ops.length && ops[i].t === '-') { dels.push(ops[i]); i++; }
+        while (i < ops.length && ops[i].t === '+') { adds.push(ops[i]); i++; }
+        var pairs = Math.min(dels.length, adds.length);
+        dels.forEach(function (d, di) {
+          var chg = di < pairs ? charSplit(a[d.a], b[adds[di].b]) : null;
+          frag.appendChild(makeLine('-', d.a + 1, null, a[d.a], chg));
+        });
+        adds.forEach(function (ad, ai) {
+          var chg = ai < pairs ? charSplit(a[dels[ai].a], b[ad.b]) : null;
+          frag.appendChild(makeLine('+', null, ad.b + 1, b[ad.b], chg));
+        });
+      }
+      out.appendChild(frag);
+      out.hidden = false;
+    }
+
+    /* ---------- Wiring ---------- */
+
+    var timer = null;
+    function schedule() {
+      clearTimeout(timer);
+      timer = setTimeout(render, 250);
+    }
+    $('df-a').addEventListener('input', schedule);
+    $('df-b').addEventListener('input', schedule);
+    $('df-trim').addEventListener('change', render);
+    $('df-case').addEventListener('change', render);
+
+    /* ---------- Restore, then first render ---------- */
+
+    var sa = load('a'), sb = load('b');
+    if (typeof sa === 'string') $('df-a').value = sa;
+    if (typeof sb === 'string') $('df-b').value = sb;
+    if (load('trim') === '1') $('df-trim').checked = true;
+    if (load('case') === '1') $('df-case').checked = true;
+
+    window.SiteLang.init(I18N, function () { render(); });
+  })();
+  </script>
+</body>
+</html>
