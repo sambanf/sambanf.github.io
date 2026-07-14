@@ -13,6 +13,7 @@ Personal site and simple tools, served by [GitHub Pages](https://pages.github.co
 - **`/hashgen/`** — hash & UUID generator ([hashgen/index.html](hashgen/index.html))
 - **`/password/`** — password generator ([password/index.html](password/index.html))
 - **`/cron/`** — cron expression builder ([cron/index.html](cron/index.html))
+- **`/randompick/`** — random list picker ([randompick/index.html](randompick/index.html))
 - **`/assets/style.css`** — shared design tokens and base styles used by every page
 - **`/assets/lang.js`** — shared English/Indonesian language switcher
 - **`/assets/theme.js`** — shared dark-mode toggle (system default, manual override in `localStorage['site.theme']`)

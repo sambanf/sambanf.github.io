@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Random List Picker</title>
+  <meta name="description" content="Free random name picker. Paste a list, draw one or more winners with cryptographically fair randomness — great for arisan, doorprizes, and giveaways. Nothing leaves your browser.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d9488'/%3E%3Cg stroke='%23ffffff' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 7h5v5'/%3E%3Cpath d='M7 25L25 7'/%3E%3Cpath d='M25 20v5h-5'/%3E%3Cpath d='M18 18l7 7'/%3E%3Cpath d='M7 7l5 5'/%3E%3C/g%3E%3C/svg%3E">
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../assets/theme.js"></script>
+  <style>
+    .top-nav {
+      padding: 1.25rem 0 2.25rem; font-size: 0.9rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .top-nav a { color: var(--text-muted); text-decoration: none; }
+    .top-nav a:hover { color: var(--accent-strong); }
+    .lede { color: var(--text-muted); max-width: 44rem; margin-bottom: 0; }
+    .tool-card { margin: 1.75rem 0 1.25rem; }
+    .how-card { margin-bottom: 1rem; }
+
+    textarea#rp-list {
+      width: 100%; min-height: 200px; padding: 0.85rem 1rem;
+      font: inherit; line-height: 1.7; color: var(--text);
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); resize: vertical;
+    }
+    .count { margin: 0.4rem 0 1rem; font-size: 0.85rem; color: var(--text-muted); font-family: var(--mono); }
+
+    .controls { display: flex; flex-wrap: wrap; gap: 1rem; align-items: end; margin-bottom: 0.9rem; }
+    .controls .num-field { width: 7rem; }
+    .controls .num-field label { white-space: nowrap; }
+    .opts { display: grid; gap: 0.5rem; margin-bottom: 1.1rem; }
+    .opt { display: flex; align-items: center; gap: 0.55rem; font-size: 0.9rem; }
+    .opt input { width: auto; }
+
+    .actions { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+    .err { color: var(--negative); font-size: 0.9rem; min-height: 1.2em; margin: 0.9rem 0 0; }
+    .msg { min-height: 1.2em; margin-top: 0.6rem; font-size: 0.9rem; color: var(--text-muted); }
+
+    .winner-box {
+      margin-top: 1.5rem; padding: 1.5rem 1.25rem;
+      background: var(--accent-soft); border: 1px solid var(--accent);
+      border-radius: var(--radius-sm); text-align: center;
+    }
+    .winner-box[hidden] { display: none; }
+    .winner-label {
+      display: block; font-size: 0.75rem; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-strong);
+      margin-bottom: 0.5rem;
+    }
+    .winner-names { margin: 0; padding: 0; list-style: none; display: grid; gap: 0.35rem; }
+    .winner-names li {
+      font-size: clamp(1.3rem, 4vw, 1.8rem); font-weight: 700;
+      letter-spacing: -0.01em; overflow-wrap: anywhere; color: var(--text);
+    }
+    .winner-names li .num { color: var(--accent-strong); font-family: var(--mono); font-size: 0.8em; margin-right: 0.4rem; }
+    .rolling { opacity: 0.75; }
+
+    .hist-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; margin: 1.75rem 0 0.5rem; }
+    .hist-head h2 { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-muted); margin: 0; }
+    .history { margin: 0; padding: 0; list-style: none; display: grid; gap: 0.4rem; }
+    .history li {
+      display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+      padding-top: 0.4rem; border-top: 1px solid var(--border); font-size: 0.9rem;
+    }
+    .history li .who { overflow-wrap: anywhere; }
+    .history li .at { color: var(--text-muted); font-family: var(--mono); font-size: 0.8rem; flex: none; }
+
+    @media (max-width: 520px) { .card { padding: 1.1rem; } }
+  </style>
+</head>
+<body>
+  <header class="container">
+    <nav class="top-nav" aria-label="Site" data-i18n-attr="aria-label:nav_site">
+      <a href="../">&#8592; samba nugraha</a>
+      <div class="nav-actions">
+      <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
+        <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0l60 30M60 0L0 30" stroke="#fff" stroke-width="6"/><path d="M0 0l60 30M60 0L0 30" stroke="#C8102E" stroke-width="2.5"/><path d="M30 0v30M0 15h60" stroke="#fff" stroke-width="10"/><path d="M30 0v30M0 15h60" stroke="#C8102E" stroke-width="6"/></svg>EN
+        </button>
+        <button type="button" data-lang="id" aria-pressed="false" aria-label="Bahasa Indonesia">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="15" fill="#E70011"/><rect y="15" width="60" height="15" fill="#F7F7F7"/></svg>ID
+        </button>
+      </div>
+      <button type="button" class="theme-toggle" aria-label="Dark mode / Mode gelap" aria-pressed="false">
+        <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+      </div>
+    </nav>
+    <h1 data-i18n="h1">Random List Picker</h1>
+    <p class="lede" data-i18n="lede">Paste a list — one entry per line — and draw one or more winners with cryptographically fair randomness. Great for arisan, doorprizes, and giveaways.</p>
+  </header>
+
+  <main class="container">
+    <noscript>
+      <div class="card" style="border-left:3px solid var(--negative)">This tool needs JavaScript to run. Please enable it and reload. / Alat ini membutuhkan JavaScript. Aktifkan lalu muat ulang.</div>
+    </noscript>
+
+    <div class="card tool-card">
+      <label for="rp-list" data-i18n="list_label">Entries (one per line)</label>
+      <textarea id="rp-list" spellcheck="false" placeholder="Budi&#10;Sari&#10;Dewi&#10;Andi" data-i18n-attr="placeholder:list_ph"></textarea>
+      <p class="count" id="rp-count" aria-live="polite"></p>
+
+      <div class="controls">
+        <div class="num-field">
+          <label for="rp-k" data-i18n="k_label">Winners</label>
+          <input type="number" id="rp-k" min="1" max="1000" step="1" value="1" inputmode="numeric">
+        </div>
+        <div class="actions">
+          <button type="button" class="btn btn-primary" id="rp-pick" data-i18n="btn_pick">Pick winners</button>
+          <button type="button" class="btn" id="rp-shuffle" data-i18n="btn_shuffle">Shuffle list</button>
+        </div>
+      </div>
+
+      <div class="opts">
+        <label class="opt" for="rp-remove">
+          <input type="checkbox" id="rp-remove">
+          <span data-i18n="opt_remove">Remove winners from the list after drawing (for successive rounds)</span>
+        </label>
+        <label class="opt" for="rp-dedupe">
+          <input type="checkbox" id="rp-dedupe">
+          <span data-i18n="opt_dedupe">Ignore duplicate entries (each name gets one chance)</span>
+        </label>
+      </div>
+
+      <p class="err" id="rp-err" role="alert"></p>
+
+      <div class="winner-box" id="rp-winner-box" hidden aria-live="polite">
+        <span class="winner-label" id="rp-winner-label" data-i18n="winner_one">Winner</span>
+        <ol class="winner-names" id="rp-winners"></ol>
+      </div>
+
+      <div class="actions" style="margin-top: 1rem;">
+        <button type="button" class="btn" id="rp-copy" hidden data-i18n="btn_copy">Copy winners</button>
+      </div>
+      <p class="msg" id="rp-msg" aria-live="polite"></p>
+
+      <div class="hist-head">
+        <h2 data-i18n="hist_title">Draw history</h2>
+        <button type="button" class="btn btn-sm" id="rp-clear-hist" hidden data-i18n="btn_clear_hist" style="padding:0.3rem 0.7rem;font-size:0.8rem;">Clear</button>
+      </div>
+      <ul class="history" id="rp-history"></ul>
+    </div>
+
+    <section class="card how-card" aria-labelledby="how-heading">
+      <h2 id="how-heading" data-i18n="how_title">Is it fair?</h2>
+      <p data-i18n="how_1">Yes — winners are drawn with the browser's cryptographically secure random generator (the same one used for encryption keys), with rejection sampling so every entry has exactly the same chance. Duplicate lines count as extra chances unless you tick "ignore duplicates". Drawing several winners at once never picks the same line twice.</p>
+      <p class="muted small" data-i18n="privacy">Everything happens in your browser — no server, no upload, no tracking. Your list is remembered only on this device; the draw history disappears when you close the page.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p><a href="../" data-i18n="footer_back">&#8592; back to all tools</a> &middot; &copy; 2026 Samba Nugraha</p>
+    </div>
+  </footer>
+
+  <script src="../assets/lang.js"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    var I18N = {
+      en: {
+        _title: 'Random List Picker',
+        _meta: 'Free random name picker. Paste a list, draw one or more winners with cryptographically fair randomness — great for arisan, doorprizes, and giveaways. Nothing leaves your browser.',
+        nav_site: 'Site',
+        h1: 'Random List Picker',
+        lede: 'Paste a list — one entry per line — and draw one or more winners with cryptographically fair randomness. Great for arisan, doorprizes, and giveaways.',
+        list_label: 'Entries (one per line)',
+        list_ph: 'Budi\nSari\nDewi\nAndi',
+        count_entries: '{n} entries',
+        count_unique: '{n} entries · {u} unique',
+        k_label: 'Winners',
+        btn_pick: 'Pick winners',
+        btn_shuffle: 'Shuffle list',
+        opt_remove: 'Remove winners from the list after drawing (for successive rounds)',
+        opt_dedupe: 'Ignore duplicate entries (each name gets one chance)',
+        winner_one: 'Winner',
+        winner_many: 'Winners',
+        btn_copy: 'Copy winners',
+        hist_title: 'Draw history',
+        btn_clear_hist: 'Clear',
+        err_empty: 'Add at least one entry to the list.',
+        err_insecure: 'Secure random numbers are unavailable on this connection (needs https).',
+        msg_copied: 'Copied to clipboard.',
+        msg_copy_fail: 'Could not copy automatically — select the names and copy them manually.',
+        msg_removed: 'Removed {n} winner(s) from the list.',
+        msg_shuffled: 'List order shuffled.',
+        how_title: 'Is it fair?',
+        how_1: 'Yes — winners are drawn with the browser’s cryptographically secure random generator (the same one used for encryption keys), with rejection sampling so every entry has exactly the same chance. Duplicate lines count as extra chances unless you tick "ignore duplicates". Drawing several winners at once never picks the same line twice.',
+        privacy: 'Everything happens in your browser — no server, no upload, no tracking. Your list is remembered only on this device; the draw history disappears when you close the page.',
+        footer_back: '← back to all tools'
+      },
+      id: {
+        _title: 'Pengundi Acak',
+        _meta: 'Pengundi nama acak gratis. Tempel daftar, undi satu atau beberapa pemenang dengan keacakan yang adil secara kriptografis — cocok untuk arisan, doorprize, dan giveaway. Tidak ada data yang keluar dari browser Anda.',
+        nav_site: 'Situs',
+        h1: 'Pengundi Acak',
+        lede: 'Tempel daftar — satu entri per baris — lalu undi satu atau beberapa pemenang dengan keacakan yang adil secara kriptografis. Cocok untuk arisan, doorprize, dan giveaway.',
+        list_label: 'Daftar (satu per baris)',
+        list_ph: 'Budi\nSari\nDewi\nAndi',
+        count_entries: '{n} entri',
+        count_unique: '{n} entri · {u} unik',
+        k_label: 'Pemenang',
+        btn_pick: 'Undi sekarang',
+        btn_shuffle: 'Acak urutan',
+        opt_remove: 'Hapus pemenang dari daftar setelah diundi (untuk putaran berikutnya)',
+        opt_dedupe: 'Abaikan entri duplikat (setiap nama dapat satu kesempatan)',
+        winner_one: 'Pemenang',
+        winner_many: 'Para pemenang',
+        btn_copy: 'Salin pemenang',
+        hist_title: 'Riwayat undian',
+        btn_clear_hist: 'Bersihkan',
+        err_empty: 'Tambahkan minimal satu entri ke daftar.',
+        err_insecure: 'Angka acak yang aman tidak tersedia pada koneksi ini (butuh https).',
+        msg_copied: 'Disalin ke clipboard.',
+        msg_copy_fail: 'Tidak bisa menyalin otomatis — pilih namanya lalu salin manual.',
+        msg_removed: '{n} pemenang dihapus dari daftar.',
+        msg_shuffled: 'Urutan daftar diacak.',
+        how_title: 'Apakah adil?',
+        how_1: 'Ya — pemenang diundi dengan generator acak browser yang aman secara kriptografis (yang sama dipakai untuk kunci enkripsi), dengan rejection sampling sehingga setiap entri punya peluang persis sama. Baris duplikat dihitung sebagai kesempatan ekstra kecuali Anda mencentang "abaikan duplikat". Mengundi beberapa pemenang sekaligus tidak akan memilih baris yang sama dua kali.',
+        privacy: 'Semuanya terjadi di browser Anda — tanpa server, tanpa unggahan, tanpa pelacakan. Daftar hanya diingat di perangkat ini; riwayat undian hilang saat halaman ditutup.',
+        footer_back: '← kembali ke semua alat'
+      }
+    };
+
+    function t(key) { return window.SiteLang.t(key); }
+    function tf(key, vars) {
+      var s = t(key);
+      for (var k in vars) {
+        if (Object.prototype.hasOwnProperty.call(vars, k)) s = s.replace('{' + k + '}', vars[k]);
+      }
+      return s;
+    }
+    function fmt(n) { return n.toLocaleString(window.SiteLang.locale()); }
+    function $(id) { return document.getElementById(id); }
+
+    var secure = !!(window.crypto && crypto.getRandomValues);
+    var reduced = window.matchMedia &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* ---------- Crypto-fair randomness (rejection sampling) ---------- */
+
+    function randInt(max) {
+      var lim = Math.floor(4294967296 / max) * max;
+      var buf = new Uint32Array(1);
+      do { crypto.getRandomValues(buf); } while (buf[0] >= lim);
+      return buf[0] % max;
+    }
+
+    // k distinct picks via partial Fisher–Yates.
+    function pickK(items, k) {
+      var a = items.slice();
+      var n = Math.min(k, a.length);
+      for (var i = 0; i < n; i++) {
+        var j = i + randInt(a.length - i);
+        var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+      }
+      return a.slice(0, n);
+    }
+
+    function shuffleAll(items) {
+      var a = items.slice();
+      for (var i = a.length - 1; i > 0; i--) {
+        var j = randInt(i + 1);
+        var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+      }
+      return a;
+    }
+
+    /* ---------- List parsing ---------- */
+
+    function rawLines() {
+      return $('rp-list').value.split(/\r\n|\r|\n/)
+        .map(function (s) { return s.trim(); })
+        .filter(Boolean);
+    }
+
+    function entries() {
+      var lines = rawLines();
+      if (!$('rp-dedupe').checked) return lines;
+      var seen = {};
+      var out = [];
+      lines.forEach(function (l) {
+        var key = l.toLowerCase();
+        if (!seen[key]) { seen[key] = true; out.push(l); }
+      });
+      return out;
+    }
+
+    /* ---------- localStorage (list + options; history is session-only) ---------- */
+
+    var NS = 'randompick.';
+    function save(key, value) { try { localStorage.setItem(NS + key, value); } catch (e) { /* ignore */ } }
+    function load(key) { try { return localStorage.getItem(NS + key); } catch (e) { return null; } }
+
+    /* ---------- Rendering ---------- */
+
+    function renderCount() {
+      var lines = rawLines();
+      var uniq = {};
+      lines.forEach(function (l) { uniq[l.toLowerCase()] = true; });
+      var u = Object.keys(uniq).length;
+      $('rp-count').textContent = lines.length === 0 ? '' :
+        (u === lines.length
+          ? tf('count_entries', { n: fmt(lines.length) })
+          : tf('count_unique', { n: fmt(lines.length), u: fmt(u) }));
+    }
+
+    function flash(text, isError) {
+      var el = $('rp-msg');
+      el.textContent = text;
+      el.style.color = isError ? 'var(--negative)' : 'var(--text-muted)';
+    }
+
+    var lastWinners = [];
+    var history = [];
+
+    function showWinners(winners) {
+      var box = $('rp-winner-box');
+      var list = $('rp-winners');
+      $('rp-winner-label').textContent = t(winners.length > 1 ? 'winner_many' : 'winner_one');
+      list.innerHTML = '';
+      winners.forEach(function (w, i) {
+        var li = document.createElement('li');
+        if (winners.length > 1) {
+          var num = document.createElement('span');
+          num.className = 'num';
+          num.textContent = (i + 1) + '.';
+          li.appendChild(num);
+        }
+        li.appendChild(document.createTextNode(w));
+        list.appendChild(li);
+      });
+      box.hidden = false;
+      $('rp-copy').hidden = false;
+    }
+
+    function renderHistory() {
+      var ul = $('rp-history');
+      ul.innerHTML = '';
+      history.slice().reverse().forEach(function (h) {
+        var li = document.createElement('li');
+        var who = document.createElement('span');
+        who.className = 'who';
+        who.textContent = h.winners.join(', ');
+        var at = document.createElement('span');
+        at.className = 'at';
+        at.textContent = h.at;
+        li.appendChild(who); li.appendChild(at);
+        ul.appendChild(li);
+      });
+      $('rp-clear-hist').hidden = history.length === 0;
+    }
+
+    /* ---------- Drawing ---------- */
+
+    var rolling = false;
+
+    function draw() {
+      if (rolling) return;
+      var err = $('rp-err');
+      err.textContent = '';
+      flash('', false);
+      if (!secure) { err.textContent = t('err_insecure'); return; }
+      var pool = entries();
+      if (!pool.length) { err.textContent = t('err_empty'); return; }
+      var k = parseInt($('rp-k').value, 10);
+      if (!isFinite(k) || k < 1) k = 1;
+      k = Math.min(k, pool.length);
+      $('rp-k').value = k;
+
+      var winners = pickK(pool, k);
+
+      function reveal() {
+        rolling = false;
+        $('rp-pick').disabled = false;
+        $('rp-winners').classList.remove('rolling');
+        showWinners(winners);
+        lastWinners = winners;
+        history.push({
+          winners: winners,
+          at: new Date().toLocaleTimeString(window.SiteLang.locale())
+        });
+        renderHistory();
+        if ($('rp-remove').checked) {
+          removeFromList(winners);
+          flash(tf('msg_removed', { n: fmt(winners.length) }), false);
+        }
+      }
+
+      if (reduced) { reveal(); return; }
+
+      // Short rolling animation: cycle random names, then settle.
+      rolling = true;
+      $('rp-pick').disabled = true;
+      var box = $('rp-winner-box');
+      var list = $('rp-winners');
+      $('rp-winner-label').textContent = '…';
+      box.hidden = false;
+      list.classList.add('rolling');
+      var ticks = 0;
+      var timer = setInterval(function () {
+        list.innerHTML = '';
+        var li = document.createElement('li');
+        li.textContent = pool[randInt(pool.length)];
+        list.appendChild(li);
+        if (++ticks >= 16) { clearInterval(timer); reveal(); }
+      }, 75);
+    }
+
+    // Remove each winner's first matching line from the textarea.
+    function removeFromList(winners) {
+      var lines = $('rp-list').value.split(/\r\n|\r|\n/);
+      winners.forEach(function (w) {
+        var key = w.toLowerCase();
+        for (var i = 0; i < lines.length; i++) {
+          if (lines[i].trim().toLowerCase() === key) { lines.splice(i, 1); break; }
+        }
+      });
+      $('rp-list').value = lines.join('\n');
+      save('list', $('rp-list').value);
+      renderCount();
+    }
+
+    /* ---------- Wiring ---------- */
+
+    $('rp-list').addEventListener('input', function () {
+      save('list', $('rp-list').value);
+      renderCount();
+      $('rp-err').textContent = '';
+    });
+    $('rp-k').addEventListener('input', function () { save('k', $('rp-k').value); });
+    $('rp-remove').addEventListener('change', function () { save('remove', $('rp-remove').checked ? '1' : '0'); });
+    $('rp-dedupe').addEventListener('change', function () {
+      save('dedupe', $('rp-dedupe').checked ? '1' : '0');
+      renderCount();
+    });
+
+    $('rp-pick').addEventListener('click', draw);
+
+    $('rp-shuffle').addEventListener('click', function () {
+      if (!secure) { $('rp-err').textContent = t('err_insecure'); return; }
+      var lines = rawLines();
+      if (!lines.length) { $('rp-err').textContent = t('err_empty'); return; }
+      $('rp-list').value = shuffleAll(lines).join('\n');
+      save('list', $('rp-list').value);
+      renderCount();
+      flash(t('msg_shuffled'), false);
+    });
+
+    $('rp-copy').addEventListener('click', function () {
+      if (!lastWinners.length) return;
+      var text = lastWinners.join('\n');
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(
+          function () { flash(t('msg_copied'), false); },
+          function () { flash(t('msg_copy_fail'), true); }
+        );
+      } else { flash(t('msg_copy_fail'), true); }
+    });
+
+    $('rp-clear-hist').addEventListener('click', function () {
+      history = [];
+      renderHistory();
+    });
+
+    /* ---------- Restore, then first render ---------- */
+
+    var savedList = load('list');
+    if (typeof savedList === 'string') $('rp-list').value = savedList;
+    var savedK = parseInt(load('k'), 10);
+    if (savedK >= 1 && savedK <= 1000) $('rp-k').value = savedK;
+    if (load('remove') === '1') $('rp-remove').checked = true;
+    if (load('dedupe') === '1') $('rp-dedupe').checked = true;
+
+    window.SiteLang.init(I18N, function () {
+      renderCount();
+      if (lastWinners.length) showWinners(lastWinners); // re-label Winner(s)
+      renderHistory();
+    });
+  })();
+  </script>
+</body>
+</html>
