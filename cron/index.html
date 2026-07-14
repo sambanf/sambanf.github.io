@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cron Expression Builder</title>
+  <meta name="description" content="Free cron expression builder. Create schedules visually and get both standard cron and Quartz expressions, with the next run times shown in your timezone — all in your browser.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d9488'/%3E%3Cg stroke='%23ffffff' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M25 16a9 9 0 1 1-2.6-6.3'/%3E%3Cpath d='M25 4v6h-6'/%3E%3Cpath d='M16 11v5l3.5 2'/%3E%3C/g%3E%3C/svg%3E">
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../assets/theme.js"></script>
+  <style>
+    .top-nav {
+      padding: 1.25rem 0 2.25rem; font-size: 0.9rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .top-nav a { color: var(--text-muted); text-decoration: none; }
+    .top-nav a:hover { color: var(--accent-strong); }
+    .lede { color: var(--text-muted); max-width: 44rem; margin-bottom: 0; }
+    .tool-card { margin: 1.75rem 0 1.25rem; }
+    .how-card { margin-bottom: 1rem; }
+    h2.sub { font-size: 1.05rem; margin: 0 0 1rem; }
+
+    /* Tabs (same pattern as the stock calculator) */
+    .tabs {
+      display: flex; flex-wrap: wrap; gap: 0.25rem; padding: 0.25rem;
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); margin-bottom: 1.5rem;
+    }
+    .tabs [role="tab"] {
+      flex: 1 1 0; min-width: 0; padding: 0.5rem 0.4rem;
+      border: 0; border-radius: calc(var(--radius-sm) - 3px);
+      background: transparent; color: var(--text-muted);
+      font: inherit; font-size: 0.875rem; font-weight: 600; line-height: 1.3;
+      cursor: pointer; white-space: nowrap;
+    }
+    .tabs [role="tab"]:hover { color: var(--text); }
+    .tabs [role="tab"][aria-selected="true"] {
+      background: var(--surface); color: var(--accent-strong); box-shadow: var(--shadow);
+    }
+
+    /* Builder rows */
+    .row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; margin-bottom: 0.9rem; font-size: 0.95rem; }
+    .row label { margin: 0; font-weight: 400; font-size: 0.95rem; }
+    .row input[type="number"] { width: 5.2rem; }
+    .row input[type="time"] { width: auto; }
+    .row select { width: auto; }
+    .row input[type="radio"], .row input[type="checkbox"] { width: auto; }
+    .variant { padding: 0.35rem 0; }
+    .day-boxes { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; }
+    .day-boxes label { display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 400; font-size: 0.9rem; }
+
+    /* Results */
+    .results {
+      margin-top: 1.5rem; padding: 1.15rem 1.25rem;
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+    }
+    .expr-row { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.75rem; flex-wrap: wrap; }
+    .expr-row .lbl { flex: none; width: 6.5rem; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); }
+    .expr-row code {
+      flex: 1; min-width: 10rem; padding: 0.5rem 0.75rem;
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm);
+      font-size: 0.95rem; overflow-wrap: anywhere;
+    }
+    .btn-sm { padding: 0.35rem 0.7rem; font-size: 0.8rem; flex: none; }
+    .desc { margin: 0.75rem 0 0; font-size: 0.95rem; }
+    .note { margin: 0.35rem 0 0; font-size: 0.82rem; color: var(--text-muted); }
+    .err { color: var(--negative); font-size: 0.9rem; min-height: 1.2em; margin: 0.75rem 0 0; }
+    .msg { min-height: 1.2em; margin-top: 0.6rem; font-size: 0.9rem; color: var(--text-muted); }
+
+    .runs { margin: 1rem 0 0; padding: 0; list-style: none; display: grid; gap: 0.4rem; }
+    .runs li {
+      display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+      padding-top: 0.4rem; border-top: 1px solid var(--border); font-size: 0.9rem;
+    }
+    .runs li .rel { color: var(--text-muted); }
+    .runs-title { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-muted); margin: 1.25rem 0 0; }
+
+    #ck-in { font-family: var(--mono); }
+
+    @media (max-width: 640px) {
+      .tabs [role="tab"] { flex: 1 1 30%; }
+    }
+    @media (max-width: 520px) { .card { padding: 1.1rem; } }
+  </style>
+</head>
+<body>
+  <header class="container">
+    <nav class="top-nav" aria-label="Site" data-i18n-attr="aria-label:nav_site">
+      <a href="../">&#8592; samba nugraha</a>
+      <div class="nav-actions">
+      <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
+        <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0l60 30M60 0L0 30" stroke="#fff" stroke-width="6"/><path d="M0 0l60 30M60 0L0 30" stroke="#C8102E" stroke-width="2.5"/><path d="M30 0v30M0 15h60" stroke="#fff" stroke-width="10"/><path d="M30 0v30M0 15h60" stroke="#C8102E" stroke-width="6"/></svg>EN
+        </button>
+        <button type="button" data-lang="id" aria-pressed="false" aria-label="Bahasa Indonesia">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="15" fill="#E70011"/><rect y="15" width="60" height="15" fill="#F7F7F7"/></svg>ID
+        </button>
+      </div>
+      <button type="button" class="theme-toggle" aria-label="Dark mode / Mode gelap" aria-pressed="false">
+        <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+      </div>
+    </nav>
+    <h1 data-i18n="h1">Cron Expression Builder</h1>
+    <p class="lede" data-i18n="lede">Build a schedule visually and get the matching cron expression — both standard (crontab, GitHub Actions) and Quartz formats — plus the next run times in your timezone.</p>
+  </header>
+
+  <main class="container">
+    <noscript>
+      <div class="card" style="border-left:3px solid var(--negative)">This tool needs JavaScript to run. Please enable it and reload. / Alat ini membutuhkan JavaScript. Aktifkan lalu muat ulang.</div>
+    </noscript>
+
+    <div class="card tool-card">
+      <div class="tabs" role="tablist" aria-label="Schedule type" data-i18n-attr="aria-label:tabs_aria">
+        <button type="button" role="tab" id="tab-minutes" aria-controls="panel-minutes" aria-selected="true" data-i18n="tab_minutes">Minutes</button>
+        <button type="button" role="tab" id="tab-hourly" aria-controls="panel-hourly" aria-selected="false" tabindex="-1" data-i18n="tab_hourly">Hourly</button>
+        <button type="button" role="tab" id="tab-daily" aria-controls="panel-daily" aria-selected="false" tabindex="-1" data-i18n="tab_daily">Daily</button>
+        <button type="button" role="tab" id="tab-weekly" aria-controls="panel-weekly" aria-selected="false" tabindex="-1" data-i18n="tab_weekly">Weekly</button>
+        <button type="button" role="tab" id="tab-monthly" aria-controls="panel-monthly" aria-selected="false" tabindex="-1" data-i18n="tab_monthly">Monthly</button>
+        <button type="button" role="tab" id="tab-yearly" aria-controls="panel-yearly" aria-selected="false" tabindex="-1" data-i18n="tab_yearly">Yearly</button>
+      </div>
+
+      <div role="tabpanel" id="panel-minutes" aria-labelledby="tab-minutes">
+        <div class="row">
+          <label for="min-n" data-i18n="every">Every</label>
+          <input type="number" id="min-n" min="1" max="59" step="1" value="5" inputmode="numeric">
+          <span data-i18n="unit_minutes">minute(s)</span>
+        </div>
+      </div>
+
+      <div role="tabpanel" id="panel-hourly" aria-labelledby="tab-hourly" hidden>
+        <div class="row">
+          <label for="hr-n" data-i18n="every">Every</label>
+          <input type="number" id="hr-n" min="1" max="23" step="1" value="1" inputmode="numeric">
+          <span data-i18n="unit_hours">hour(s)</span>
+          <span data-i18n="at_minute">at minute</span>
+          <input type="number" id="hr-m" min="0" max="59" step="1" value="0" inputmode="numeric" data-i18n-attr="aria-label:at_minute">
+        </div>
+      </div>
+
+      <div role="tabpanel" id="panel-daily" aria-labelledby="tab-daily" hidden>
+        <div class="row variant">
+          <input type="radio" name="daily-mode" id="daily-every" value="every" checked>
+          <label for="daily-every" data-i18n="every">Every</label>
+          <input type="number" id="daily-n" min="1" max="31" step="1" value="1" inputmode="numeric">
+          <span data-i18n="unit_days">day(s)</span>
+        </div>
+        <div class="row variant">
+          <input type="radio" name="daily-mode" id="daily-wd" value="weekday">
+          <label for="daily-wd" data-i18n="every_weekday">Every weekday (Monday–Friday)</label>
+        </div>
+        <div class="row">
+          <label for="daily-time" data-i18n="at_time">At</label>
+          <input type="time" id="daily-time" value="12:00">
+        </div>
+      </div>
+
+      <div role="tabpanel" id="panel-weekly" aria-labelledby="tab-weekly" hidden>
+        <div class="row">
+          <span data-i18n="on_days">On</span>
+          <div class="day-boxes" id="wk-days"></div>
+        </div>
+        <div class="row">
+          <label for="wk-time" data-i18n="at_time">At</label>
+          <input type="time" id="wk-time" value="12:00">
+        </div>
+      </div>
+
+      <div role="tabpanel" id="panel-monthly" aria-labelledby="tab-monthly" hidden>
+        <div class="row variant">
+          <input type="radio" name="mon-mode" id="mon-day" value="day" checked>
+          <label for="mon-day" data-i18n="on_day">On day</label>
+          <input type="number" id="mon-d" min="1" max="31" step="1" value="1" inputmode="numeric">
+          <span data-i18n="of_every">of every</span>
+          <input type="number" id="mon-n" min="1" max="12" step="1" value="1" inputmode="numeric">
+          <span data-i18n="unit_months">month(s)</span>
+        </div>
+        <div class="row variant">
+          <input type="radio" name="mon-mode" id="mon-nth" value="nth">
+          <label for="mon-nth" data-i18n="the">The</label>
+          <select id="mon-k"></select>
+          <select id="mon-dow"></select>
+          <span data-i18n="of_every">of every</span>
+          <input type="number" id="mon-n2" min="1" max="12" step="1" value="1" inputmode="numeric">
+          <span data-i18n="unit_months">month(s)</span>
+        </div>
+        <div class="row">
+          <label for="mon-time" data-i18n="at_time">At</label>
+          <input type="time" id="mon-time" value="12:00">
+        </div>
+      </div>
+
+      <div role="tabpanel" id="panel-yearly" aria-labelledby="tab-yearly" hidden>
+        <div class="row variant">
+          <input type="radio" name="yr-mode" id="yr-date" value="date" checked>
+          <label for="yr-date" data-i18n="every_cap">Every</label>
+          <select id="yr-month"></select>
+          <input type="number" id="yr-d" min="1" max="31" step="1" value="1" inputmode="numeric" data-i18n-attr="aria-label:on_day">
+        </div>
+        <div class="row variant">
+          <input type="radio" name="yr-mode" id="yr-nth" value="nth">
+          <label for="yr-nth" data-i18n="the">The</label>
+          <select id="yr-k"></select>
+          <select id="yr-dow"></select>
+          <span data-i18n="of_month">of</span>
+          <select id="yr-month2"></select>
+        </div>
+        <div class="row">
+          <label for="yr-time" data-i18n="at_time">At</label>
+          <input type="time" id="yr-time" value="12:00">
+        </div>
+      </div>
+
+      <p class="err" id="build-err"></p>
+
+      <div class="results" aria-live="polite">
+        <div class="expr-row">
+          <span class="lbl" data-i18n="lbl_unix">Standard cron</span>
+          <code id="out-unix">—</code>
+          <button type="button" class="btn btn-sm" id="copy-unix" data-i18n="btn_copy">Copy</button>
+        </div>
+        <div class="expr-row">
+          <span class="lbl">Quartz</span>
+          <code id="out-quartz">—</code>
+          <button type="button" class="btn btn-sm" id="copy-quartz" data-i18n="btn_copy">Copy</button>
+        </div>
+        <p class="note" id="unix-note" hidden data-i18n="note_no_unix">Standard 5-field cron cannot express "nth weekday" schedules — use the Quartz form, or a day-of-month approximation.</p>
+        <p class="desc" id="out-desc"></p>
+        <p class="runs-title" data-i18n="runs_title">Next 5 runs (your timezone)</p>
+        <ul class="runs" id="out-runs"></ul>
+        <p class="msg" id="copy-msg" aria-live="polite"></p>
+      </div>
+    </div>
+
+    <div class="card tool-card">
+      <h2 class="sub" data-i18n="ck_title">Check an existing expression</h2>
+      <label for="ck-in" data-i18n="ck_label">Standard cron expression (5 fields: minute hour day-of-month month day-of-week)</label>
+      <input type="text" id="ck-in" autocomplete="off" spellcheck="false" placeholder="*/15 9-17 * * 1-5">
+      <p class="err" id="ck-err"></p>
+      <ul class="runs" id="ck-runs"></ul>
+    </div>
+
+    <section class="card how-card" aria-labelledby="how-heading">
+      <h2 id="how-heading" data-i18n="how_title">Cron in 30 seconds</h2>
+      <p data-i18n="how_1">A standard cron expression has five fields: minute (0–59), hour (0–23), day of month (1–31), month (1–12), and day of week (0–6, Sunday = 0). Each field takes a number, a list (1,3,5), a range (9–17), a step (*/15), or * for "any". This format works in crontab, GitHub Actions, Kubernetes, and most schedulers.</p>
+      <p data-i18n="how_2">Quartz (used by many Java systems and CronMaker) adds a seconds field at the front and an optional year at the end, uses ? for the unused day field, and supports extras like MON#2 (second Monday) and 6L (last Friday). The two formats are not interchangeable — copy the one your system expects.</p>
+      <p class="muted small" data-i18n="privacy">Everything runs in your browser — nothing is uploaded and nothing is tracked. Next-run times are computed for this device's timezone.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p><a href="../" data-i18n="footer_back">&#8592; back to all tools</a> &middot; &copy; 2026 Samba Nugraha</p>
+    </div>
+  </footer>
+
+  <script src="../assets/lang.js"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    var I18N = {
+      en: {
+        _title: 'Cron Expression Builder',
+        _meta: 'Free cron expression builder. Create schedules visually and get both standard cron and Quartz expressions, with the next run times shown in your timezone — all in your browser.',
+        nav_site: 'Site',
+        h1: 'Cron Expression Builder',
+        lede: 'Build a schedule visually and get the matching cron expression — both standard (crontab, GitHub Actions) and Quartz formats — plus the next run times in your timezone.',
+        tabs_aria: 'Schedule type',
+        tab_minutes: 'Minutes', tab_hourly: 'Hourly', tab_daily: 'Daily',
+        tab_weekly: 'Weekly', tab_monthly: 'Monthly', tab_yearly: 'Yearly',
+        every: 'Every', every_cap: 'Every', the: 'The',
+        unit_minutes: 'minute(s)', unit_hours: 'hour(s)', unit_days: 'day(s)', unit_months: 'month(s)',
+        at_minute: 'at minute', at_time: 'At', on_days: 'On', on_day: 'On day',
+        of_every: 'of every', of_month: 'of',
+        every_weekday: 'Every weekday (Monday–Friday)',
+        ord_1: 'first', ord_2: 'second', ord_3: 'third', ord_4: 'fourth', ord_last: 'last',
+        lbl_unix: 'Standard cron',
+        btn_copy: 'Copy',
+        note_no_unix: 'Standard 5-field cron cannot express "nth weekday" schedules — use the Quartz form, or a day-of-month approximation.',
+        runs_title: 'Next 5 runs (your timezone)',
+        err_no_days: 'Select at least one day of the week.',
+        err_no_runs: 'No runs found in the next 5 years — check the values (e.g. 31 February never happens).',
+        msg_copied: 'Copied to clipboard.',
+        msg_copy_fail: 'Could not copy automatically — select the expression and copy it manually.',
+        desc_minutes: 'Runs every {n} minute(s).',
+        desc_hourly: 'Runs at minute {m} past every {n} hour(s).',
+        desc_daily: 'Runs at {time}, every {n} day(s).',
+        desc_weekday: 'Runs at {time} on weekdays (Monday to Friday).',
+        desc_weekly: 'Runs at {time} on {days}.',
+        desc_monthly_day: 'Runs at {time} on day {d} of every {n} month(s).',
+        desc_monthly_nth: 'Runs at {time} on the {k} {dow} of every {n} month(s).',
+        desc_yearly_date: 'Runs at {time} on {month} {d}, every year.',
+        desc_yearly_nth: 'Runs at {time} on the {k} {dow} of {month}, every year.',
+        ck_title: 'Check an existing expression',
+        ck_label: 'Standard cron expression (5 fields: minute hour day-of-month month day-of-week)',
+        ck_err: 'Not a valid 5-field cron expression.',
+        how_title: 'Cron in 30 seconds',
+        how_1: 'A standard cron expression has five fields: minute (0–59), hour (0–23), day of month (1–31), month (1–12), and day of week (0–6, Sunday = 0). Each field takes a number, a list (1,3,5), a range (9–17), a step (*/15), or * for "any". This format works in crontab, GitHub Actions, Kubernetes, and most schedulers.',
+        how_2: 'Quartz (used by many Java systems and CronMaker) adds a seconds field at the front and an optional year at the end, uses ? for the unused day field, and supports extras like MON#2 (second Monday) and 6L (last Friday). The two formats are not interchangeable — copy the one your system expects.',
+        privacy: "Everything runs in your browser — nothing is uploaded and nothing is tracked. Next-run times are computed for this device's timezone.",
+        footer_back: '← back to all tools'
+      },
+      id: {
+        _title: 'Pembuat Ekspresi Cron',
+        _meta: 'Pembuat ekspresi cron gratis. Susun jadwal secara visual dan dapatkan ekspresi cron standar maupun Quartz, dengan waktu eksekusi berikutnya di zona waktu Anda — semuanya di browser.',
+        nav_site: 'Situs',
+        h1: 'Pembuat Ekspresi Cron',
+        lede: 'Susun jadwal secara visual dan dapatkan ekspresi cron-nya — format standar (crontab, GitHub Actions) maupun Quartz — plus waktu eksekusi berikutnya di zona waktu Anda.',
+        tabs_aria: 'Jenis jadwal',
+        tab_minutes: 'Menit', tab_hourly: 'Per jam', tab_daily: 'Harian',
+        tab_weekly: 'Mingguan', tab_monthly: 'Bulanan', tab_yearly: 'Tahunan',
+        every: 'Setiap', every_cap: 'Setiap', the: 'Hari',
+        unit_minutes: 'menit', unit_hours: 'jam', unit_days: 'hari', unit_months: 'bulan',
+        at_minute: 'pada menit', at_time: 'Pukul', on_days: 'Pada hari', on_day: 'Pada tanggal',
+        of_every: 'setiap', of_month: 'di bulan',
+        every_weekday: 'Setiap hari kerja (Senin–Jumat)',
+        ord_1: 'pertama', ord_2: 'kedua', ord_3: 'ketiga', ord_4: 'keempat', ord_last: 'terakhir',
+        lbl_unix: 'Cron standar',
+        btn_copy: 'Salin',
+        note_no_unix: 'Cron standar 5-kolom tidak bisa menyatakan jadwal "hari-ke-N dalam bulan" — gunakan bentuk Quartz, atau perkiraan tanggal.',
+        runs_title: '5 eksekusi berikutnya (zona waktu Anda)',
+        err_no_days: 'Pilih minimal satu hari dalam seminggu.',
+        err_no_runs: 'Tidak ada eksekusi dalam 5 tahun ke depan — periksa nilainya (mis. 31 Februari tidak pernah ada).',
+        msg_copied: 'Disalin ke clipboard.',
+        msg_copy_fail: 'Tidak bisa menyalin otomatis — pilih ekspresinya lalu salin manual.',
+        desc_minutes: 'Berjalan setiap {n} menit.',
+        desc_hourly: 'Berjalan pada menit {m} setiap {n} jam.',
+        desc_daily: 'Berjalan pukul {time}, setiap {n} hari.',
+        desc_weekday: 'Berjalan pukul {time} pada hari kerja (Senin sampai Jumat).',
+        desc_weekly: 'Berjalan pukul {time} setiap {days}.',
+        desc_monthly_day: 'Berjalan pukul {time} pada tanggal {d} setiap {n} bulan.',
+        desc_monthly_nth: 'Berjalan pukul {time} pada {dow} {k} setiap {n} bulan.',
+        desc_yearly_date: 'Berjalan pukul {time} setiap tanggal {d} {month}.',
+        desc_yearly_nth: 'Berjalan pukul {time} pada {dow} {k} di bulan {month}, setiap tahun.',
+        ck_title: 'Periksa ekspresi yang sudah ada',
+        ck_label: 'Ekspresi cron standar (5 kolom: menit jam tanggal bulan hari-dalam-minggu)',
+        ck_err: 'Bukan ekspresi cron 5-kolom yang valid.',
+        how_title: 'Cron dalam 30 detik',
+        how_1: 'Ekspresi cron standar punya lima kolom: menit (0–59), jam (0–23), tanggal (1–31), bulan (1–12), dan hari dalam minggu (0–6, Minggu = 0). Tiap kolom bisa berisi angka, daftar (1,3,5), rentang (9–17), langkah (*/15), atau * untuk "apa saja". Format ini dipakai crontab, GitHub Actions, Kubernetes, dan sebagian besar penjadwal.',
+        how_2: 'Quartz (dipakai banyak sistem Java dan CronMaker) menambah kolom detik di depan dan tahun opsional di belakang, memakai ? untuk kolom hari yang tidak digunakan, dan mendukung tambahan seperti MON#2 (Senin kedua) dan 6L (Jumat terakhir). Kedua format tidak bisa saling dipertukarkan — salin yang sesuai dengan sistem Anda.',
+        privacy: 'Semuanya berjalan di browser Anda — tidak ada yang diunggah dan tidak ada pelacakan. Waktu eksekusi dihitung untuk zona waktu perangkat ini.',
+        footer_back: '← kembali ke semua alat'
+      }
+    };
+
+    function t(key) { return window.SiteLang.t(key); }
+    function tf(key, vars) {
+      var s = t(key);
+      for (var k in vars) {
+        if (Object.prototype.hasOwnProperty.call(vars, k)) s = s.replace('{' + k + '}', vars[k]);
+      }
+      return s;
+    }
+    function $(id) { return document.getElementById(id); }
+
+    /* ---------- Locale-aware day / month names ---------- */
+
+    function dayName(dowUnix) { // 0=Sun … 6=Sat; 1 Aug 2021 was a Sunday
+      return new Intl.DateTimeFormat(window.SiteLang.locale(), { weekday: 'long' })
+        .format(new Date(Date.UTC(2021, 7, 1 + dowUnix, 12)));
+    }
+    function monthName(m) { // 1-12
+      return new Intl.DateTimeFormat(window.SiteLang.locale(), { month: 'long' })
+        .format(new Date(Date.UTC(2021, m - 1, 1, 12)));
+    }
+
+    var QUARTZ_DOW = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+
+    /* ---------- Generic 5-field cron parser + next-run engine ---------- */
+
+    var MONTH_NAMES = { JAN:1, FEB:2, MAR:3, APR:4, MAY:5, JUN:6, JUL:7, AUG:8, SEP:9, OCT:10, NOV:11, DEC:12 };
+    var DOW_NAMES = { SUN:0, MON:1, TUE:2, WED:3, THU:4, FRI:5, SAT:6 };
+
+    function fieldValue(tok, min, max, names) {
+      var up = tok.toUpperCase();
+      if (names && Object.prototype.hasOwnProperty.call(names, up)) return names[up];
+      if (!/^\d+$/.test(tok)) return NaN;
+      return parseInt(tok, 10);
+    }
+
+    function parseField(str, min, max, names, isDow) {
+      var star = str === '*';
+      var set = {};
+      str.split(',').forEach(function (part) {
+        var step = 1;
+        var m = part.match(/^(.+)\/(\d+)$/);
+        var hadStep = false;
+        if (m) { part = m[1]; step = parseInt(m[2], 10); hadStep = true; if (!step) throw new Error('step'); }
+        var lo, hi;
+        if (part === '*') { lo = min; hi = max; }
+        else {
+          var r = part.split('-');
+          if (r.length > 2) throw new Error('range');
+          lo = fieldValue(r[0], min, max, names);
+          hi = r.length === 2 ? fieldValue(r[1], min, max, names) : (hadStep ? max : lo);
+          if (isDow) { if (lo === 7) lo = 0; if (hi === 7) hi = 0; }
+          if (isNaN(lo) || isNaN(hi)) throw new Error('value');
+          if (r.length === 2 && isDow && hi < lo) throw new Error('range'); // keep it simple: no wrap ranges
+          if (lo < min || hi > max || (r.length === 2 && hi < lo)) throw new Error('bounds');
+        }
+        for (var v = lo; v <= hi; v += step) set[v] = true;
+      });
+      return { star: star, set: set };
+    }
+
+    function parseCron(expr) {
+      var f = expr.trim().split(/\s+/);
+      if (f.length !== 5) throw new Error('fields');
+      return {
+        minute: parseField(f[0], 0, 59),
+        hour: parseField(f[1], 0, 23),
+        dom: parseField(f[2], 1, 31),
+        month: parseField(f[3], 1, 12, MONTH_NAMES),
+        dow: parseField(f[4], 0, 7, DOW_NAMES, true)
+      };
+    }
+
+    // Standard cron day semantics: when BOTH dom and dow are restricted,
+    // a day matches if EITHER matches.
+    function nextRuns(sets, count) {
+      var res = [];
+      var d = new Date();
+      d.setSeconds(0, 0);
+      d.setMinutes(d.getMinutes() + 1);
+      var limit = new Date(d.getFullYear() + 5, 0, 1);
+      while (res.length < count && d < limit) {
+        if (!sets.month.set[d.getMonth() + 1]) {
+          d = new Date(d.getFullYear(), d.getMonth() + 1, 1, 0, 0);
+          continue;
+        }
+        var domM = !!sets.dom.set[d.getDate()];
+        var dowM = !!sets.dow.set[d.getDay()];
+        var dayOk = (sets.dom.star && sets.dow.star) ? true
+          : sets.dom.star ? dowM
+          : sets.dow.star ? domM
+          : (domM || dowM);
+        if (!dayOk) {
+          d = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1, 0, 0);
+          continue;
+        }
+        if (!sets.hour.set[d.getHours()]) {
+          d = new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours() + 1, 0);
+          continue;
+        }
+        if (!sets.minute.set[d.getMinutes()]) {
+          d.setMinutes(d.getMinutes() + 1);
+          continue;
+        }
+        res.push(new Date(d));
+        d.setMinutes(d.getMinutes() + 1);
+      }
+      return res;
+    }
+
+    // Date of the kth (1-4) or last ('L') weekday of a month, or null.
+    function nthWeekdayDate(year, monthIdx, dow, k) {
+      if (k === 'L') {
+        var last = new Date(year, monthIdx + 1, 0);
+        return new Date(year, monthIdx, last.getDate() - ((last.getDay() - dow + 7) % 7));
+      }
+      var first = new Date(year, monthIdx, 1);
+      var date = 1 + ((dow - first.getDay() + 7) % 7) + (k - 1) * 7;
+      if (date > new Date(year, monthIdx + 1, 0).getDate()) return null;
+      return new Date(year, monthIdx, date);
+    }
+
+    // Next runs for "nth weekday" schedules (monthly: every nStep months
+    // from this month; yearly: fixed month, nStep = 12).
+    function nthWeekdayRuns(k, dow, fixedMonth, nStep, hh, mm, count) {
+      var res = [];
+      var now = new Date();
+      var y = now.getFullYear(), mo = fixedMonth !== null ? fixedMonth : now.getMonth();
+      for (var i = 0; res.length < count && i < 200; i++) {
+        var dt = nthWeekdayDate(y, mo, dow, k);
+        if (dt) {
+          dt.setHours(hh, mm, 0, 0);
+          if (dt > now) res.push(dt);
+        }
+        if (fixedMonth !== null) { y += 1; }
+        else { mo += nStep; y += Math.floor(mo / 12); mo = mo % 12; }
+      }
+      return res;
+    }
+
+    /* ---------- Relative time ---------- */
+
+    function relFmt(ms) {
+      var diff = ms - Date.now();
+      var abs = Math.abs(diff) / 1000;
+      var unit, val;
+      if (abs < 60) { unit = 'second'; val = diff / 1e3; }
+      else if (abs < 3600) { unit = 'minute'; val = diff / 6e4; }
+      else if (abs < 86400) { unit = 'hour'; val = diff / 3.6e6; }
+      else if (abs < 2592000) { unit = 'day'; val = diff / 8.64e7; }
+      else if (abs < 31536000) { unit = 'month'; val = diff / 2.592e9; }
+      else { unit = 'year'; val = diff / 3.1536e10; }
+      try {
+        return new Intl.RelativeTimeFormat(window.SiteLang.locale(), { numeric: 'auto' })
+          .format(Math.round(val), unit);
+      } catch (e) { return ''; }
+    }
+
+    function renderRuns(listEl, dates) {
+      listEl.innerHTML = '';
+      dates.forEach(function (dt) {
+        var li = document.createElement('li');
+        var when = document.createElement('span');
+        when.textContent = dt.toLocaleString(window.SiteLang.locale(), { dateStyle: 'full', timeStyle: 'short' });
+        var rel = document.createElement('span');
+        rel.className = 'rel';
+        rel.textContent = relFmt(dt.getTime());
+        li.appendChild(when); li.appendChild(rel);
+        listEl.appendChild(li);
+      });
+    }
+
+    /* ---------- localStorage ---------- */
+
+    var NS = 'cron.';
+    function saveState() {
+      var days = [];
+      document.querySelectorAll('#wk-days input:checked').forEach(function (c) { days.push(c.value); });
+      var state = {
+        tab: activeTab,
+        minN: $('min-n').value, hrN: $('hr-n').value, hrM: $('hr-m').value,
+        dailyMode: $('daily-wd').checked ? 'weekday' : 'every',
+        dailyN: $('daily-n').value, dailyTime: $('daily-time').value,
+        wkDays: days, wkTime: $('wk-time').value,
+        monMode: $('mon-nth').checked ? 'nth' : 'day',
+        monD: $('mon-d').value, monN: $('mon-n').value,
+        monK: $('mon-k').value, monDow: $('mon-dow').value, monN2: $('mon-n2').value,
+        monTime: $('mon-time').value,
+        yrMode: $('yr-nth').checked ? 'nth' : 'date',
+        yrMonth: $('yr-month').value, yrD: $('yr-d').value,
+        yrK: $('yr-k').value, yrDow: $('yr-dow').value, yrMonth2: $('yr-month2').value,
+        yrTime: $('yr-time').value
+      };
+      try { localStorage.setItem(NS + 'state', JSON.stringify(state)); } catch (e) { /* ignore */ }
+    }
+    function loadState() {
+      try {
+        var raw = localStorage.getItem(NS + 'state');
+        return raw ? JSON.parse(raw) : null;
+      } catch (e) { return null; }
+    }
+
+    /* ---------- Selects (rebuilt on language change) ---------- */
+
+    function fillSelect(sel, options, keep) {
+      var prev = keep ? sel.value : null;
+      sel.innerHTML = '';
+      options.forEach(function (o) {
+        var opt = document.createElement('option');
+        opt.value = o.value;
+        opt.textContent = o.label;
+        sel.appendChild(opt);
+      });
+      if (prev !== null && prev !== '') sel.value = prev;
+    }
+
+    function ordinalOptions() {
+      return [
+        { value: '1', label: t('ord_1') }, { value: '2', label: t('ord_2') },
+        { value: '3', label: t('ord_3') }, { value: '4', label: t('ord_4') },
+        { value: 'L', label: t('ord_last') }
+      ];
+    }
+    function dowOptions() {
+      var out = [];
+      [1, 2, 3, 4, 5, 6, 0].forEach(function (d) { out.push({ value: String(d), label: dayName(d) }); });
+      return out;
+    }
+    function monthOptions() {
+      var out = [];
+      for (var m = 1; m <= 12; m++) out.push({ value: String(m), label: monthName(m) });
+      return out;
+    }
+
+    function rebuildSelects(keep) {
+      fillSelect($('mon-k'), ordinalOptions(), keep);
+      fillSelect($('mon-dow'), dowOptions(), keep);
+      fillSelect($('yr-k'), ordinalOptions(), keep);
+      fillSelect($('yr-dow'), dowOptions(), keep);
+      fillSelect($('yr-month'), monthOptions(), keep);
+      fillSelect($('yr-month2'), monthOptions(), keep);
+      // weekly checkboxes
+      var wrap = $('wk-days');
+      var checked = {};
+      wrap.querySelectorAll('input').forEach(function (c) { checked[c.value] = c.checked; });
+      var had = wrap.children.length > 0;
+      wrap.innerHTML = '';
+      [1, 2, 3, 4, 5, 6, 0].forEach(function (d) {
+        var lab = document.createElement('label');
+        var cb = document.createElement('input');
+        cb.type = 'checkbox'; cb.value = String(d);
+        cb.checked = had ? !!checked[String(d)] : d === 1;
+        lab.appendChild(cb);
+        lab.appendChild(document.createTextNode(' ' + dayName(d)));
+        wrap.appendChild(lab);
+      });
+    }
+
+    /* ---------- Tabs ---------- */
+
+    var TAB_IDS = ['minutes', 'hourly', 'daily', 'weekly', 'monthly', 'yearly'];
+    var activeTab = 'minutes';
+    var tabs = TAB_IDS.map(function (id) { return $('tab-' + id); });
+
+    function selectTab(name) {
+      activeTab = name;
+      TAB_IDS.forEach(function (id) {
+        var on = id === name;
+        $('tab-' + id).setAttribute('aria-selected', on ? 'true' : 'false');
+        $('tab-' + id).tabIndex = on ? 0 : -1;
+        $('panel-' + id).hidden = !on;
+      });
+      update();
+    }
+
+    tabs.forEach(function (tab, i) {
+      tab.addEventListener('click', function () { selectTab(TAB_IDS[i]); });
+      tab.addEventListener('keydown', function (e) {
+        var idx = null;
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') idx = (i + 1) % tabs.length;
+        else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') idx = (i - 1 + tabs.length) % tabs.length;
+        else if (e.key === 'Home') idx = 0;
+        else if (e.key === 'End') idx = tabs.length - 1;
+        if (idx !== null) {
+          e.preventDefault();
+          selectTab(TAB_IDS[idx]);
+          tabs[idx].focus();
+        }
+      });
+    });
+
+    /* ---------- Build the expression from the active panel ---------- */
+
+    function clamp(id, lo, hi, dflt) {
+      var v = parseInt($(id).value, 10);
+      if (!isFinite(v)) return dflt;
+      return Math.min(hi, Math.max(lo, v));
+    }
+    function timeOf(id) {
+      var m = ($(id).value || '').match(/^(\d{2}):(\d{2})/);
+      return m ? { h: +m[1], m: +m[2], str: m[1] + ':' + m[2] } : { h: 12, m: 0, str: '12:00' };
+    }
+
+    function build() {
+      var r = { unix: null, quartz: null, desc: '', runs: null, err: '' };
+      var tm, n;
+
+      if (activeTab === 'minutes') {
+        n = clamp('min-n', 1, 59, 5);
+        r.unix = (n === 1 ? '*' : '*/' + n) + ' * * * *';
+        r.quartz = '0 0/' + n + ' * 1/1 * ? *';
+        r.desc = tf('desc_minutes', { n: n });
+
+      } else if (activeTab === 'hourly') {
+        n = clamp('hr-n', 1, 23, 1);
+        var mi = clamp('hr-m', 0, 59, 0);
+        r.unix = mi + ' ' + (n === 1 ? '*' : '*/' + n) + ' * * *';
+        r.quartz = '0 ' + mi + ' 0/' + n + ' 1/1 * ? *';
+        r.desc = tf('desc_hourly', { m: mi, n: n });
+
+      } else if (activeTab === 'daily') {
+        tm = timeOf('daily-time');
+        if ($('daily-wd').checked) {
+          r.unix = tm.m + ' ' + tm.h + ' * * 1-5';
+          r.quartz = '0 ' + tm.m + ' ' + tm.h + ' ? * MON-FRI *';
+          r.desc = tf('desc_weekday', { time: tm.str });
+        } else {
+          n = clamp('daily-n', 1, 31, 1);
+          r.unix = tm.m + ' ' + tm.h + ' ' + (n === 1 ? '*' : '*/' + n) + ' * *';
+          r.quartz = '0 ' + tm.m + ' ' + tm.h + ' 1/' + n + ' * ? *';
+          r.desc = tf('desc_daily', { time: tm.str, n: n });
+        }
+
+      } else if (activeTab === 'weekly') {
+        tm = timeOf('wk-time');
+        var days = [];
+        document.querySelectorAll('#wk-days input:checked').forEach(function (c) { days.push(+c.value); });
+        if (!days.length) { r.err = t('err_no_days'); return r; }
+        days.sort(function (a, b) { return a - b; });
+        r.unix = tm.m + ' ' + tm.h + ' * * ' + days.join(',');
+        r.quartz = '0 ' + tm.m + ' ' + tm.h + ' ? * ' + days.map(function (d) { return QUARTZ_DOW[d]; }).join(',') + ' *';
+        var order = [1, 2, 3, 4, 5, 6, 0].filter(function (d) { return days.indexOf(d) !== -1; });
+        r.desc = tf('desc_weekly', { time: tm.str, days: order.map(dayName).join(', ') });
+
+      } else if (activeTab === 'monthly') {
+        tm = timeOf('mon-time');
+        if ($('mon-nth').checked) {
+          var k = $('mon-k').value, dw = +$('mon-dow').value;
+          n = clamp('mon-n2', 1, 12, 1);
+          r.quartz = '0 ' + tm.m + ' ' + tm.h + ' ? 1/' + n + ' ' + (dw + 1) + (k === 'L' ? 'L' : '#' + k) + ' *';
+          r.desc = tf('desc_monthly_nth', { time: tm.str, k: t(k === 'L' ? 'ord_last' : 'ord_' + k), dow: dayName(dw), n: n });
+          r.runs = nthWeekdayRuns(k === 'L' ? 'L' : +k, dw, null, n, tm.h, tm.m, 5);
+        } else {
+          var d = clamp('mon-d', 1, 31, 1);
+          n = clamp('mon-n', 1, 12, 1);
+          r.unix = tm.m + ' ' + tm.h + ' ' + d + ' ' + (n === 1 ? '*' : '*/' + n) + ' *';
+          r.quartz = '0 ' + tm.m + ' ' + tm.h + ' ' + d + ' 1/' + n + ' ? *';
+          r.desc = tf('desc_monthly_day', { time: tm.str, d: d, n: n });
+        }
+
+      } else { // yearly
+        tm = timeOf('yr-time');
+        if ($('yr-nth').checked) {
+          var k2 = $('yr-k').value, dw2 = +$('yr-dow').value, mo2 = +$('yr-month2').value;
+          r.quartz = '0 ' + tm.m + ' ' + tm.h + ' ? ' + mo2 + ' ' + (dw2 + 1) + (k2 === 'L' ? 'L' : '#' + k2) + ' *';
+          r.desc = tf('desc_yearly_nth', { time: tm.str, k: t(k2 === 'L' ? 'ord_last' : 'ord_' + k2), dow: dayName(dw2), month: monthName(mo2) });
+          r.runs = nthWeekdayRuns(k2 === 'L' ? 'L' : +k2, dw2, mo2 - 1, 12, tm.h, tm.m, 5);
+        } else {
+          var mo = +$('yr-month').value, dd = clamp('yr-d', 1, 31, 1);
+          r.unix = tm.m + ' ' + tm.h + ' ' + dd + ' ' + mo + ' *';
+          r.quartz = '0 ' + tm.m + ' ' + tm.h + ' ' + dd + ' ' + mo + ' ? *';
+          r.desc = tf('desc_yearly_date', { time: tm.str, month: monthName(mo), d: dd });
+        }
+      }
+      return r;
+    }
+
+    function update() {
+      saveState();
+      var r = build();
+      $('build-err').textContent = r.err;
+      $('out-unix').textContent = r.unix || '—';
+      $('out-quartz').textContent = r.quartz || '—';
+      $('unix-note').hidden = !!r.unix || !!r.err;
+      $('out-desc').textContent = r.err ? '' : r.desc;
+      $('copy-msg').textContent = '';
+      var runsEl = $('out-runs');
+      if (r.err) { runsEl.innerHTML = ''; return; }
+      var runs = r.runs;
+      if (!runs && r.unix) {
+        try { runs = nextRuns(parseCron(r.unix), 5); } catch (e) { runs = []; }
+      }
+      if (runs && runs.length) renderRuns(runsEl, runs);
+      else {
+        runsEl.innerHTML = '';
+        $('build-err').textContent = t('err_no_runs');
+      }
+    }
+
+    // Every builder control re-renders on change.
+    document.querySelectorAll('#panel-minutes input, #panel-hourly input, #panel-daily input, #panel-monthly input, #panel-monthly select, #panel-yearly input, #panel-yearly select, #panel-weekly input').forEach(function (el) {
+      el.addEventListener('input', update);
+      el.addEventListener('change', update);
+    });
+    $('wk-days').addEventListener('change', update);
+    $('wk-time').addEventListener('input', update);
+
+    /* ---------- Copy ---------- */
+
+    function copyBtn(btnId, codeId) {
+      $(btnId).addEventListener('click', function () {
+        var val = $(codeId).textContent;
+        if (!val || val === '—') return;
+        var el = $('copy-msg');
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(val).then(
+            function () { el.textContent = t('msg_copied'); el.style.color = 'var(--text-muted)'; },
+            function () { el.textContent = t('msg_copy_fail'); el.style.color = 'var(--negative)'; }
+          );
+        } else {
+          el.textContent = t('msg_copy_fail');
+          el.style.color = 'var(--negative)';
+        }
+      });
+    }
+    copyBtn('copy-unix', 'out-unix');
+    copyBtn('copy-quartz', 'out-quartz');
+
+    /* ---------- Checker ---------- */
+
+    var ckTimer = null;
+    function check() {
+      var expr = $('ck-in').value.trim();
+      var errEl = $('ck-err'), runsEl = $('ck-runs');
+      errEl.textContent = '';
+      runsEl.innerHTML = '';
+      try { localStorage.setItem(NS + 'check', $('ck-in').value); } catch (e) { /* ignore */ }
+      if (!expr) return;
+      var runs;
+      try { runs = nextRuns(parseCron(expr), 5); }
+      catch (e) { errEl.textContent = t('ck_err'); return; }
+      if (!runs.length) { errEl.textContent = t('err_no_runs'); return; }
+      renderRuns(runsEl, runs);
+    }
+    $('ck-in').addEventListener('input', function () {
+      clearTimeout(ckTimer);
+      ckTimer = setTimeout(check, 250);
+    });
+
+    /* ---------- Restore, then first render ---------- */
+
+    rebuildSelects(false);
+    var st = loadState();
+    if (st && typeof st === 'object') {
+      if (typeof st.minN === 'string') $('min-n').value = st.minN;
+      if (typeof st.hrN === 'string') $('hr-n').value = st.hrN;
+      if (typeof st.hrM === 'string') $('hr-m').value = st.hrM;
+      if (st.dailyMode === 'weekday') $('daily-wd').checked = true;
+      if (typeof st.dailyN === 'string') $('daily-n').value = st.dailyN;
+      if (typeof st.dailyTime === 'string') $('daily-time').value = st.dailyTime;
+      if (Array.isArray(st.wkDays)) {
+        document.querySelectorAll('#wk-days input').forEach(function (c) {
+          c.checked = st.wkDays.indexOf(c.value) !== -1;
+        });
+      }
+      if (typeof st.wkTime === 'string') $('wk-time').value = st.wkTime;
+      if (st.monMode === 'nth') $('mon-nth').checked = true;
+      if (typeof st.monD === 'string') $('mon-d').value = st.monD;
+      if (typeof st.monN === 'string') $('mon-n').value = st.monN;
+      if (typeof st.monK === 'string') $('mon-k').value = st.monK;
+      if (typeof st.monDow === 'string') $('mon-dow').value = st.monDow;
+      if (typeof st.monN2 === 'string') $('mon-n2').value = st.monN2;
+      if (typeof st.monTime === 'string') $('mon-time').value = st.monTime;
+      if (st.yrMode === 'nth') $('yr-nth').checked = true;
+      if (typeof st.yrMonth === 'string') $('yr-month').value = st.yrMonth;
+      if (typeof st.yrD === 'string') $('yr-d').value = st.yrD;
+      if (typeof st.yrK === 'string') $('yr-k').value = st.yrK;
+      if (typeof st.yrDow === 'string') $('yr-dow').value = st.yrDow;
+      if (typeof st.yrMonth2 === 'string') $('yr-month2').value = st.yrMonth2;
+      if (typeof st.yrTime === 'string') $('yr-time').value = st.yrTime;
+      if (TAB_IDS.indexOf(st.tab) !== -1) activeTab = st.tab;
+    }
+    try {
+      var savedCk = localStorage.getItem(NS + 'check');
+      if (typeof savedCk === 'string') $('ck-in').value = savedCk;
+    } catch (e) { /* ignore */ }
+
+    window.SiteLang.init(I18N, function () {
+      rebuildSelects(true);   // re-label day/month/ordinal options
+      selectTab(activeTab);   // re-renders expression, description, runs
+      check();
+    });
+  })();
+  </script>
+</body>
+</html>
