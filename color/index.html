@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Color Converter &amp; Contrast Checker</title>
+  <meta name="description" content="Free color converter and WCAG contrast checker. Convert between HEX, RGB, and HSL, and test text/background contrast against accessibility guidelines — all in your browser.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d9488'/%3E%3Cpath d='M16 6l6.5 6.5a9 9 0 1 1-13 0z' stroke='%23ffffff' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../assets/theme.js"></script>
+  <style>
+    .top-nav {
+      padding: 1.25rem 0 2.25rem; font-size: 0.9rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .top-nav a { color: var(--text-muted); text-decoration: none; }
+    .top-nav a:hover { color: var(--accent-strong); }
+    .lede { color: var(--text-muted); max-width: 44rem; margin-bottom: 0; }
+    .tool-card { margin: 1.75rem 0 1.25rem; }
+    .how-card { margin-bottom: 1rem; }
+    h2.sub { font-size: 1.05rem; margin: 0 0 1rem; }
+
+    .color-in { display: flex; gap: 0.6rem; align-items: stretch; }
+    .color-in input[type="text"] { flex: 1; font-family: var(--mono); }
+    input[type="color"] {
+      width: 3rem; height: auto; padding: 0.2rem; flex: none;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); cursor: pointer;
+    }
+    .err { color: var(--negative); font-size: 0.9rem; min-height: 1.2em; margin: 0.6rem 0 0; }
+
+    /* checkerboard behind the swatch so alpha is visible */
+    .swatch-wrap {
+      margin-top: 1rem; border-radius: var(--radius-sm); overflow: hidden;
+      border: 1px solid var(--border);
+      background: repeating-conic-gradient(color-mix(in srgb, var(--text) 12%, transparent) 0% 25%, transparent 0% 50%) 0 0 / 18px 18px;
+    }
+    .swatch { height: 5rem; }
+
+    .out-rows { margin: 1.25rem 0 0; display: grid; gap: 0.6rem; }
+    .out-row { display: flex; align-items: center; gap: 0.6rem; }
+    .out-row .lbl { flex: none; width: 3.2rem; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); }
+    .out-row code {
+      flex: 1; padding: 0.5rem 0.75rem;
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+      font-size: 0.95rem; overflow-wrap: anywhere;
+    }
+    .btn-sm { padding: 0.35rem 0.7rem; font-size: 0.8rem; flex: none; }
+    .msg { min-height: 1.2em; margin-top: 0.75rem; font-size: 0.9rem; color: var(--text-muted); }
+
+    /* Contrast checker */
+    .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: end; }
+    .swap-row { display: flex; justify-content: center; margin: 0.9rem 0; }
+    .preview {
+      margin-top: 1rem; padding: 1.4rem 1.25rem; text-align: center;
+      border-radius: var(--radius-sm); border: 1px solid var(--border);
+    }
+    .preview .big { font-size: 1.35rem; font-weight: 700; margin: 0 0 0.25rem; }
+    .preview .small-sample { font-size: 0.9rem; margin: 0; }
+    .ratio-row { display: flex; align-items: baseline; gap: 0.75rem; margin-top: 1.25rem; flex-wrap: wrap; }
+    .ratio { font-family: var(--mono); font-size: 2rem; font-weight: 700; letter-spacing: -0.01em; }
+    .badges { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.9rem; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.3rem 0.75rem; border-radius: 999px;
+      font-size: 0.8rem; font-weight: 600;
+    }
+    .badge.pass { background: color-mix(in srgb, var(--positive) 15%, transparent); color: var(--positive); }
+    .badge.fail { background: color-mix(in srgb, var(--negative) 13%, transparent); color: var(--negative); }
+
+    @media (max-width: 640px) { .pair { grid-template-columns: 1fr; } }
+    @media (max-width: 520px) { .card { padding: 1.1rem; } }
+  </style>
+</head>
+<body>
+  <header class="container">
+    <nav class="top-nav" aria-label="Site" data-i18n-attr="aria-label:nav_site">
+      <a href="../">&#8592; samba nugraha</a>
+      <div class="nav-actions">
+      <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
+        <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0l60 30M60 0L0 30" stroke="#fff" stroke-width="6"/><path d="M0 0l60 30M60 0L0 30" stroke="#C8102E" stroke-width="2.5"/><path d="M30 0v30M0 15h60" stroke="#fff" stroke-width="10"/><path d="M30 0v30M0 15h60" stroke="#C8102E" stroke-width="6"/></svg>EN
+        </button>
+        <button type="button" data-lang="id" aria-pressed="false" aria-label="Bahasa Indonesia">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="15" fill="#E70011"/><rect y="15" width="60" height="15" fill="#F7F7F7"/></svg>ID
+        </button>
+      </div>
+      <button type="button" class="theme-toggle" aria-label="Dark mode / Mode gelap" aria-pressed="false">
+        <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+      </div>
+    </nav>
+    <h1 data-i18n="h1">Color Converter &amp; Contrast Checker</h1>
+    <p class="lede" data-i18n="lede">Convert any CSS color between HEX, RGB, and HSL, and check text/background contrast against the WCAG accessibility guidelines.</p>
+  </header>
+
+  <main class="container">
+    <noscript>
+      <div class="card" style="border-left:3px solid var(--negative)">This tool needs JavaScript to run. Please enable it and reload. / Alat ini membutuhkan JavaScript. Aktifkan lalu muat ulang.</div>
+    </noscript>
+
+    <div class="card tool-card">
+      <h2 class="sub" data-i18n="conv_title">Convert a color</h2>
+      <label for="cc-in" data-i18n="in_label">Color (HEX, RGB, HSL, or a CSS name like "teal")</label>
+      <div class="color-in">
+        <input type="text" id="cc-in" autocomplete="off" spellcheck="false" placeholder="#0d9488" value="#0d9488">
+        <input type="color" id="cc-pick" value="#0d9488" data-i18n-attr="aria-label:in_label">
+      </div>
+      <p class="err" id="cc-err"></p>
+
+      <div class="swatch-wrap"><div class="swatch" id="cc-swatch"></div></div>
+
+      <div class="out-rows">
+        <div class="out-row"><span class="lbl">HEX</span><code id="cc-hex">—</code><button type="button" class="btn btn-sm" data-copy="cc-hex" data-i18n="btn_copy">Copy</button></div>
+        <div class="out-row"><span class="lbl">RGB</span><code id="cc-rgb">—</code><button type="button" class="btn btn-sm" data-copy="cc-rgb" data-i18n="btn_copy">Copy</button></div>
+        <div class="out-row"><span class="lbl">HSL</span><code id="cc-hsl">—</code><button type="button" class="btn btn-sm" data-copy="cc-hsl" data-i18n="btn_copy">Copy</button></div>
+      </div>
+      <p class="msg" id="cc-msg" aria-live="polite"></p>
+    </div>
+
+    <div class="card tool-card">
+      <h2 class="sub" data-i18n="ct_title">Contrast checker (WCAG)</h2>
+      <div class="pair">
+        <div>
+          <label for="ct-fg" data-i18n="fg_label">Text color</label>
+          <div class="color-in">
+            <input type="text" id="ct-fg" autocomplete="off" spellcheck="false" value="#1c1917">
+            <input type="color" id="ct-fg-pick" value="#1c1917" data-i18n-attr="aria-label:fg_label">
+          </div>
+        </div>
+        <div>
+          <label for="ct-bg" data-i18n="bg_label">Background color</label>
+          <div class="color-in">
+            <input type="text" id="ct-bg" autocomplete="off" spellcheck="false" value="#fafaf9">
+            <input type="color" id="ct-bg-pick" value="#fafaf9" data-i18n-attr="aria-label:bg_label">
+          </div>
+        </div>
+      </div>
+      <div class="swap-row">
+        <button type="button" class="btn btn-sm" id="ct-swap" data-i18n="btn_swap">⇅ Swap colors</button>
+      </div>
+      <p class="err" id="ct-err"></p>
+
+      <div class="preview" id="ct-preview">
+        <p class="big" data-i18n="sample_big">Large text 24px</p>
+        <p class="small-sample" data-i18n="sample_small">Normal text — the quick brown fox jumps over the lazy dog.</p>
+      </div>
+
+      <div class="ratio-row">
+        <span class="ratio" id="ct-ratio">—</span>
+        <span class="muted" data-i18n="ratio_label">contrast ratio</span>
+      </div>
+      <div class="badges" id="ct-badges"></div>
+    </div>
+
+    <section class="card how-card" aria-labelledby="how-heading">
+      <h2 id="how-heading" data-i18n="how_title">What the badges mean</h2>
+      <p data-i18n="how_1">WCAG measures contrast as a ratio from 1:1 (identical) to 21:1 (black on white). Level AA — the common legal/professional bar — requires 4.5:1 for normal text and 3:1 for large text (18pt+, or 14pt bold). The stricter AAA level requires 7:1 and 4.5:1. If the text color has transparency, it is composited onto the background before measuring, just like the browser renders it.</p>
+      <p class="muted small" data-i18n="privacy">Everything runs in your browser — nothing is uploaded and nothing is tracked.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p><a href="../" data-i18n="footer_back">&#8592; back to all tools</a> &middot; &copy; 2026 Samba Nugraha</p>
+    </div>
+  </footer>
+
+  <script src="../assets/lang.js"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    var I18N = {
+      en: {
+        _title: 'Color Converter & Contrast Checker',
+        _meta: 'Free color converter and WCAG contrast checker. Convert between HEX, RGB, and HSL, and test text/background contrast against accessibility guidelines — all in your browser.',
+        nav_site: 'Site',
+        h1: 'Color Converter & Contrast Checker',
+        lede: 'Convert any CSS color between HEX, RGB, and HSL, and check text/background contrast against the WCAG accessibility guidelines.',
+        conv_title: 'Convert a color',
+        in_label: 'Color (HEX, RGB, HSL, or a CSS name like "teal")',
+        err_color: 'Not a recognizable CSS color — try #0d9488, rgb(13, 148, 136), or "teal".',
+        btn_copy: 'Copy',
+        ct_title: 'Contrast checker (WCAG)',
+        fg_label: 'Text color',
+        bg_label: 'Background color',
+        btn_swap: '⇅ Swap colors',
+        sample_big: 'Large text 24px',
+        sample_small: 'Normal text — the quick brown fox jumps over the lazy dog.',
+        ratio_label: 'contrast ratio',
+        aa_normal: 'AA normal',
+        aa_large: 'AA large',
+        aaa_normal: 'AAA normal',
+        aaa_large: 'AAA large',
+        pass: 'pass',
+        fail: 'fail',
+        msg_copied: 'Copied to clipboard.',
+        msg_copy_fail: 'Could not copy automatically — select the value and copy it manually.',
+        how_title: 'What the badges mean',
+        how_1: 'WCAG measures contrast as a ratio from 1:1 (identical) to 21:1 (black on white). Level AA — the common legal/professional bar — requires 4.5:1 for normal text and 3:1 for large text (18pt+, or 14pt bold). The stricter AAA level requires 7:1 and 4.5:1. If the text color has transparency, it is composited onto the background before measuring, just like the browser renders it.',
+        privacy: 'Everything runs in your browser — nothing is uploaded and nothing is tracked.',
+        footer_back: '← back to all tools'
+      },
+      id: {
+        _title: 'Konverter Warna & Pemeriksa Kontras',
+        _meta: 'Konverter warna dan pemeriksa kontras WCAG gratis. Konversi antara HEX, RGB, dan HSL, dan uji kontras teks/latar terhadap pedoman aksesibilitas — semuanya di browser Anda.',
+        nav_site: 'Situs',
+        h1: 'Konverter Warna & Pemeriksa Kontras',
+        lede: 'Konversi warna CSS apa pun antara HEX, RGB, dan HSL, dan periksa kontras teks/latar terhadap pedoman aksesibilitas WCAG.',
+        conv_title: 'Konversi warna',
+        in_label: 'Warna (HEX, RGB, HSL, atau nama CSS seperti "teal")',
+        err_color: 'Bukan warna CSS yang dikenali — coba #0d9488, rgb(13, 148, 136), atau "teal".',
+        btn_copy: 'Salin',
+        ct_title: 'Pemeriksa kontras (WCAG)',
+        fg_label: 'Warna teks',
+        bg_label: 'Warna latar',
+        btn_swap: '⇅ Tukar warna',
+        sample_big: 'Teks besar 24px',
+        sample_small: 'Teks normal — sembilan belas kupu-kupu terbang melintasi taman kota.',
+        ratio_label: 'rasio kontras',
+        aa_normal: 'AA normal',
+        aa_large: 'AA besar',
+        aaa_normal: 'AAA normal',
+        aaa_large: 'AAA besar',
+        pass: 'lolos',
+        fail: 'gagal',
+        msg_copied: 'Disalin ke clipboard.',
+        msg_copy_fail: 'Tidak bisa menyalin otomatis — pilih nilainya lalu salin manual.',
+        how_title: 'Arti lencana',
+        how_1: 'WCAG mengukur kontras sebagai rasio dari 1:1 (identik) sampai 21:1 (hitam di atas putih). Level AA — standar umum legal/profesional — mensyaratkan 4,5:1 untuk teks normal dan 3:1 untuk teks besar (18pt+, atau 14pt tebal). Level AAA yang lebih ketat mensyaratkan 7:1 dan 4,5:1. Jika warna teks punya transparansi, warnanya digabungkan ke latar sebelum diukur, persis seperti yang dirender browser.',
+        privacy: 'Semuanya berjalan di browser Anda — tidak ada yang diunggah dan tidak ada pelacakan.',
+        footer_back: '← kembali ke semua alat'
+      }
+    };
+
+    function t(key) { return window.SiteLang.t(key); }
+    function $(id) { return document.getElementById(id); }
+
+    /* ---------- Color parsing via the browser's own CSS engine ---------- */
+
+    var probe = document.createElement('div');
+    probe.style.display = 'none';
+    document.body.appendChild(probe);
+
+    function parseColor(str) {
+      if (!str || !str.trim()) return null;
+      probe.style.color = '';
+      probe.style.color = str.trim();
+      if (!probe.style.color) return null;
+      var cs = getComputedStyle(probe).color;
+      var m = cs.match(/^rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*(?:,\s*([\d.]+)\s*)?\)$/);
+      if (!m) return null;
+      return {
+        r: Math.round(+m[1]),
+        g: Math.round(+m[2]),
+        b: Math.round(+m[3]),
+        a: m[4] === undefined ? 1 : +m[4]
+      };
+    }
+
+    function hex2(v) { return (v < 16 ? '0' : '') + v.toString(16); }
+    function toHex(c) {
+      var s = '#' + hex2(c.r) + hex2(c.g) + hex2(c.b);
+      if (c.a < 1) s += hex2(Math.round(c.a * 255));
+      return s;
+    }
+    function toRgb(c) {
+      return c.a < 1
+        ? 'rgba(' + c.r + ', ' + c.g + ', ' + c.b + ', ' + (Math.round(c.a * 100) / 100) + ')'
+        : 'rgb(' + c.r + ', ' + c.g + ', ' + c.b + ')';
+    }
+    function toHsl(c) {
+      var r = c.r / 255, g = c.g / 255, b = c.b / 255;
+      var max = Math.max(r, g, b), min = Math.min(r, g, b);
+      var l = (max + min) / 2;
+      var h = 0, s = 0;
+      if (max !== min) {
+        var d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        if (max === r) h = ((g - b) / d + (g < b ? 6 : 0));
+        else if (max === g) h = (b - r) / d + 2;
+        else h = (r - g) / d + 4;
+        h *= 60;
+      }
+      var H = Math.round(h), S = Math.round(s * 100), L = Math.round(l * 100);
+      return c.a < 1
+        ? 'hsla(' + H + ', ' + S + '%, ' + L + '%, ' + (Math.round(c.a * 100) / 100) + ')'
+        : 'hsl(' + H + ', ' + S + '%, ' + L + '%)';
+    }
+
+    /* ---------- WCAG contrast ---------- */
+
+    function luminance(c) {
+      function lin(v) {
+        v /= 255;
+        return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+      }
+      return 0.2126 * lin(c.r) + 0.7152 * lin(c.g) + 0.0722 * lin(c.b);
+    }
+
+    function composite(fg, bg) {
+      var a = fg.a;
+      if (a >= 1) return fg;
+      return {
+        r: Math.round(fg.r * a + bg.r * (1 - a)),
+        g: Math.round(fg.g * a + bg.g * (1 - a)),
+        b: Math.round(fg.b * a + bg.b * (1 - a)),
+        a: 1
+      };
+    }
+
+    function contrastRatio(fg, bg) {
+      var solid = composite(fg, { r: bg.r, g: bg.g, b: bg.b, a: 1 });
+      var l1 = luminance(solid), l2 = luminance(bg);
+      var hi = Math.max(l1, l2), lo = Math.min(l1, l2);
+      return (hi + 0.05) / (lo + 0.05);
+    }
+
+    /* ---------- localStorage ---------- */
+
+    var NS = 'color.';
+    function save(key, value) { try { localStorage.setItem(NS + key, value); } catch (e) { /* ignore */ } }
+    function load(key) { try { return localStorage.getItem(NS + key); } catch (e) { return null; } }
+
+    /* ---------- Converter ---------- */
+
+    var lastColor = null;
+
+    function renderConvert(fromPicker) {
+      save('c', $('cc-in').value);
+      var err = $('cc-err');
+      err.textContent = '';
+      var c = parseColor($('cc-in').value);
+      if (!c) {
+        $('cc-hex').textContent = '—';
+        $('cc-rgb').textContent = '—';
+        $('cc-hsl').textContent = '—';
+        $('cc-swatch').style.background = 'transparent';
+        if ($('cc-in').value.trim()) err.textContent = t('err_color');
+        lastColor = null;
+        return;
+      }
+      lastColor = c;
+      $('cc-hex').textContent = toHex(c);
+      $('cc-rgb').textContent = toRgb(c);
+      $('cc-hsl').textContent = toHsl(c);
+      $('cc-swatch').style.background = toRgb(c);
+      if (!fromPicker) $('cc-pick').value = '#' + hex2(c.r) + hex2(c.g) + hex2(c.b);
+    }
+
+    $('cc-in').addEventListener('input', function () { renderConvert(false); $('cc-msg').textContent = ''; });
+    $('cc-pick').addEventListener('input', function () {
+      $('cc-in').value = $('cc-pick').value;
+      save('c', $('cc-in').value);
+      renderConvert(true);
+    });
+
+    document.querySelectorAll('[data-copy]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var val = $(btn.getAttribute('data-copy')).textContent;
+        if (!val || val === '—') return;
+        var el = $('cc-msg');
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(val).then(
+            function () { el.textContent = t('msg_copied'); el.style.color = 'var(--text-muted)'; },
+            function () { el.textContent = t('msg_copy_fail'); el.style.color = 'var(--negative)'; }
+          );
+        } else {
+          el.textContent = t('msg_copy_fail');
+          el.style.color = 'var(--negative)';
+        }
+      });
+    });
+
+    /* ---------- Contrast checker ---------- */
+
+    function badge(labelKey, ok) {
+      var b = document.createElement('span');
+      b.className = 'badge ' + (ok ? 'pass' : 'fail');
+      b.textContent = t(labelKey) + ': ' + t(ok ? 'pass' : 'fail');
+      return b;
+    }
+
+    function renderContrast(fromPicker) {
+      save('fg', $('ct-fg').value);
+      save('bg', $('ct-bg').value);
+      var err = $('ct-err');
+      err.textContent = '';
+      var fg = parseColor($('ct-fg').value);
+      var bg = parseColor($('ct-bg').value);
+      var badges = $('ct-badges');
+      badges.innerHTML = '';
+      if (!fg || !bg) {
+        $('ct-ratio').textContent = '—';
+        if ($('ct-fg').value.trim() || $('ct-bg').value.trim()) err.textContent = t('err_color');
+        return;
+      }
+      if (!fromPicker) {
+        $('ct-fg-pick').value = '#' + hex2(fg.r) + hex2(fg.g) + hex2(fg.b);
+        $('ct-bg-pick').value = '#' + hex2(bg.r) + hex2(bg.g) + hex2(bg.b);
+      }
+      var prev = $('ct-preview');
+      prev.style.background = toRgb(bg);
+      prev.style.color = toRgb(fg);
+      var ratio = contrastRatio(fg, bg);
+      var shown = Math.round(ratio * 100) / 100;
+      $('ct-ratio').textContent = shown.toLocaleString(window.SiteLang.locale()) + ' : 1';
+      badges.appendChild(badge('aa_normal', ratio >= 4.5));
+      badges.appendChild(badge('aa_large', ratio >= 3));
+      badges.appendChild(badge('aaa_normal', ratio >= 7));
+      badges.appendChild(badge('aaa_large', ratio >= 4.5));
+    }
+
+    $('ct-fg').addEventListener('input', function () { renderContrast(false); });
+    $('ct-bg').addEventListener('input', function () { renderContrast(false); });
+    $('ct-fg-pick').addEventListener('input', function () {
+      $('ct-fg').value = $('ct-fg-pick').value;
+      renderContrast(true);
+    });
+    $('ct-bg-pick').addEventListener('input', function () {
+      $('ct-bg').value = $('ct-bg-pick').value;
+      renderContrast(true);
+    });
+
+    $('ct-swap').addEventListener('click', function () {
+      var tmp = $('ct-fg').value;
+      $('ct-fg').value = $('ct-bg').value;
+      $('ct-bg').value = tmp;
+      renderContrast(false);
+    });
+
+    /* ---------- Restore, then first render ---------- */
+
+    var sc = load('c'), sf = load('fg'), sb = load('bg');
+    if (typeof sc === 'string' && sc) $('cc-in').value = sc;
+    if (typeof sf === 'string' && sf) $('ct-fg').value = sf;
+    if (typeof sb === 'string' && sb) $('ct-bg').value = sb;
+
+    window.SiteLang.init(I18N, function () {
+      renderConvert(false);
+      renderContrast(false);
+    });
+  })();
+  </script>
+</body>
+</html>

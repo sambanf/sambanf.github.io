@@ -175,13 +175,6 @@
     };
 
     function t(key) { return window.SiteLang.t(key); }
-    function tf(key, vars) {
-      var s = t(key);
-      for (var k in vars) {
-        if (Object.prototype.hasOwnProperty.call(vars, k)) s = s.replace('{' + k + '}', vars[k]);
-      }
-      return s;
-    }
     function fmt(n) { return n.toLocaleString(window.SiteLang.locale()); }
     function $(id) { return document.getElementById(id); }
 
@@ -305,17 +298,22 @@
         out.hidden = true;
         return;
       }
+
+      // Split the template on the {a}/{d} placeholders so the counts can
+      // be colored spans: "{a} added · {d} removed · {s} unchanged"
       stats.innerHTML = '';
-      var span = document.createElement('span');
-      var parts = tf('stats', { a: ' ', d: '', s: fmt(same) }).split(/[ ]/);
-      var addEl = document.createElement('span'); addEl.className = 'add'; addEl.textContent = '+' + fmt(added);
-      var delEl = document.createElement('span'); delEl.className = 'del'; delEl.textContent = '−' + fmt(removed);
-      span.appendChild(document.createTextNode(parts[0]));
-      span.appendChild(addEl);
-      span.appendChild(document.createTextNode(parts[1]));
-      span.appendChild(delEl);
-      span.appendChild(document.createTextNode(parts[2]));
-      stats.appendChild(span);
+      var segs = t('stats').split(/\{a\}|\{d\}/);
+      var addEl = document.createElement('span');
+      addEl.className = 'add';
+      addEl.textContent = '+' + fmt(added);
+      var delEl = document.createElement('span');
+      delEl.className = 'del';
+      delEl.textContent = '−' + fmt(removed);
+      stats.appendChild(document.createTextNode(segs[0] || ''));
+      stats.appendChild(addEl);
+      stats.appendChild(document.createTextNode(segs[1] || ''));
+      stats.appendChild(delEl);
+      stats.appendChild(document.createTextNode((segs[2] || '').replace('{s}', fmt(same))));
 
       // Pair up del/add blocks for in-line change highlighting.
       var frag = document.createDocumentFragment();
