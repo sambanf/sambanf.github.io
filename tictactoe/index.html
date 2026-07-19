@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tic-Tac-Toe</title>
+  <meta name="description" content="Free tic-tac-toe game. Play against a friend on one device or against the computer with easy and hard difficulty — right in your browser.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d9488'/%3E%3Cg stroke='%23ffffff' stroke-width='2.2' fill='none' stroke-linecap='round'%3E%3Cpath d='M12.5 6v20M19.5 6v20M6 12.5h20M6 19.5h20'/%3E%3C/g%3E%3C/svg%3E">
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../assets/theme.js"></script>
+  <style>
+    .top-nav {
+      padding: 1.25rem 0 2.25rem; font-size: 0.9rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .top-nav a { color: var(--text-muted); text-decoration: none; }
+    .top-nav a:hover { color: var(--accent-strong); }
+    .lede { color: var(--text-muted); max-width: 44rem; margin-bottom: 0; }
+    .tool-card { margin: 1.75rem 0 1.25rem; }
+    .how-card { margin-bottom: 1rem; }
+
+    .seg {
+      display: inline-flex; gap: 0.25rem; padding: 0.25rem;
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    }
+    .seg button {
+      border: 0; background: transparent; color: var(--text-muted);
+      font: inherit; font-weight: 600; font-size: 0.9rem;
+      padding: 0.45rem 1rem; border-radius: calc(var(--radius-sm) - 3px); cursor: pointer;
+    }
+    .seg button:hover { color: var(--text); }
+    .seg button[aria-pressed="true"] { background: var(--surface); color: var(--accent-strong); box-shadow: var(--shadow); }
+
+    .setup { display: flex; flex-wrap: wrap; gap: 1rem 1.5rem; align-items: center; margin-bottom: 1.25rem; }
+    .setup .grp { display: flex; align-items: center; gap: 0.6rem; }
+    .setup .grp > span { font-size: 0.875rem; font-weight: 600; }
+    .setup select { width: auto; }
+
+    .board {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;
+      max-width: 320px; margin: 0 auto;
+    }
+    .cell {
+      aspect-ratio: 1; font-size: clamp(2rem, 10vw, 3rem); font-weight: 700;
+      font-family: var(--mono); line-height: 1;
+      background: var(--surface-2); color: var(--text);
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      cursor: pointer; transition: background 0.15s ease, border-color 0.15s ease;
+    }
+    .cell:hover:not(:disabled) { border-color: var(--accent); }
+    .cell:disabled { cursor: default; }
+    .cell.winline { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-strong); }
+    .cell.x { color: var(--accent-strong); }
+    .cell.o { color: var(--negative); }
+
+    .status { text-align: center; font-weight: 600; min-height: 1.5em; margin: 1.1rem 0 0.4rem; }
+
+    .scores {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.85rem;
+      max-width: 420px; margin: 1rem auto 0;
+    }
+    .score-box {
+      text-align: center; padding: 0.7rem 0.5rem;
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    }
+    .score-box b { display: block; font-family: var(--mono); font-size: 1.4rem; }
+    .score-box span { font-size: 0.8rem; color: var(--text-muted); }
+
+    .actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 0.6rem; margin-top: 1.25rem; }
+
+    @media (max-width: 520px) { .card { padding: 1.1rem; } }
+  </style>
+</head>
+<body>
+  <header class="container">
+    <nav class="top-nav" aria-label="Site" data-i18n-attr="aria-label:nav_site">
+      <a href="../">&#8592; samba nugraha</a>
+      <div class="nav-actions">
+      <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
+        <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0l60 30M60 0L0 30" stroke="#fff" stroke-width="6"/><path d="M0 0l60 30M60 0L0 30" stroke="#C8102E" stroke-width="2.5"/><path d="M30 0v30M0 15h60" stroke="#fff" stroke-width="10"/><path d="M30 0v30M0 15h60" stroke="#C8102E" stroke-width="6"/></svg>EN
+        </button>
+        <button type="button" data-lang="id" aria-pressed="false" aria-label="Bahasa Indonesia">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="15" fill="#E70011"/><rect y="15" width="60" height="15" fill="#F7F7F7"/></svg>ID
+        </button>
+      </div>
+      <button type="button" class="theme-toggle" aria-label="Dark mode / Mode gelap" aria-pressed="false">
+        <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+      </div>
+    </nav>
+    <h1 data-i18n="h1">Tic-Tac-Toe</h1>
+    <p class="lede" data-i18n="lede">Play against a friend on one device, or take on the computer — easy for a warm-up, hard if you think you can win.</p>
+  </header>
+
+  <main class="container">
+    <noscript>
+      <div class="card" style="border-left:3px solid var(--negative)">This game needs JavaScript to run. Please enable it and reload. / Permainan ini membutuhkan JavaScript. Aktifkan lalu muat ulang.</div>
+    </noscript>
+
+    <div class="card tool-card">
+      <div class="setup">
+        <div class="seg" role="group" aria-label="Mode" data-i18n-attr="aria-label:mode_aria">
+          <button type="button" id="mode-ai" aria-pressed="true" data-i18n="mode_ai">vs Computer</button>
+          <button type="button" id="mode-2p" aria-pressed="false" data-i18n="mode_2p">2 Players</button>
+        </div>
+        <div class="grp" id="grp-symbol">
+          <span data-i18n="play_as">Play as</span>
+          <div class="seg" role="group" aria-label="Symbol" data-i18n-attr="aria-label:play_as">
+            <button type="button" id="sym-x" aria-pressed="true">X</button>
+            <button type="button" id="sym-o" aria-pressed="false">O</button>
+          </div>
+        </div>
+        <div class="grp" id="grp-diff">
+          <label for="ttt-diff" style="margin:0" data-i18n="diff_label">Difficulty</label>
+          <select id="ttt-diff">
+            <option value="easy" data-i18n="diff_easy">Easy</option>
+            <option value="hard" selected data-i18n="diff_hard">Hard</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="board" id="ttt-board" role="grid" aria-label="Tic-tac-toe board"></div>
+      <p class="status" id="ttt-status" aria-live="polite"></p>
+
+      <div class="scores">
+        <div class="score-box"><b id="sc-x">0</b><span id="lbl-x">X</span></div>
+        <div class="score-box"><b id="sc-d">0</b><span data-i18n="lbl_draws">Draws</span></div>
+        <div class="score-box"><b id="sc-o">0</b><span id="lbl-o">O</span></div>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn btn-primary" id="ttt-new" data-i18n="btn_new">New round</button>
+        <button type="button" class="btn" id="ttt-reset" data-i18n="btn_reset">Reset scores</button>
+      </div>
+    </div>
+
+    <section class="card how-card" aria-labelledby="how-heading">
+      <h2 id="how-heading" data-i18n="how_title">Rules</h2>
+      <p data-i18n="how_1">Take turns placing X and O — X always starts. First to line up three in a row, column, or diagonal wins. On hard difficulty the computer plays a perfect game (minimax), so the best you can achieve is a draw; on easy it makes mistakes you can punish.</p>
+      <p class="muted small" data-i18n="privacy">Runs entirely in your browser. The score tally is remembered only on this device.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p><a href="../" data-i18n="footer_back">&#8592; back to all tools</a> &middot; &copy; 2026 Samba Nugraha</p>
+    </div>
+  </footer>
+
+  <script src="../assets/lang.js"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    var I18N = {
+      en: {
+        _title: 'Tic-Tac-Toe',
+        _meta: 'Free tic-tac-toe game. Play against a friend on one device or against the computer with easy and hard difficulty — right in your browser.',
+        nav_site: 'Site',
+        h1: 'Tic-Tac-Toe',
+        lede: 'Play against a friend on one device, or take on the computer — easy for a warm-up, hard if you think you can win.',
+        mode_aria: 'Mode',
+        mode_ai: 'vs Computer',
+        mode_2p: '2 Players',
+        play_as: 'Play as',
+        diff_label: 'Difficulty',
+        diff_easy: 'Easy',
+        diff_hard: 'Hard',
+        lbl_draws: 'Draws',
+        you: 'You',
+        ai: 'Computer',
+        turn_x: "X's turn",
+        turn_o: "O's turn",
+        turn_you: 'Your turn',
+        turn_ai: 'Computer is thinking…',
+        win_x: 'X wins!',
+        win_o: 'O wins!',
+        win_you: 'You win! 🎉',
+        win_ai: 'The computer wins.',
+        draw: "It's a draw.",
+        btn_new: 'New round',
+        btn_reset: 'Reset scores',
+        cell_aria: 'Cell {n}',
+        how_title: 'Rules',
+        how_1: 'Take turns placing X and O — X always starts. First to line up three in a row, column, or diagonal wins. On hard difficulty the computer plays a perfect game (minimax), so the best you can achieve is a draw; on easy it makes mistakes you can punish.',
+        privacy: 'Runs entirely in your browser. The score tally is remembered only on this device.',
+        footer_back: '← back to all tools'
+      },
+      id: {
+        _title: 'Tic-Tac-Toe',
+        _meta: 'Permainan tic-tac-toe gratis. Main melawan teman di satu perangkat atau melawan komputer dengan tingkat mudah dan sulit — langsung di browser Anda.',
+        nav_site: 'Situs',
+        h1: 'Tic-Tac-Toe',
+        lede: 'Main melawan teman di satu perangkat, atau lawan komputer — mudah untuk pemanasan, sulit kalau Anda merasa bisa menang.',
+        mode_aria: 'Mode',
+        mode_ai: 'vs Komputer',
+        mode_2p: '2 Pemain',
+        play_as: 'Main sebagai',
+        diff_label: 'Kesulitan',
+        diff_easy: 'Mudah',
+        diff_hard: 'Sulit',
+        lbl_draws: 'Seri',
+        you: 'Anda',
+        ai: 'Komputer',
+        turn_x: 'Giliran X',
+        turn_o: 'Giliran O',
+        turn_you: 'Giliran Anda',
+        turn_ai: 'Komputer sedang berpikir…',
+        win_x: 'X menang!',
+        win_o: 'O menang!',
+        win_you: 'Anda menang! 🎉',
+        win_ai: 'Komputer menang.',
+        draw: 'Seri.',
+        btn_new: 'Ronde baru',
+        btn_reset: 'Reset skor',
+        cell_aria: 'Kotak {n}',
+        how_title: 'Aturan',
+        how_1: 'Bergiliran menempatkan X dan O — X selalu mulai duluan. Yang pertama menyusun tiga sejajar dalam baris, kolom, atau diagonal menang. Pada tingkat sulit komputer bermain sempurna (minimax), jadi hasil terbaik Anda adalah seri; pada tingkat mudah komputer membuat kesalahan yang bisa Anda manfaatkan.',
+        privacy: 'Berjalan sepenuhnya di browser Anda. Hitungan skor hanya diingat di perangkat ini.',
+        footer_back: '← kembali ke semua alat'
+      }
+    };
+
+    function t(key) { return window.SiteLang.t(key); }
+    function tf(key, vars) {
+      var s = t(key);
+      for (var k in vars) {
+        if (Object.prototype.hasOwnProperty.call(vars, k)) s = s.replace('{' + k + '}', vars[k]);
+      }
+      return s;
+    }
+    function $(id) { return document.getElementById(id); }
+
+    function randInt(max) {
+      if (window.crypto && crypto.getRandomValues) {
+        var lim = Math.floor(4294967296 / max) * max;
+        var buf = new Uint32Array(1);
+        do { crypto.getRandomValues(buf); } while (buf[0] >= lim);
+        return buf[0] % max;
+      }
+      return Math.floor(Math.random() * max);
+    }
+
+    /* ---------- Game state ---------- */
+
+    var LINES = [
+      [0, 1, 2], [3, 4, 5], [6, 7, 8],
+      [0, 3, 6], [1, 4, 7], [2, 5, 8],
+      [0, 4, 8], [2, 4, 6]
+    ];
+
+    var board, current, finished, winLine;
+    var mode = 'ai';        // 'ai' | '2p'
+    var playerSym = 'X';    // in AI mode
+    var scores = { ai: { X: 0, D: 0, O: 0 }, '2p': { X: 0, D: 0, O: 0 } };
+
+    function winnerOf(b) {
+      for (var i = 0; i < LINES.length; i++) {
+        var L = LINES[i];
+        if (b[L[0]] && b[L[0]] === b[L[1]] && b[L[1]] === b[L[2]]) {
+          return { sym: b[L[0]], line: L };
+        }
+      }
+      return null;
+    }
+    function emptyCells(b) {
+      var out = [];
+      for (var i = 0; i < 9; i++) if (!b[i]) out.push(i);
+      return out;
+    }
+
+    /* ---------- Minimax (perfect play, prefers fast wins) ---------- */
+
+    function minimax(b, sym, me, depth) {
+      var w = winnerOf(b);
+      if (w) return w.sym === me ? 10 - depth : depth - 10;
+      var empties = emptyCells(b);
+      if (!empties.length) return 0;
+      var best = sym === me ? -Infinity : Infinity;
+      for (var i = 0; i < empties.length; i++) {
+        var c = empties[i];
+        b[c] = sym;
+        var v = minimax(b, sym === 'X' ? 'O' : 'X', me, depth + 1);
+        b[c] = '';
+        if (sym === me) { if (v > best) best = v; }
+        else { if (v < best) best = v; }
+      }
+      return best;
+    }
+
+    function bestMove(b, sym) {
+      var empties = emptyCells(b);
+      var best = -Infinity, moves = [];
+      for (var i = 0; i < empties.length; i++) {
+        var c = empties[i];
+        b[c] = sym;
+        var v = minimax(b, sym === 'X' ? 'O' : 'X', sym, 1);
+        b[c] = '';
+        if (v > best) { best = v; moves = [c]; }
+        else if (v === best) moves.push(c);
+      }
+      return moves[randInt(moves.length)];
+    }
+
+    function aiMove() {
+      var sym = playerSym === 'X' ? 'O' : 'X';
+      var empties = emptyCells(board);
+      if (!empties.length || finished) return;
+      var cell;
+      if ($('ttt-diff').value === 'easy' && randInt(100) < 45) {
+        cell = empties[randInt(empties.length)];
+      } else {
+        cell = bestMove(board, sym);
+      }
+      place(cell, sym);
+    }
+
+    /* ---------- localStorage ---------- */
+
+    var NS = 'tictactoe.';
+    function saveAll() {
+      try {
+        localStorage.setItem(NS + 'scores', JSON.stringify(scores));
+        localStorage.setItem(NS + 'mode', mode);
+        localStorage.setItem(NS + 'sym', playerSym);
+        localStorage.setItem(NS + 'diff', $('ttt-diff').value);
+      } catch (e) { /* ignore */ }
+    }
+    function loadAll() {
+      try {
+        var s = JSON.parse(localStorage.getItem(NS + 'scores'));
+        if (s && s.ai && s['2p']) scores = s;
+        var m = localStorage.getItem(NS + 'mode');
+        if (m === 'ai' || m === '2p') mode = m;
+        var p = localStorage.getItem(NS + 'sym');
+        if (p === 'X' || p === 'O') playerSym = p;
+        var d = localStorage.getItem(NS + 'diff');
+        if (d === 'easy' || d === 'hard') $('ttt-diff').value = d;
+      } catch (e) { /* ignore */ }
+    }
+
+    /* ---------- Rendering ---------- */
+
+    var cells = [];
+    var boardEl = $('ttt-board');
+    for (var ci = 0; ci < 9; ci++) {
+      (function (idx) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'cell';
+        btn.addEventListener('click', function () { humanPlay(idx); });
+        boardEl.appendChild(btn);
+        cells.push(btn);
+      })(ci);
+    }
+
+    function renderBoard() {
+      for (var i = 0; i < 9; i++) {
+        cells[i].textContent = board[i];
+        cells[i].className = 'cell' +
+          (board[i] === 'X' ? ' x' : board[i] === 'O' ? ' o' : '') +
+          (winLine && winLine.indexOf(i) !== -1 ? ' winline' : '');
+        cells[i].disabled = finished || !!board[i] ||
+          (mode === 'ai' && current !== playerSym);
+        cells[i].setAttribute('aria-label', tf('cell_aria', { n: i + 1 }) + (board[i] ? ' ' + board[i] : ''));
+      }
+    }
+
+    function renderStatus() {
+      var st = $('ttt-status');
+      if (finished) {
+        var w = winnerOf(board);
+        if (!w) st.textContent = t('draw');
+        else if (mode === '2p') st.textContent = t(w.sym === 'X' ? 'win_x' : 'win_o');
+        else st.textContent = t(w.sym === playerSym ? 'win_you' : 'win_ai');
+      } else if (mode === '2p') {
+        st.textContent = t(current === 'X' ? 'turn_x' : 'turn_o');
+      } else {
+        st.textContent = t(current === playerSym ? 'turn_you' : 'turn_ai');
+      }
+    }
+
+    function renderScores() {
+      var s = scores[mode];
+      $('sc-x').textContent = s.X;
+      $('sc-d').textContent = s.D;
+      $('sc-o').textContent = s.O;
+      if (mode === 'ai') {
+        $('lbl-x').textContent = 'X' + (playerSym === 'X' ? ' (' + t('you') + ')' : ' (' + t('ai') + ')');
+        $('lbl-o').textContent = 'O' + (playerSym === 'O' ? ' (' + t('you') + ')' : ' (' + t('ai') + ')');
+      } else {
+        $('lbl-x').textContent = 'X';
+        $('lbl-o').textContent = 'O';
+      }
+    }
+
+    function renderSetup() {
+      $('mode-ai').setAttribute('aria-pressed', mode === 'ai' ? 'true' : 'false');
+      $('mode-2p').setAttribute('aria-pressed', mode === '2p' ? 'true' : 'false');
+      $('sym-x').setAttribute('aria-pressed', playerSym === 'X' ? 'true' : 'false');
+      $('sym-o').setAttribute('aria-pressed', playerSym === 'O' ? 'true' : 'false');
+      $('grp-symbol').style.display = mode === 'ai' ? '' : 'none';
+      $('grp-diff').style.display = mode === 'ai' ? '' : 'none';
+    }
+
+    function renderAll() {
+      renderSetup();
+      renderBoard();
+      renderStatus();
+      renderScores();
+    }
+
+    /* ---------- Play flow ---------- */
+
+    function newRound() {
+      board = ['', '', '', '', '', '', '', '', ''];
+      current = 'X';
+      finished = false;
+      winLine = null;
+      renderAll();
+      if (mode === 'ai' && playerSym === 'O') {
+        setTimeout(aiMove, 350);
+      }
+    }
+
+    function place(idx, sym) {
+      if (finished || board[idx]) return;
+      board[idx] = sym;
+      var w = winnerOf(board);
+      if (w) {
+        finished = true;
+        winLine = w.line;
+        scores[mode][w.sym] += 1;
+        saveAll();
+      } else if (!emptyCells(board).length) {
+        finished = true;
+        scores[mode].D += 1;
+        saveAll();
+      } else {
+        current = sym === 'X' ? 'O' : 'X';
+      }
+      renderAll();
+      if (!finished && mode === 'ai' && current !== playerSym) {
+        setTimeout(aiMove, 350);
+      }
+    }
+
+    function humanPlay(idx) {
+      if (finished || board[idx]) return;
+      if (mode === 'ai' && current !== playerSym) return;
+      place(idx, current);
+    }
+
+    /* ---------- Controls ---------- */
+
+    $('mode-ai').addEventListener('click', function () {
+      if (mode === 'ai') return;
+      mode = 'ai'; saveAll(); newRound();
+    });
+    $('mode-2p').addEventListener('click', function () {
+      if (mode === '2p') return;
+      mode = '2p'; saveAll(); newRound();
+    });
+    $('sym-x').addEventListener('click', function () {
+      if (playerSym === 'X') return;
+      playerSym = 'X'; saveAll(); newRound();
+    });
+    $('sym-o').addEventListener('click', function () {
+      if (playerSym === 'O') return;
+      playerSym = 'O'; saveAll(); newRound();
+    });
+    $('ttt-diff').addEventListener('change', function () { saveAll(); newRound(); });
+    $('ttt-new').addEventListener('click', newRound);
+    $('ttt-reset').addEventListener('click', function () {
+      scores[mode] = { X: 0, D: 0, O: 0 };
+      saveAll();
+      renderScores();
+    });
+
+    /* ---------- Init ---------- */
+
+    loadAll();
+    newRound();
+    window.SiteLang.init(I18N, function () { renderAll(); });
+  })();
+  </script>
+</body>
+</html>

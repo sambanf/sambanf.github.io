@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Memory Match</title>
+  <meta name="description" content="Free memory matching game. Flip cards to find emoji pairs, with a move counter, timer, and three difficulty levels — runs entirely in your browser.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d9488'/%3E%3Cg fill='none' stroke='%23ffffff' stroke-width='2.2'%3E%3Crect x='6' y='9' width='12' height='16' rx='2.5'/%3E%3Crect x='14' y='6' width='12' height='16' rx='2.5' fill='%230d9488'/%3E%3C/g%3E%3C/svg%3E">
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../assets/theme.js"></script>
+  <style>
+    .top-nav {
+      padding: 1.25rem 0 2.25rem; font-size: 0.9rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .top-nav a { color: var(--text-muted); text-decoration: none; }
+    .top-nav a:hover { color: var(--accent-strong); }
+    .lede { color: var(--text-muted); max-width: 44rem; margin-bottom: 0; }
+    .tool-card { margin: 1.75rem 0 1.25rem; }
+    .how-card { margin-bottom: 1rem; }
+
+    .topbar-game { display: flex; flex-wrap: wrap; align-items: end; justify-content: center; gap: 1rem; margin-bottom: 1.1rem; }
+    .topbar-game .grp { display: flex; align-items: center; gap: 0.6rem; }
+    .topbar-game label { margin: 0; }
+    .topbar-game select { width: auto; }
+
+    .hud { display: flex; justify-content: center; gap: 0.85rem; margin-bottom: 1.1rem; flex-wrap: wrap; }
+    .hud .box {
+      min-width: 6.2rem; text-align: center; padding: 0.55rem 0.9rem;
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    }
+    .hud b { display: block; font-family: var(--mono); font-size: 1.2rem; }
+    .hud span { font-size: 0.78rem; color: var(--text-muted); }
+
+    .m-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem;
+      max-width: 420px; margin: 0 auto;
+    }
+    .mcard {
+      aspect-ratio: 1; border: 0; padding: 0; background: transparent;
+      cursor: pointer; perspective: 600px;
+    }
+    .mcard .inner {
+      position: relative; width: 100%; height: 100%;
+      transform-style: preserve-3d; transition: transform 0.35s;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .mcard .inner { transition: none; }
+    }
+    .mcard.flipped .inner { transform: rotateY(180deg); }
+    .mcard .face {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      border-radius: var(--radius-sm); border: 1px solid var(--border);
+      backface-visibility: hidden; font-size: clamp(1.4rem, 7vw, 2.2rem);
+    }
+    .mcard .front {
+      background: var(--accent-soft); color: var(--accent-strong);
+      font-weight: 700; font-family: var(--mono); font-size: 1.2rem;
+    }
+    .mcard .back { background: var(--surface-2); transform: rotateY(180deg); }
+    .mcard.matched .back { background: var(--accent-soft); border-color: var(--accent); }
+    .mcard.matched { cursor: default; }
+    .mcard:hover:not(.matched):not(.flipped) .front { border-color: var(--accent); }
+
+    .status { text-align: center; font-weight: 600; min-height: 1.5em; margin: 1.1rem 0 0; }
+    .actions { display: flex; justify-content: center; gap: 0.6rem; margin-top: 1rem; }
+
+    @media (max-width: 520px) { .card { padding: 1.1rem; } }
+  </style>
+</head>
+<body>
+  <header class="container">
+    <nav class="top-nav" aria-label="Site" data-i18n-attr="aria-label:nav_site">
+      <a href="../">&#8592; samba nugraha</a>
+      <div class="nav-actions">
+      <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
+        <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0l60 30M60 0L0 30" stroke="#fff" stroke-width="6"/><path d="M0 0l60 30M60 0L0 30" stroke="#C8102E" stroke-width="2.5"/><path d="M30 0v30M0 15h60" stroke="#fff" stroke-width="10"/><path d="M30 0v30M0 15h60" stroke="#C8102E" stroke-width="6"/></svg>EN
+        </button>
+        <button type="button" data-lang="id" aria-pressed="false" aria-label="Bahasa Indonesia">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="15" fill="#E70011"/><rect y="15" width="60" height="15" fill="#F7F7F7"/></svg>ID
+        </button>
+      </div>
+      <button type="button" class="theme-toggle" aria-label="Dark mode / Mode gelap" aria-pressed="false">
+        <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+      </div>
+    </nav>
+    <h1 data-i18n="h1">Memory Match</h1>
+    <p class="lede" data-i18n="lede">Flip two cards at a time and find all the pairs. Fewer moves is better — can you beat your best?</p>
+  </header>
+
+  <main class="container">
+    <noscript>
+      <div class="card" style="border-left:3px solid var(--negative)">This game needs JavaScript to run. Please enable it and reload. / Permainan ini membutuhkan JavaScript. Aktifkan lalu muat ulang.</div>
+    </noscript>
+
+    <div class="card tool-card">
+      <div class="topbar-game">
+        <div class="grp">
+          <label for="mm-diff" data-i18n="diff_label">Difficulty</label>
+          <select id="mm-diff">
+            <option value="6" data-i18n="diff_easy">Easy (6 pairs)</option>
+            <option value="8" selected data-i18n="diff_med">Medium (8 pairs)</option>
+            <option value="12" data-i18n="diff_hard">Hard (12 pairs)</option>
+          </select>
+        </div>
+        <button type="button" class="btn" id="mm-new" data-i18n="btn_new">New game</button>
+      </div>
+
+      <div class="hud">
+        <div class="box"><b id="mm-moves">0</b><span data-i18n="hud_moves">Moves</span></div>
+        <div class="box"><b id="mm-time">0:00</b><span data-i18n="hud_time">Time</span></div>
+        <div class="box"><b id="mm-best">—</b><span data-i18n="hud_best">Best (moves)</span></div>
+      </div>
+
+      <div class="m-grid" id="mm-grid"></div>
+      <p class="status" id="mm-status" aria-live="polite"></p>
+    </div>
+
+    <section class="card how-card" aria-labelledby="how-heading">
+      <h2 id="how-heading" data-i18n="how_title">Rules</h2>
+      <p data-i18n="how_1">All cards start face down. Flip any two — if they match, they stay open; if not, they flip back. The timer starts on your first flip, and every two flips count as one move. Find all pairs to win; your best (fewest moves) is saved per difficulty.</p>
+      <p class="muted small" data-i18n="privacy">Runs entirely in your browser. Best scores are remembered only on this device.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p><a href="../" data-i18n="footer_back">&#8592; back to all tools</a> &middot; &copy; 2026 Samba Nugraha</p>
+    </div>
+  </footer>
+
+  <script src="../assets/lang.js"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    var I18N = {
+      en: {
+        _title: 'Memory Match',
+        _meta: 'Free memory matching game. Flip cards to find emoji pairs, with a move counter, timer, and three difficulty levels — runs entirely in your browser.',
+        nav_site: 'Site',
+        h1: 'Memory Match',
+        lede: 'Flip two cards at a time and find all the pairs. Fewer moves is better — can you beat your best?',
+        diff_label: 'Difficulty',
+        diff_easy: 'Easy (6 pairs)',
+        diff_med: 'Medium (8 pairs)',
+        diff_hard: 'Hard (12 pairs)',
+        btn_new: 'New game',
+        hud_moves: 'Moves',
+        hud_time: 'Time',
+        hud_best: 'Best (moves)',
+        win: 'You found them all in {m} moves and {t}! 🎉',
+        win_best: 'New best: {m} moves! 🎉',
+        card_aria: 'Card {n}',
+        how_title: 'Rules',
+        how_1: 'All cards start face down. Flip any two — if they match, they stay open; if not, they flip back. The timer starts on your first flip, and every two flips count as one move. Find all pairs to win; your best (fewest moves) is saved per difficulty.',
+        privacy: 'Runs entirely in your browser. Best scores are remembered only on this device.',
+        footer_back: '← back to all tools'
+      },
+      id: {
+        _title: 'Cari Pasangan (Memory)',
+        _meta: 'Permainan mencocokkan kartu gratis. Balik kartu untuk menemukan pasangan emoji, dengan penghitung langkah, timer, dan tiga tingkat kesulitan — berjalan sepenuhnya di browser Anda.',
+        nav_site: 'Situs',
+        h1: 'Cari Pasangan (Memory)',
+        lede: 'Balik dua kartu sekaligus dan temukan semua pasangan. Makin sedikit langkah makin baik — bisa kalahkan rekor Anda?',
+        diff_label: 'Kesulitan',
+        diff_easy: 'Mudah (6 pasang)',
+        diff_med: 'Sedang (8 pasang)',
+        diff_hard: 'Sulit (12 pasang)',
+        btn_new: 'Permainan baru',
+        hud_moves: 'Langkah',
+        hud_time: 'Waktu',
+        hud_best: 'Terbaik (langkah)',
+        win: 'Semua ketemu dalam {m} langkah dan {t}! 🎉',
+        win_best: 'Rekor baru: {m} langkah! 🎉',
+        card_aria: 'Kartu {n}',
+        how_title: 'Aturan',
+        how_1: 'Semua kartu mulai tertutup. Balik dua kartu — jika cocok, keduanya tetap terbuka; jika tidak, tertutup kembali. Timer mulai pada balikan pertama, dan setiap dua balikan dihitung satu langkah. Temukan semua pasangan untuk menang; rekor terbaik (langkah paling sedikit) disimpan per tingkat kesulitan.',
+        privacy: 'Berjalan sepenuhnya di browser Anda. Rekor hanya diingat di perangkat ini.',
+        footer_back: '← kembali ke semua alat'
+      }
+    };
+
+    function t(key) { return window.SiteLang.t(key); }
+    function tf(key, vars) {
+      var s = t(key);
+      for (var k in vars) {
+        if (Object.prototype.hasOwnProperty.call(vars, k)) s = s.replace('{' + k + '}', vars[k]);
+      }
+      return s;
+    }
+    function $(id) { return document.getElementById(id); }
+
+    function randInt(max) {
+      if (window.crypto && crypto.getRandomValues) {
+        var lim = Math.floor(4294967296 / max) * max;
+        var buf = new Uint32Array(1);
+        do { crypto.getRandomValues(buf); } while (buf[0] >= lim);
+        return buf[0] % max;
+      }
+      return Math.floor(Math.random() * max);
+    }
+
+    var EMOJI = ['🐶', '🐱', '🦊', '🐼', '🐸', '🦁', '🐵', '🐷', '🐨', '🐯', '🦄', '🐝'];
+
+    /* ---------- State ---------- */
+
+    var pairs, deck, first, lock, moves, matched, timer, seconds, started, finished;
+
+    var NS = 'memory.';
+    function bestFor(n) {
+      try { return parseInt(localStorage.getItem(NS + 'best.' + n), 10) || 0; } catch (e) { return 0; }
+    }
+    function setBest(n, v) {
+      try { localStorage.setItem(NS + 'best.' + n, String(v)); } catch (e) { /* ignore */ }
+    }
+
+    function fmtTime(s) {
+      var m = Math.floor(s / 60);
+      var r = s % 60;
+      return m + ':' + (r < 10 ? '0' : '') + r;
+    }
+
+    function newGame() {
+      pairs = parseInt($('mm-diff').value, 10);
+      try { localStorage.setItem(NS + 'diff', String(pairs)); } catch (e) { /* ignore */ }
+
+      var faces = EMOJI.slice(0, pairs);
+      deck = faces.concat(faces);
+      for (var i = deck.length - 1; i > 0; i--) {
+        var j = randInt(i + 1);
+        var tmp = deck[i]; deck[i] = deck[j]; deck[j] = tmp;
+      }
+
+      first = null; lock = false; moves = 0; matched = 0;
+      seconds = 0; started = false; finished = false;
+      clearInterval(timer);
+
+      renderHud();
+      $('mm-status').textContent = '';
+      $('mm-time').textContent = '0:00';
+
+      var grid = $('mm-grid');
+      grid.innerHTML = '';
+      deck.forEach(function (face, idx) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'mcard';
+        btn.setAttribute('aria-label', tf('card_aria', { n: idx + 1 }));
+        var inner = document.createElement('div');
+        inner.className = 'inner';
+        var front = document.createElement('div');
+        front.className = 'face front';
+        front.textContent = '?';
+        var back = document.createElement('div');
+        back.className = 'face back';
+        back.textContent = face;
+        inner.appendChild(front); inner.appendChild(back);
+        btn.appendChild(inner);
+        btn.addEventListener('click', function () { flip(btn, face); });
+        grid.appendChild(btn);
+      });
+    }
+
+    function flip(btn, face) {
+      if (lock || finished) return;
+      if (btn.classList.contains('flipped') || btn.classList.contains('matched')) return;
+
+      if (!started) {
+        started = true;
+        timer = setInterval(function () {
+          seconds++;
+          $('mm-time').textContent = fmtTime(seconds);
+        }, 1000);
+      }
+
+      btn.classList.add('flipped');
+
+      if (!first) {
+        first = { btn: btn, face: face };
+        return;
+      }
+
+      moves++;
+      renderHud();
+      var a = first;
+      first = null;
+
+      if (a.face === face) {
+        a.btn.classList.add('matched');
+        btn.classList.add('matched');
+        matched++;
+        if (matched === pairs) win();
+      } else {
+        lock = true;
+        setTimeout(function () {
+          a.btn.classList.remove('flipped');
+          btn.classList.remove('flipped');
+          lock = false;
+        }, 750);
+      }
+    }
+
+    function win() {
+      finished = true;
+      clearInterval(timer);
+      var prev = bestFor(pairs);
+      var isBest = !prev || moves < prev;
+      if (isBest) setBest(pairs, moves);
+      renderHud();
+      $('mm-status').textContent = isBest
+        ? tf('win_best', { m: moves })
+        : tf('win', { m: moves, t: fmtTime(seconds) });
+    }
+
+    function renderHud() {
+      $('mm-moves').textContent = moves;
+      var b = bestFor(pairs || parseInt($('mm-diff').value, 10));
+      $('mm-best').textContent = b || '—';
+    }
+
+    $('mm-new').addEventListener('click', newGame);
+    $('mm-diff').addEventListener('change', newGame);
+
+    /* ---------- Init ---------- */
+
+    try {
+      var d = localStorage.getItem(NS + 'diff');
+      if (d === '6' || d === '8' || d === '12') $('mm-diff').value = d;
+    } catch (e) { /* ignore */ }
+
+    newGame();
+    window.SiteLang.init(I18N, function () { renderHud(); });
+  })();
+  </script>
+</body>
+</html>

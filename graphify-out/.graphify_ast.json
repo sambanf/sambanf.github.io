@@ -1,0 +1,136 @@
+{
+  "nodes": [
+    {
+      "id": "assets_lang",
+      "label": "lang.js",
+      "file_type": "code",
+      "source_file": "assets/lang.js",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "assets_lang_apply",
+      "label": "apply()",
+      "file_type": "code",
+      "source_file": "assets/lang.js",
+      "source_location": "L33",
+      "_origin": "ast"
+    },
+    {
+      "id": "assets_lang_refreshbuttons",
+      "label": "refreshButtons()",
+      "file_type": "code",
+      "source_file": "assets/lang.js",
+      "source_location": "L60",
+      "_origin": "ast"
+    },
+    {
+      "id": "assets_theme",
+      "label": "theme.js",
+      "file_type": "code",
+      "source_file": "assets/theme.js",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "assets_theme_systemdark",
+      "label": "systemDark()",
+      "file_type": "code",
+      "source_file": "assets/theme.js",
+      "source_location": "L30",
+      "_origin": "ast"
+    },
+    {
+      "id": "assets_theme_effective",
+      "label": "effective()",
+      "file_type": "code",
+      "source_file": "assets/theme.js",
+      "source_location": "L34",
+      "_origin": "ast"
+    },
+    {
+      "id": "assets_theme_apply",
+      "label": "apply()",
+      "file_type": "code",
+      "source_file": "assets/theme.js",
+      "source_location": "L38",
+      "_origin": "ast"
+    }
+  ],
+  "edges": [
+    {
+      "source": "assets_lang",
+      "target": "assets_lang_apply",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "assets/lang.js",
+      "source_location": "L33",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "assets_lang",
+      "target": "assets_lang_refreshbuttons",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "assets/lang.js",
+      "source_location": "L60",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "assets_theme",
+      "target": "assets_theme_systemdark",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "assets/theme.js",
+      "source_location": "L30",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "assets_theme",
+      "target": "assets_theme_effective",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "assets/theme.js",
+      "source_location": "L34",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "assets_theme",
+      "target": "assets_theme_apply",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "assets/theme.js",
+      "source_location": "L38",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "assets_theme_effective",
+      "target": "assets_theme_systemdark",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "assets/theme.js",
+      "source_location": "L35",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "assets_theme_apply",
+      "target": "assets_theme_effective",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "assets/theme.js",
+      "source_location": "L41",
+      "weight": 1.0,
+      "_origin": "ast"
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

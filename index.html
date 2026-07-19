@@ -701,6 +701,65 @@
           </ul>
         </div>
 
+        <div class="tool-group">
+          <h3 class="tool-group-title reveal" data-i18n="catGames">Games</h3>
+          <ul class="tool-grid">
+
+          <li class="card tool-card reveal" data-tags="tic tac toe tictactoe game permainan xo minimax ai komputer">
+            <span class="tool-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+                <path pathLength="1" d="M9 3v18"/>
+                <path pathLength="1" d="M15 3v18"/>
+                <path pathLength="1" d="M3 9h18"/>
+                <path pathLength="1" d="M3 15h18"/>
+              </svg>
+            </span>
+            <h3><a href="tictactoe/" data-i18n="toolTttTitle">Tic-Tac-Toe</a></h3>
+            <p data-i18n="toolTttDesc">Play a friend on one device, or challenge the computer on easy or hard.</p>
+            <span class="tool-cta" aria-hidden="true" data-i18n="openTool">Open tool</span>
+          </li>
+
+          <li class="card tool-card reveal" data-tags="snake ular game permainan arcade klasik nokia">
+            <span class="tool-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+                <path pathLength="1" d="M4 8h10a3 3 0 0 1 0 6H9a3 3 0 0 0 0 6h11"/>
+                <path pathLength="1" d="M20 4v.01"/>
+              </svg>
+            </span>
+            <h3><a href="snake/" data-i18n="toolSnakeTitle">Snake</a></h3>
+            <p data-i18n="toolSnakeDesc">The classic — eat, grow, speed up. Arrow keys or swipe, best score saved.</p>
+            <span class="tool-cta" aria-hidden="true" data-i18n="openTool">Open tool</span>
+          </li>
+
+          <li class="card tool-card reveal" data-tags="2048 game permainan puzzle angka tile ubin merge geser">
+            <span class="tool-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+                <path pathLength="1" d="M4 4h7v7H4z"/>
+                <path pathLength="1" d="M13 4h7v7h-7z"/>
+                <path pathLength="1" d="M4 13h7v7H4z"/>
+                <path pathLength="1" d="M13 13h7v7h-7z"/>
+              </svg>
+            </span>
+            <h3><a href="2048/" data-i18n="tool2048Title">2048</a></h3>
+            <p data-i18n="tool2048Desc">Slide and merge tiles to reach 2048. Your game saves automatically.</p>
+            <span class="tool-cta" aria-hidden="true" data-i18n="openTool">Open tool</span>
+          </li>
+
+          <li class="card tool-card reveal" data-tags="memory match game permainan kartu cari pasangan pairs anak kids emoji">
+            <span class="tool-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+                <path pathLength="1" d="M4 8h9a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/>
+                <path pathLength="1" d="M9 4h10a1 1 0 0 1 1 1v12"/>
+              </svg>
+            </span>
+            <h3><a href="memory/" data-i18n="toolMemTitle">Memory Match</a></h3>
+            <p data-i18n="toolMemDesc">Flip cards to find all the emoji pairs in as few moves as you can.</p>
+            <span class="tool-cta" aria-hidden="true" data-i18n="openTool">Open tool</span>
+          </li>
+
+          </ul>
+        </div>
+
         <p class="muted" id="no-results" hidden data-i18n="noResults">No tools match your search.</p>
 
         <!-- TEMPLATE: copy this block to add a new tool card inside one
@@ -821,10 +880,19 @@
           toolPwDesc: 'Generate strong random passwords locally, with length and character options and a strength meter.',
           toolPickTitle: 'Random List Picker',
           toolPickDesc: 'Draw fair random winners from any list of names — for arisan, doorprizes, and giveaways.',
+          toolTttTitle: 'Tic-Tac-Toe',
+          toolTttDesc: 'Play a friend on one device, or challenge the computer on easy or hard.',
+          toolSnakeTitle: 'Snake',
+          toolSnakeDesc: 'The classic — eat, grow, speed up. Arrow keys or swipe, best score saved.',
+          tool2048Title: '2048',
+          tool2048Desc: 'Slide and merge tiles to reach 2048. Your game saves automatically.',
+          toolMemTitle: 'Memory Match',
+          toolMemDesc: 'Flip cards to find all the emoji pairs in as few moves as you can.',
           searchPh: 'Search tools…',
           catFinance: 'Finance',
           catEveryday: 'Everyday',
           catDev: 'Developer',
+          catGames: 'Games',
           noResults: 'No tools match your search.',
           openTool: 'Open tool',
           aboutHeading: 'About',
@@ -868,10 +936,19 @@
           toolPwDesc: 'Buat password acak yang kuat secara lokal, dengan opsi panjang dan karakter serta pengukur kekuatan.',
           toolPickTitle: 'Pengundi Acak',
           toolPickDesc: 'Undi pemenang secara adil dari daftar nama apa pun — untuk arisan, doorprize, dan giveaway.',
+          toolTttTitle: 'Tic-Tac-Toe',
+          toolTttDesc: 'Main melawan teman di satu perangkat, atau tantang komputer di tingkat mudah atau sulit.',
+          toolSnakeTitle: 'Ular (Snake)',
+          toolSnakeDesc: 'Yang klasik — makan, tumbuh, makin cepat. Tombol panah atau usapan, skor terbaik tersimpan.',
+          tool2048Title: '2048',
+          tool2048Desc: 'Geser dan gabungkan ubin hingga mencapai 2048. Permainan tersimpan otomatis.',
+          toolMemTitle: 'Cari Pasangan (Memory)',
+          toolMemDesc: 'Balik kartu untuk menemukan semua pasangan emoji dengan langkah sesedikit mungkin.',
           searchPh: 'Cari alat…',
           catFinance: 'Keuangan',
           catEveryday: 'Sehari-hari',
           catDev: 'Developer',
+          catGames: 'Permainan',
           noResults: 'Tidak ada alat yang cocok dengan pencarian Anda.',
           openTool: 'Buka alat',
           aboutHeading: 'Tentang',

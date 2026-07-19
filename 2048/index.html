@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>2048</title>
+  <meta name="description" content="Free 2048 puzzle game. Slide and merge tiles to reach 2048 — arrow keys or swipe, with your best score saved. Runs entirely in your browser.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d9488'/%3E%3Cg fill='%23ffffff'%3E%3Crect x='6' y='6' width='9' height='9' rx='2'/%3E%3Crect x='17' y='6' width='9' height='9' rx='2' opacity='0.7'/%3E%3Crect x='6' y='17' width='9' height='9' rx='2' opacity='0.7'/%3E%3Crect x='17' y='17' width='9' height='9' rx='2' opacity='0.4'/%3E%3C/g%3E%3C/svg%3E">
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../assets/theme.js"></script>
+  <style>
+    .top-nav {
+      padding: 1.25rem 0 2.25rem; font-size: 0.9rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .top-nav a { color: var(--text-muted); text-decoration: none; }
+    .top-nav a:hover { color: var(--accent-strong); }
+    .lede { color: var(--text-muted); max-width: 44rem; margin-bottom: 0; }
+    .tool-card { margin: 1.75rem 0 1.25rem; }
+    .how-card { margin-bottom: 1rem; }
+
+    .hud { display: flex; justify-content: center; gap: 0.85rem; margin-bottom: 1rem; }
+    .hud .box {
+      min-width: 7rem; text-align: center; padding: 0.6rem 1rem;
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    }
+    .hud b { display: block; font-family: var(--mono); font-size: 1.3rem; }
+    .hud span { font-size: 0.8rem; color: var(--text-muted); }
+
+    .stage { position: relative; max-width: 400px; margin: 0 auto; touch-action: none; }
+    .g-board {
+      position: relative; aspect-ratio: 1;
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 2.5%;
+    }
+    .g-cells { position: absolute; inset: 2.5%; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr); gap: 2.5%; }
+    .g-cell { background: color-mix(in srgb, var(--text) 6%, transparent); border-radius: calc(var(--radius-sm) - 2px); }
+    .g-tiles { position: absolute; inset: 2.5%; }
+    .tile {
+      position: absolute; width: 23.1%; height: 23.1%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--mono); font-weight: 700;
+      border-radius: calc(var(--radius-sm) - 2px);
+      color: var(--text);
+      font-size: clamp(1.1rem, 6vw, 1.7rem);
+    }
+    .tile.small { font-size: clamp(0.85rem, 4.5vw, 1.25rem); }
+    .t2    { background: color-mix(in srgb, var(--accent) 10%, var(--surface)); }
+    .t4    { background: color-mix(in srgb, var(--accent) 18%, var(--surface)); }
+    .t8    { background: color-mix(in srgb, var(--accent) 28%, var(--surface)); }
+    .t16   { background: color-mix(in srgb, var(--accent) 38%, var(--surface)); }
+    .t32   { background: color-mix(in srgb, var(--accent) 50%, var(--surface)); color: var(--accent-contrast); }
+    .t64   { background: color-mix(in srgb, var(--accent) 62%, var(--surface)); color: var(--accent-contrast); }
+    .t128  { background: color-mix(in srgb, var(--accent) 74%, var(--surface)); color: var(--accent-contrast); }
+    .t256  { background: color-mix(in srgb, var(--accent) 84%, var(--surface)); color: var(--accent-contrast); }
+    .t512  { background: var(--accent); color: var(--accent-contrast); }
+    .t1024 { background: var(--accent-strong); color: var(--accent-contrast); }
+    .t2048 { background: var(--accent-strong); color: var(--accent-contrast); box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 55%, transparent); }
+    .tbig  { background: var(--text); color: var(--bg); }
+
+    @media (prefers-reduced-motion: no-preference) {
+      @keyframes tile-pop { from { transform: scale(0.4); } to { transform: scale(1); } }
+      .tile.pop { animation: tile-pop 0.14s ease-out; }
+      @keyframes tile-merge { 0% { transform: scale(1); } 50% { transform: scale(1.18); } 100% { transform: scale(1); } }
+      .tile.merged { animation: tile-merge 0.18s ease-out; }
+    }
+
+    .overlay {
+      position: absolute; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 0.75rem; text-align: center;
+      background: color-mix(in srgb, var(--bg) 72%, transparent);
+      border-radius: var(--radius-sm); padding: 1rem; z-index: 2;
+    }
+    .overlay[hidden] { display: none; }
+    .overlay h2 { margin: 0; font-size: 1.4rem; }
+    .overlay p { margin: 0; color: var(--text-muted); font-size: 0.9rem; }
+    .overlay .row { display: flex; gap: 0.6rem; flex-wrap: wrap; justify-content: center; }
+
+    .actions { display: flex; justify-content: center; gap: 0.6rem; margin-top: 1.1rem; }
+    .hint { text-align: center; font-size: 0.82rem; color: var(--text-muted); margin: 0.9rem 0 0; }
+
+    @media (max-width: 520px) { .card { padding: 1.1rem; } }
+  </style>
+</head>
+<body>
+  <header class="container">
+    <nav class="top-nav" aria-label="Site" data-i18n-attr="aria-label:nav_site">
+      <a href="../">&#8592; samba nugraha</a>
+      <div class="nav-actions">
+      <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
+        <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0l60 30M60 0L0 30" stroke="#fff" stroke-width="6"/><path d="M0 0l60 30M60 0L0 30" stroke="#C8102E" stroke-width="2.5"/><path d="M30 0v30M0 15h60" stroke="#fff" stroke-width="10"/><path d="M30 0v30M0 15h60" stroke="#C8102E" stroke-width="6"/></svg>EN
+        </button>
+        <button type="button" data-lang="id" aria-pressed="false" aria-label="Bahasa Indonesia">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="15" fill="#E70011"/><rect y="15" width="60" height="15" fill="#F7F7F7"/></svg>ID
+        </button>
+      </div>
+      <button type="button" class="theme-toggle" aria-label="Dark mode / Mode gelap" aria-pressed="false">
+        <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+      </div>
+    </nav>
+    <h1>2048</h1>
+    <p class="lede" data-i18n="lede">Slide the tiles with arrow keys or a swipe. Equal tiles merge — reach 2048 without filling the board.</p>
+  </header>
+
+  <main class="container">
+    <noscript>
+      <div class="card" style="border-left:3px solid var(--negative)">This game needs JavaScript to run. Please enable it and reload. / Permainan ini membutuhkan JavaScript. Aktifkan lalu muat ulang.</div>
+    </noscript>
+
+    <div class="card tool-card">
+      <div class="hud">
+        <div class="box"><b id="g-score">0</b><span data-i18n="hud_score">Score</span></div>
+        <div class="box"><b id="g-best">0</b><span data-i18n="hud_best">Best</span></div>
+      </div>
+
+      <div class="stage" id="g-stage">
+        <div class="g-board" aria-label="2048 board">
+          <div class="g-cells" aria-hidden="true">
+            <div class="g-cell"></div><div class="g-cell"></div><div class="g-cell"></div><div class="g-cell"></div>
+            <div class="g-cell"></div><div class="g-cell"></div><div class="g-cell"></div><div class="g-cell"></div>
+            <div class="g-cell"></div><div class="g-cell"></div><div class="g-cell"></div><div class="g-cell"></div>
+            <div class="g-cell"></div><div class="g-cell"></div><div class="g-cell"></div><div class="g-cell"></div>
+          </div>
+          <div class="g-tiles" id="g-tiles"></div>
+          <div class="overlay" id="g-overlay" hidden>
+            <h2 id="g-ov-title"></h2>
+            <p id="g-ov-text"></p>
+            <div class="row">
+              <button type="button" class="btn btn-primary" id="g-ov-new" data-i18n="btn_new">New game</button>
+              <button type="button" class="btn" id="g-ov-continue" hidden data-i18n="btn_continue">Keep going</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn" id="g-new" data-i18n="btn_new">New game</button>
+      </div>
+      <p class="hint" data-i18n="hint">Your game is saved automatically — come back any time.</p>
+    </div>
+
+    <section class="card how-card" aria-labelledby="how-heading">
+      <h2 id="how-heading" data-i18n="how_title">Rules</h2>
+      <p data-i18n="how_1">Each move slides every tile as far as it can go. Two tiles with the same number merge into one with their sum, and each merge adds to your score. After every move a new 2 (or occasionally a 4) appears. The game ends when the board is full and no merges are possible.</p>
+      <p class="muted small" data-i18n="privacy">Runs entirely in your browser. Your game and best score are remembered only on this device.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p><a href="../" data-i18n="footer_back">&#8592; back to all tools</a> &middot; &copy; 2026 Samba Nugraha</p>
+    </div>
+  </footer>
+
+  <script src="../assets/lang.js"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    var I18N = {
+      en: {
+        _title: '2048',
+        _meta: 'Free 2048 puzzle game. Slide and merge tiles to reach 2048 — arrow keys or swipe, with your best score saved. Runs entirely in your browser.',
+        nav_site: 'Site',
+        lede: 'Slide the tiles with arrow keys or a swipe. Equal tiles merge — reach 2048 without filling the board.',
+        hud_score: 'Score',
+        hud_best: 'Best',
+        btn_new: 'New game',
+        btn_continue: 'Keep going',
+        ov_win: 'You made 2048! 🎉',
+        ov_win_text: 'Stop here with your glory intact, or keep going for 4096.',
+        ov_over: 'Game over!',
+        ov_over_text: 'No more moves. Final score: {n}',
+        hint: 'Your game is saved automatically — come back any time.',
+        how_title: 'Rules',
+        how_1: 'Each move slides every tile as far as it can go. Two tiles with the same number merge into one with their sum, and each merge adds to your score. After every move a new 2 (or occasionally a 4) appears. The game ends when the board is full and no merges are possible.',
+        privacy: 'Runs entirely in your browser. Your game and best score are remembered only on this device.',
+        footer_back: '← back to all tools'
+      },
+      id: {
+        _title: '2048',
+        _meta: 'Permainan puzzle 2048 gratis. Geser dan gabungkan ubin untuk mencapai 2048 — tombol panah atau usapan, dengan skor terbaik tersimpan. Berjalan sepenuhnya di browser Anda.',
+        nav_site: 'Situs',
+        lede: 'Geser ubin dengan tombol panah atau usapan. Ubin yang sama akan bergabung — capai 2048 sebelum papan penuh.',
+        hud_score: 'Skor',
+        hud_best: 'Terbaik',
+        btn_new: 'Permainan baru',
+        btn_continue: 'Lanjutkan',
+        ov_win: 'Anda mencapai 2048! 🎉',
+        ov_win_text: 'Berhenti di sini dengan kemenangan, atau lanjutkan menuju 4096.',
+        ov_over: 'Permainan selesai!',
+        ov_over_text: 'Tidak ada langkah tersisa. Skor akhir: {n}',
+        hint: 'Permainan tersimpan otomatis — kembali kapan saja.',
+        how_title: 'Aturan',
+        how_1: 'Setiap langkah menggeser semua ubin sejauh mungkin. Dua ubin dengan angka sama bergabung menjadi satu dengan jumlahnya, dan setiap penggabungan menambah skor. Setelah setiap langkah muncul ubin 2 baru (kadang 4). Permainan berakhir saat papan penuh dan tidak ada penggabungan yang mungkin.',
+        privacy: 'Berjalan sepenuhnya di browser Anda. Permainan dan skor terbaik hanya diingat di perangkat ini.',
+        footer_back: '← kembali ke semua alat'
+      }
+    };
+
+    function t(key) { return window.SiteLang.t(key); }
+    function tf(key, vars) {
+      var s = t(key);
+      for (var k in vars) {
+        if (Object.prototype.hasOwnProperty.call(vars, k)) s = s.replace('{' + k + '}', vars[k]);
+      }
+      return s;
+    }
+    function fmt(n) { return n.toLocaleString(window.SiteLang.locale()); }
+    function $(id) { return document.getElementById(id); }
+
+    function randInt(max) {
+      if (window.crypto && crypto.getRandomValues) {
+        var lim = Math.floor(4294967296 / max) * max;
+        var buf = new Uint32Array(1);
+        do { crypto.getRandomValues(buf); } while (buf[0] >= lim);
+        return buf[0] % max;
+      }
+      return Math.floor(Math.random() * max);
+    }
+
+    /* ---------- State ---------- */
+
+    var grid, score, won, over, keepGoing;
+    var best = 0;
+    var newTiles = [], mergedTiles = [];   // [r,c] lists for animation
+
+    var NS = '2048.';
+    function saveState() {
+      try {
+        localStorage.setItem(NS + 'state', JSON.stringify({ grid: grid, score: score, won: won, keepGoing: keepGoing }));
+        localStorage.setItem(NS + 'best', String(best));
+      } catch (e) { /* ignore */ }
+    }
+    function loadState() {
+      try {
+        best = parseInt(localStorage.getItem(NS + 'best'), 10) || 0;
+        var s = JSON.parse(localStorage.getItem(NS + 'state'));
+        if (s && Array.isArray(s.grid) && s.grid.length === 4) {
+          grid = s.grid;
+          score = s.score || 0;
+          won = !!s.won;
+          keepGoing = !!s.keepGoing;
+          return true;
+        }
+      } catch (e) { /* ignore */ }
+      return false;
+    }
+
+    function emptyList() {
+      var out = [];
+      for (var r = 0; r < 4; r++) for (var c = 0; c < 4; c++) if (!grid[r][c]) out.push([r, c]);
+      return out;
+    }
+
+    function addRandomTile() {
+      var empties = emptyList();
+      if (!empties.length) return;
+      var cell = empties[randInt(empties.length)];
+      grid[cell[0]][cell[1]] = randInt(10) === 0 ? 4 : 2;
+      newTiles.push(cell);
+    }
+
+    function newGame() {
+      grid = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
+      score = 0; won = false; over = false; keepGoing = false;
+      newTiles = []; mergedTiles = [];
+      addRandomTile();
+      addRandomTile();
+      $('g-overlay').hidden = true;
+      saveState();
+      render();
+    }
+
+    /* ---------- Moves ----------
+       All four directions are expressed as "merge a row leftwards"
+       through index transforms. */
+
+    function lineFor(dir, i) {
+      // returns list of [r,c] from the movement edge inward
+      var out = [];
+      for (var j = 0; j < 4; j++) {
+        if (dir === 'left') out.push([i, j]);
+        else if (dir === 'right') out.push([i, 3 - j]);
+        else if (dir === 'up') out.push([j, i]);
+        else out.push([3 - j, i]);
+      }
+      return out;
+    }
+
+    function move(dir) {
+      if (over) return;
+      var changed = false, gain = 0;
+      mergedTiles = []; newTiles = [];
+      for (var i = 0; i < 4; i++) {
+        var line = lineFor(dir, i);
+        var vals = [];
+        line.forEach(function (rc) { if (grid[rc[0]][rc[1]]) vals.push(grid[rc[0]][rc[1]]); });
+        var out = [], mergedAt = [];
+        for (var v = 0; v < vals.length; v++) {
+          if (v + 1 < vals.length && vals[v] === vals[v + 1]) {
+            var mv = vals[v] * 2;
+            out.push(mv);
+            gain += mv;
+            mergedAt.push(out.length - 1);
+            if (mv === 2048 && !won) won = true;
+            v++;
+          } else {
+            out.push(vals[v]);
+          }
+        }
+        for (var j = 0; j < 4; j++) {
+          var nv = j < out.length ? out[j] : 0;
+          var rc = line[j];
+          if (grid[rc[0]][rc[1]] !== nv) changed = true;
+          grid[rc[0]][rc[1]] = nv;
+        }
+        mergedAt.forEach(function (idx) { mergedTiles.push(line[idx]); });
+      }
+      if (!changed) return;
+      score += gain;
+      if (score > best) best = score;
+      addRandomTile();
+      over = isStuck();
+      saveState();
+      render();
+      if (won && !keepGoing) showWin();
+      else if (over) showOver();
+    }
+
+    function isStuck() {
+      if (emptyList().length) return false;
+      for (var r = 0; r < 4; r++) {
+        for (var c = 0; c < 4; c++) {
+          var v = grid[r][c];
+          if (r < 3 && grid[r + 1][c] === v) return false;
+          if (c < 3 && grid[r][c + 1] === v) return false;
+        }
+      }
+      return true;
+    }
+
+    /* ---------- Rendering ---------- */
+
+    function render() {
+      $('g-score').textContent = fmt(score);
+      $('g-best').textContent = fmt(best);
+      var layer = $('g-tiles');
+      layer.innerHTML = '';
+      for (var r = 0; r < 4; r++) {
+        for (var c = 0; c < 4; c++) {
+          var v = grid[r][c];
+          if (!v) continue;
+          var el = document.createElement('div');
+          var cls = 'tile ' + (v <= 2048 ? 't' + v : 'tbig');
+          if (v >= 1024) cls += ' small';
+          var isNew = newTiles.some(function (p) { return p[0] === r && p[1] === c; });
+          var isMerged = mergedTiles.some(function (p) { return p[0] === r && p[1] === c; });
+          if (isNew) cls += ' pop';
+          else if (isMerged) cls += ' merged';
+          el.className = cls;
+          el.textContent = v;
+          el.style.left = (c * 25.63) + '%';
+          el.style.top = (r * 25.63) + '%';
+          layer.appendChild(el);
+        }
+      }
+    }
+
+    function showWin() {
+      $('g-ov-title').textContent = t('ov_win');
+      $('g-ov-text').textContent = t('ov_win_text');
+      $('g-ov-continue').hidden = false;
+      $('g-overlay').hidden = false;
+    }
+    function showOver() {
+      $('g-ov-title').textContent = t('ov_over');
+      $('g-ov-text').textContent = tf('ov_over_text', { n: fmt(score) });
+      $('g-ov-continue').hidden = true;
+      $('g-overlay').hidden = false;
+    }
+
+    /* ---------- Controls ---------- */
+
+    var KEYS = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down' };
+    document.addEventListener('keydown', function (e) {
+      var d = KEYS[e.key];
+      if (!d) return;
+      if (!$('g-overlay').hidden) return;
+      e.preventDefault();
+      move(d);
+    });
+
+    var touchStart = null;
+    var stage = $('g-stage');
+    stage.addEventListener('touchstart', function (e) {
+      touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }, { passive: true });
+    stage.addEventListener('touchend', function (e) {
+      if (!touchStart || !$('g-overlay').hidden) { touchStart = null; return; }
+      var dx = e.changedTouches[0].clientX - touchStart.x;
+      var dy = e.changedTouches[0].clientY - touchStart.y;
+      touchStart = null;
+      if (Math.abs(dx) < 26 && Math.abs(dy) < 26) return;
+      if (Math.abs(dx) > Math.abs(dy)) move(dx > 0 ? 'right' : 'left');
+      else move(dy > 0 ? 'down' : 'up');
+    });
+    stage.addEventListener('touchmove', function (e) { e.preventDefault(); }, { passive: false });
+
+    $('g-new').addEventListener('click', newGame);
+    $('g-ov-new').addEventListener('click', newGame);
+    $('g-ov-continue').addEventListener('click', function () {
+      keepGoing = true;
+      saveState();
+      $('g-overlay').hidden = true;
+    });
+
+    /* ---------- Init ---------- */
+
+    if (loadState()) {
+      over = isStuck();
+      render();
+      if (over) showOver();
+    } else {
+      newGame();
+    }
+    window.SiteLang.init(I18N, function () { render(); });
+  })();
+  </script>
+</body>
+</html>

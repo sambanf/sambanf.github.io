@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Snake</title>
+  <meta name="description" content="Free Snake game. Eat, grow, and don't hit the walls — arrow keys or swipe, with your high score saved. Runs entirely in your browser.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d9488'/%3E%3Cpath d='M7 10h12a3.5 3.5 0 0 1 0 7H12a3.5 3.5 0 0 0 0 7h13' stroke='%23ffffff' stroke-width='2.6' fill='none' stroke-linecap='round'/%3E%3Ccircle cx='26' cy='9' r='2' fill='%23ffffff'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../assets/theme.js"></script>
+  <style>
+    .top-nav {
+      padding: 1.25rem 0 2.25rem; font-size: 0.9rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .top-nav a { color: var(--text-muted); text-decoration: none; }
+    .top-nav a:hover { color: var(--accent-strong); }
+    .lede { color: var(--text-muted); max-width: 44rem; margin-bottom: 0; }
+    .tool-card { margin: 1.75rem 0 1.25rem; }
+    .how-card { margin-bottom: 1rem; }
+
+    .hud {
+      display: flex; justify-content: center; gap: 0.85rem; margin-bottom: 1rem;
+    }
+    .hud .box {
+      min-width: 7rem; text-align: center; padding: 0.6rem 1rem;
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    }
+    .hud b { display: block; font-family: var(--mono); font-size: 1.3rem; }
+    .hud span { font-size: 0.8rem; color: var(--text-muted); }
+
+    .stage {
+      position: relative; max-width: 400px; margin: 0 auto;
+      touch-action: none;
+    }
+    canvas {
+      display: block; width: 100%; height: auto;
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      background: var(--surface-2);
+    }
+    .overlay {
+      position: absolute; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 0.75rem; text-align: center;
+      background: color-mix(in srgb, var(--bg) 72%, transparent);
+      border-radius: var(--radius-sm); padding: 1rem;
+    }
+    .overlay[hidden] { display: none; }
+    .overlay h2 { margin: 0; font-size: 1.3rem; }
+    .overlay p { margin: 0; color: var(--text-muted); font-size: 0.9rem; }
+
+    .actions { display: flex; justify-content: center; gap: 0.6rem; margin-top: 1.1rem; }
+    .hint { text-align: center; font-size: 0.82rem; color: var(--text-muted); margin: 0.9rem 0 0; }
+
+    @media (max-width: 520px) { .card { padding: 1.1rem; } }
+  </style>
+</head>
+<body>
+  <header class="container">
+    <nav class="top-nav" aria-label="Site" data-i18n-attr="aria-label:nav_site">
+      <a href="../">&#8592; samba nugraha</a>
+      <div class="nav-actions">
+      <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
+        <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0l60 30M60 0L0 30" stroke="#fff" stroke-width="6"/><path d="M0 0l60 30M60 0L0 30" stroke="#C8102E" stroke-width="2.5"/><path d="M30 0v30M0 15h60" stroke="#fff" stroke-width="10"/><path d="M30 0v30M0 15h60" stroke="#C8102E" stroke-width="6"/></svg>EN
+        </button>
+        <button type="button" data-lang="id" aria-pressed="false" aria-label="Bahasa Indonesia">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="15" fill="#E70011"/><rect y="15" width="60" height="15" fill="#F7F7F7"/></svg>ID
+        </button>
+      </div>
+      <button type="button" class="theme-toggle" aria-label="Dark mode / Mode gelap" aria-pressed="false">
+        <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+      </div>
+    </nav>
+    <h1 data-i18n="h1">Snake</h1>
+    <p class="lede" data-i18n="lede">Eat, grow, don't hit the walls — or yourself. Arrow keys or WASD on desktop, swipe on your phone. It gets faster.</p>
+  </header>
+
+  <main class="container">
+    <noscript>
+      <div class="card" style="border-left:3px solid var(--negative)">This game needs JavaScript to run. Please enable it and reload. / Permainan ini membutuhkan JavaScript. Aktifkan lalu muat ulang.</div>
+    </noscript>
+
+    <div class="card tool-card">
+      <div class="hud">
+        <div class="box"><b id="sn-score">0</b><span data-i18n="hud_score">Score</span></div>
+        <div class="box"><b id="sn-best">0</b><span data-i18n="hud_best">Best</span></div>
+      </div>
+
+      <div class="stage" id="sn-stage">
+        <canvas id="sn-canvas" width="400" height="400" aria-label="Snake game board"></canvas>
+        <div class="overlay" id="sn-overlay">
+          <h2 id="sn-ov-title" data-i18n="ov_ready">Ready?</h2>
+          <p id="sn-ov-text" data-i18n="ov_hint">Press Space or tap Start. Steer with arrows, WASD, or swipe.</p>
+          <button type="button" class="btn btn-primary" id="sn-start" data-i18n="btn_start">Start</button>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn" id="sn-pause" disabled data-i18n="btn_pause">Pause</button>
+      </div>
+      <p class="hint" data-i18n="hint">Tip: you can also pause with Space.</p>
+    </div>
+
+    <section class="card how-card" aria-labelledby="how-heading">
+      <h2 id="how-heading" data-i18n="how_title">Rules</h2>
+      <p data-i18n="how_1">Every food eaten makes the snake one segment longer and adds a point — and every fifth food speeds the game up a little. The run ends if you hit a wall or your own tail. The game pauses automatically if you switch tabs.</p>
+      <p class="muted small" data-i18n="privacy">Runs entirely in your browser. Your high score is remembered only on this device.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p><a href="../" data-i18n="footer_back">&#8592; back to all tools</a> &middot; &copy; 2026 Samba Nugraha</p>
+    </div>
+  </footer>
+
+  <script src="../assets/lang.js"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    var I18N = {
+      en: {
+        _title: 'Snake',
+        _meta: "Free Snake game. Eat, grow, and don't hit the walls — arrow keys or swipe, with your high score saved. Runs entirely in your browser.",
+        nav_site: 'Site',
+        h1: 'Snake',
+        lede: "Eat, grow, don't hit the walls — or yourself. Arrow keys or WASD on desktop, swipe on your phone. It gets faster.",
+        hud_score: 'Score',
+        hud_best: 'Best',
+        ov_ready: 'Ready?',
+        ov_hint: 'Press Space or tap Start. Steer with arrows, WASD, or swipe.',
+        ov_paused: 'Paused',
+        ov_paused_hint: 'Press Space or tap Resume to continue.',
+        ov_over: 'Game over!',
+        ov_score: 'Score: {n}',
+        ov_newbest: 'New best score: {n} 🎉',
+        btn_start: 'Start',
+        btn_resume: 'Resume',
+        btn_again: 'Play again',
+        btn_pause: 'Pause',
+        hint: 'Tip: you can also pause with Space.',
+        how_title: 'Rules',
+        how_1: 'Every food eaten makes the snake one segment longer and adds a point — and every fifth food speeds the game up a little. The run ends if you hit a wall or your own tail. The game pauses automatically if you switch tabs.',
+        privacy: 'Runs entirely in your browser. Your high score is remembered only on this device.',
+        footer_back: '← back to all tools'
+      },
+      id: {
+        _title: 'Ular (Snake)',
+        _meta: 'Permainan Snake gratis. Makan, tumbuh, dan jangan menabrak dinding — tombol panah atau usapan, dengan skor tertinggi tersimpan. Berjalan sepenuhnya di browser Anda.',
+        nav_site: 'Situs',
+        h1: 'Ular (Snake)',
+        lede: 'Makan, tumbuh, jangan menabrak dinding — atau tubuh sendiri. Tombol panah atau WASD di desktop, usap di ponsel. Makin lama makin cepat.',
+        hud_score: 'Skor',
+        hud_best: 'Terbaik',
+        ov_ready: 'Siap?',
+        ov_hint: 'Tekan Spasi atau ketuk Mulai. Kendalikan dengan panah, WASD, atau usapan.',
+        ov_paused: 'Jeda',
+        ov_paused_hint: 'Tekan Spasi atau ketuk Lanjut untuk meneruskan.',
+        ov_over: 'Permainan selesai!',
+        ov_score: 'Skor: {n}',
+        ov_newbest: 'Skor terbaik baru: {n} 🎉',
+        btn_start: 'Mulai',
+        btn_resume: 'Lanjut',
+        btn_again: 'Main lagi',
+        btn_pause: 'Jeda',
+        hint: 'Tips: Anda juga bisa jeda dengan Spasi.',
+        how_title: 'Aturan',
+        how_1: 'Setiap makanan membuat ular bertambah satu ruas dan menambah satu poin — dan setiap lima makanan permainan sedikit lebih cepat. Permainan berakhir jika menabrak dinding atau ekor sendiri. Permainan otomatis jeda jika Anda pindah tab.',
+        privacy: 'Berjalan sepenuhnya di browser Anda. Skor tertinggi hanya diingat di perangkat ini.',
+        footer_back: '← kembali ke semua alat'
+      }
+    };
+
+    function t(key) { return window.SiteLang.t(key); }
+    function tf(key, vars) {
+      var s = t(key);
+      for (var k in vars) {
+        if (Object.prototype.hasOwnProperty.call(vars, k)) s = s.replace('{' + k + '}', vars[k]);
+      }
+      return s;
+    }
+    function $(id) { return document.getElementById(id); }
+
+    function randInt(max) {
+      if (window.crypto && crypto.getRandomValues) {
+        var lim = Math.floor(4294967296 / max) * max;
+        var buf = new Uint32Array(1);
+        do { crypto.getRandomValues(buf); } while (buf[0] >= lim);
+        return buf[0] % max;
+      }
+      return Math.floor(Math.random() * max);
+    }
+
+    /* ---------- Setup ---------- */
+
+    var GRID = 20;
+    var canvas = $('sn-canvas');
+    var ctx = canvas.getContext('2d');
+    var DPR = Math.min(2, window.devicePixelRatio || 1);
+    var SIZE = 400;
+    canvas.width = SIZE * DPR;
+    canvas.height = SIZE * DPR;
+    ctx.scale(DPR, DPR);
+    var CELL = SIZE / GRID;
+
+    var NS = 'snake.';
+    var best = 0;
+    try { best = parseInt(localStorage.getItem(NS + 'best'), 10) || 0; } catch (e) { /* ignore */ }
+
+    var snake, dir, nextDir, food, score, speed, timer;
+    var state = 'idle';   // idle | running | paused | over
+
+    function cssVar(name) {
+      return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    }
+
+    function spawnFood() {
+      var free = [];
+      for (var i = 0; i < GRID * GRID; i++) {
+        var x = i % GRID, y = Math.floor(i / GRID);
+        var onSnake = snake.some(function (s) { return s.x === x && s.y === y; });
+        if (!onSnake) free.push({ x: x, y: y });
+      }
+      food = free.length ? free[randInt(free.length)] : null;
+    }
+
+    function reset() {
+      snake = [{ x: 9, y: 10 }, { x: 8, y: 10 }, { x: 7, y: 10 }];
+      dir = { x: 1, y: 0 };
+      nextDir = dir;
+      score = 0;
+      speed = 140;
+      spawnFood();
+      renderHud();
+      draw();
+    }
+
+    /* ---------- Game loop ---------- */
+
+    function tick() {
+      dir = nextDir;
+      var head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
+      var hitWall = head.x < 0 || head.y < 0 || head.x >= GRID || head.y >= GRID;
+      var hitSelf = snake.some(function (s, i) {
+        // the tail cell moves away this tick unless we are eating
+        if (i === snake.length - 1 && !(food && head.x === food.x && head.y === food.y)) return false;
+        return s.x === head.x && s.y === head.y;
+      });
+      if (hitWall || hitSelf) { gameOver(); return; }
+
+      snake.unshift(head);
+      if (food && head.x === food.x && head.y === food.y) {
+        score++;
+        if (score % 5 === 0 && speed > 70) {
+          speed -= 8;
+          clearInterval(timer);
+          timer = setInterval(tick, speed);
+        }
+        spawnFood();
+        renderHud();
+      } else {
+        snake.pop();
+      }
+      draw();
+    }
+
+    function draw() {
+      var accent = cssVar('--accent') || '#0d9488';
+      var accentStrong = cssVar('--accent-strong') || '#0f766e';
+      var neg = cssVar('--negative') || '#dc2626';
+      var gridCol = cssVar('--border') || '#e7e5e4';
+
+      ctx.clearRect(0, 0, SIZE, SIZE);
+
+      ctx.strokeStyle = gridCol;
+      ctx.globalAlpha = 0.35;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (var g = 1; g < GRID; g++) {
+        ctx.moveTo(g * CELL, 0); ctx.lineTo(g * CELL, SIZE);
+        ctx.moveTo(0, g * CELL); ctx.lineTo(SIZE, g * CELL);
+      }
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+
+      if (food) {
+        ctx.fillStyle = neg;
+        ctx.beginPath();
+        ctx.arc(food.x * CELL + CELL / 2, food.y * CELL + CELL / 2, CELL * 0.32, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      for (var i = snake.length - 1; i >= 0; i--) {
+        ctx.fillStyle = i === 0 ? accentStrong : accent;
+        var pad = i === 0 ? 1.5 : 2.5;
+        var s = snake[i];
+        ctx.beginPath();
+        if (ctx.roundRect) {
+          ctx.roundRect(s.x * CELL + pad, s.y * CELL + pad, CELL - pad * 2, CELL - pad * 2, 4);
+          ctx.fill();
+        } else {
+          ctx.fillRect(s.x * CELL + pad, s.y * CELL + pad, CELL - pad * 2, CELL - pad * 2);
+        }
+      }
+    }
+
+    /* ---------- State machine ---------- */
+
+    function showOverlay(titleKey, textStr, btnKey) {
+      $('sn-ov-title').textContent = t(titleKey);
+      $('sn-ov-text').textContent = textStr;
+      $('sn-start').textContent = t(btnKey);
+      $('sn-overlay').hidden = false;
+    }
+
+    function start() {
+      if (state === 'running') return;
+      if (state === 'idle' || state === 'over') reset();
+      state = 'running';
+      $('sn-overlay').hidden = true;
+      $('sn-pause').disabled = false;
+      $('sn-pause').textContent = t('btn_pause');
+      clearInterval(timer);
+      timer = setInterval(tick, speed);
+    }
+
+    function pause() {
+      if (state !== 'running') return;
+      state = 'paused';
+      clearInterval(timer);
+      $('sn-pause').disabled = true;
+      showOverlay('ov_paused', t('ov_paused_hint'), 'btn_resume');
+    }
+
+    function gameOver() {
+      state = 'over';
+      clearInterval(timer);
+      $('sn-pause').disabled = true;
+      var isBest = score > best;
+      if (isBest) {
+        best = score;
+        try { localStorage.setItem(NS + 'best', String(best)); } catch (e) { /* ignore */ }
+        renderHud();
+      }
+      showOverlay('ov_over', tf(isBest ? 'ov_newbest' : 'ov_score', { n: score }), 'btn_again');
+    }
+
+    function renderHud() {
+      $('sn-score').textContent = score || 0;
+      $('sn-best').textContent = best;
+    }
+
+    /* ---------- Controls ---------- */
+
+    var DIRS = {
+      ArrowUp: { x: 0, y: -1 }, ArrowDown: { x: 0, y: 1 },
+      ArrowLeft: { x: -1, y: 0 }, ArrowRight: { x: 1, y: 0 },
+      w: { x: 0, y: -1 }, s: { x: 0, y: 1 }, a: { x: -1, y: 0 }, d: { x: 1, y: 0 }
+    };
+
+    function setDir(d) {
+      // no reversing into yourself
+      if (d.x === -dir.x && d.y === -dir.y) return;
+      nextDir = d;
+    }
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === ' ') {
+        e.preventDefault();
+        if (state === 'running') pause(); else start();
+        return;
+      }
+      var d = DIRS[e.key] || DIRS[e.key.toLowerCase && e.key.toLowerCase()];
+      if (d) {
+        if (state === 'running') e.preventDefault();
+        setDir(d);
+      }
+    });
+
+    var touchStart = null;
+    var stage = $('sn-stage');
+    stage.addEventListener('touchstart', function (e) {
+      touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }, { passive: true });
+    stage.addEventListener('touchmove', function (e) {
+      if (!touchStart) return;
+      var dx = e.touches[0].clientX - touchStart.x;
+      var dy = e.touches[0].clientY - touchStart.y;
+      if (Math.abs(dx) < 24 && Math.abs(dy) < 24) return;
+      if (Math.abs(dx) > Math.abs(dy)) setDir({ x: dx > 0 ? 1 : -1, y: 0 });
+      else setDir({ x: 0, y: dy > 0 ? 1 : -1 });
+      touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      e.preventDefault();
+    }, { passive: false });
+
+    $('sn-start').addEventListener('click', start);
+    $('sn-pause').addEventListener('click', pause);
+
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden && state === 'running') pause();
+    });
+
+    // Theme switch → repaint with the new palette.
+    document.addEventListener('click', function (e) {
+      if (e.target && e.target.closest && e.target.closest('.theme-toggle')) {
+        setTimeout(draw, 0);
+      }
+    });
+
+    /* ---------- Init ---------- */
+
+    reset();
+    window.SiteLang.init(I18N, function () {
+      renderHud();
+      if (state === 'idle') showOverlay('ov_ready', t('ov_hint'), 'btn_start');
+      else if (state === 'paused') showOverlay('ov_paused', t('ov_paused_hint'), 'btn_resume');
+      else if (state === 'over') showOverlay('ov_over', tf('ov_score', { n: score }), 'btn_again');
+      $('sn-pause').textContent = t('btn_pause');
+    });
+  })();
+  </script>
+</body>
+</html>

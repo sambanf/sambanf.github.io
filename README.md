@@ -16,6 +16,10 @@ Personal site and simple tools, served by [GitHub Pages](https://pages.github.co
 - **`/randompick/`** — random list picker ([randompick/index.html](randompick/index.html))
 - **`/diff/`** — text diff checker ([diff/index.html](diff/index.html))
 - **`/color/`** — color converter & contrast checker ([color/index.html](color/index.html))
+- **`/tictactoe/`** — tic-tac-toe vs AI or 2 players ([tictactoe/index.html](tictactoe/index.html))
+- **`/snake/`** — snake game ([snake/index.html](snake/index.html))
+- **`/2048/`** — 2048 puzzle ([2048/index.html](2048/index.html))
+- **`/memory/`** — memory match game ([memory/index.html](memory/index.html))
 - **`/assets/style.css`** — shared design tokens and base styles used by every page
 - **`/assets/lang.js`** — shared English/Indonesian language switcher
 - **`/assets/theme.js`** — shared dark-mode toggle (system default, manual override in `localStorage['site.theme']`)
