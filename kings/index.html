@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lone Kings</title>
+  <meta name="description" content="Free logic puzzle: place one king per row and column so no two kings touch, even diagonally. Uniquely-solvable boards from 4x4 to 8x8, right in your browser.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d9488'/%3E%3Cpath d='M7 23l-2-11 5 4 6-9 6 9 5-4-2 11z' fill='%23ffffff'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../assets/theme.js"></script>
+  <style>
+    .top-nav {
+      padding: 1.25rem 0 2.25rem; font-size: 0.9rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .top-nav a { color: var(--text-muted); text-decoration: none; }
+    .top-nav a:hover { color: var(--accent-strong); }
+    .lede { color: var(--text-muted); max-width: 44rem; margin-bottom: 0; }
+    .tool-card { margin: 1.75rem 0 1.25rem; }
+    .how-card { margin-bottom: 1rem; }
+
+    .topbar-game { display: flex; flex-wrap: wrap; align-items: end; justify-content: center; gap: 1rem; margin-bottom: 1.1rem; }
+    .topbar-game .grp { display: flex; align-items: center; gap: 0.6rem; }
+    .topbar-game label { margin: 0; }
+    .topbar-game select { width: auto; }
+
+    .hud { display: flex; justify-content: center; gap: 0.85rem; margin-bottom: 1.1rem; flex-wrap: wrap; }
+    .hud .box {
+      min-width: 6rem; text-align: center; padding: 0.55rem 0.9rem;
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    }
+    .hud b { display: block; font-family: var(--mono); font-size: 1.2rem; }
+    .hud span { font-size: 0.78rem; color: var(--text-muted); }
+
+    .board {
+      display: grid; gap: clamp(3px, 1.1vw, 6px);
+      max-width: 30rem; margin: 0 auto; touch-action: manipulation;
+    }
+    .cell {
+      aspect-ratio: 1; padding: 0; margin: 0;
+      display: flex; align-items: center; justify-content: center;
+      border: 1px solid var(--border); border-radius: 8px;
+      background: var(--surface-2); color: var(--text);
+      cursor: pointer; transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+    }
+    .cell.alt { background: color-mix(in srgb, var(--text) 5%, var(--surface-2)); }
+    .cell:hover:not(.clue):not(:disabled) { border-color: var(--accent); }
+    .cell svg { width: 68%; height: 68%; display: block; }
+    .cell.king { color: var(--text); }
+    .cell.clue { color: var(--accent-strong); background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 45%, var(--border)); cursor: default; }
+    .cell.mark { color: var(--text-muted); }
+    .cell.bad { color: var(--negative); background: color-mix(in srgb, var(--negative) 15%, var(--surface-2)); border-color: var(--negative); }
+    .board.solved .cell.king, .board.solved .cell.clue {
+      color: var(--positive); background: color-mix(in srgb, var(--positive) 15%, var(--surface-2));
+      border-color: var(--positive);
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      @keyframes king-pop { from { transform: scale(0.35); } to { transform: scale(1); } }
+      .cell.king svg, .cell.clue svg { animation: king-pop 0.14s ease-out; }
+    }
+
+    .status { text-align: center; font-weight: 600; min-height: 1.5em; margin: 1.1rem 0 0.2rem; }
+    .taphint { text-align: center; font-size: 0.82rem; color: var(--text-muted); margin: 0.3rem 0 0; }
+    .actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 0.6rem; margin-top: 1.1rem; }
+
+    @media (max-width: 520px) { .card { padding: 1.1rem; } }
+  </style>
+</head>
+<body>
+  <header class="container">
+    <nav class="top-nav" aria-label="Site" data-i18n-attr="aria-label:nav_site">
+      <a href="../">&#8592; samba nugraha</a>
+      <div class="nav-actions">
+      <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
+        <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0l60 30M60 0L0 30" stroke="#fff" stroke-width="6"/><path d="M0 0l60 30M60 0L0 30" stroke="#C8102E" stroke-width="2.5"/><path d="M30 0v30M0 15h60" stroke="#fff" stroke-width="10"/><path d="M30 0v30M0 15h60" stroke="#C8102E" stroke-width="6"/></svg>EN
+        </button>
+        <button type="button" data-lang="id" aria-pressed="false" aria-label="Bahasa Indonesia">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="15" fill="#E70011"/><rect y="15" width="60" height="15" fill="#F7F7F7"/></svg>ID
+        </button>
+      </div>
+      <button type="button" class="theme-toggle" aria-label="Dark mode / Mode gelap" aria-pressed="false">
+        <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+      </div>
+    </nav>
+    <h1 data-i18n="h1">Lone Kings</h1>
+    <p class="lede" data-i18n="lede">Place one king in every row and column so that no two kings touch — not even diagonally. Every puzzle has exactly one solution.</p>
+  </header>
+
+  <main class="container">
+    <noscript>
+      <div class="card" style="border-left:3px solid var(--negative)">This game needs JavaScript to run. Please enable it and reload. / Permainan ini membutuhkan JavaScript. Aktifkan lalu muat ulang.</div>
+    </noscript>
+
+    <div class="card tool-card">
+      <div class="topbar-game">
+        <div class="grp">
+          <label for="k-size" data-i18n="diff_label">Puzzle size</label>
+          <select id="k-size">
+            <option value="4" data-i18n="size_4">4×4 · Warm-up</option>
+            <option value="5" data-i18n="size_5">5×5 · Easy</option>
+            <option value="6" selected data-i18n="size_6">6×6 · Medium</option>
+            <option value="7" data-i18n="size_7">7×7 · Hard</option>
+            <option value="8" data-i18n="size_8">8×8 · Expert</option>
+          </select>
+        </div>
+        <button type="button" class="btn btn-primary" id="k-new" data-i18n="btn_new">New puzzle</button>
+      </div>
+
+      <div class="hud">
+        <div class="box"><b id="k-kings">0</b><span data-i18n="hud_kings">Kings</span></div>
+        <div class="box"><b id="k-time">0:00</b><span data-i18n="hud_time">Time</span></div>
+        <div class="box"><b id="k-best">—</b><span data-i18n="hud_best">Best</span></div>
+      </div>
+
+      <div class="board" id="k-board" role="grid" aria-label="Kings puzzle board"></div>
+      <p class="status" id="k-status" aria-live="polite"></p>
+      <p class="taphint" data-i18n="tap_hint">Tap a square: empty → 👑 → ✕ → empty. Use ✕ to rule squares out.</p>
+
+      <div class="actions">
+        <button type="button" class="btn" id="k-restart" data-i18n="btn_restart">Restart</button>
+        <button type="button" class="btn" id="k-hint" data-i18n="btn_hint">Hint</button>
+        <button type="button" class="btn" id="k-solve" data-i18n="btn_solve">Solve</button>
+      </div>
+    </div>
+
+    <section class="card how-card" aria-labelledby="how-heading">
+      <h2 id="how-heading" data-i18n="how_title">How to play</h2>
+      <p data-i18n="how_1">Place exactly one king in each row and each column. Kings attack every neighbouring square, so no two kings may sit next to each other horizontally, vertically, or diagonally. Because every row and column already holds exactly one king, the only way two can touch is on a diagonal — so keep neighbouring rows at least two columns apart.</p>
+      <p data-i18n="how_2">Tap an empty square to drop a king, tap again to mark it with ✕ (a note that no king goes there), and once more to clear it. The kings shown in colour are given and can’t be moved. Every puzzle is generated with a single unique solution.</p>
+      <p class="muted small" data-i18n="privacy">Runs entirely in your browser. Your puzzle, progress, and best times are saved only on this device.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p><a href="../" data-i18n="footer_back">&#8592; back to all tools</a> &middot; &copy; 2026 Samba Nugraha</p>
+    </div>
+  </footer>
+
+  <script src="../assets/lang.js"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    var I18N = {
+      en: {
+        _title: 'Lone Kings',
+        _meta: 'Free logic puzzle: place one king per row and column so no two kings touch, even diagonally. Uniquely-solvable boards from 4x4 to 8x8, right in your browser.',
+        nav_site: 'Site',
+        h1: 'Lone Kings',
+        lede: 'Place one king in every row and column so that no two kings touch — not even diagonally. Every puzzle has exactly one solution.',
+        diff_label: 'Puzzle size',
+        size_4: '4×4 · Warm-up',
+        size_5: '5×5 · Easy',
+        size_6: '6×6 · Medium',
+        size_7: '7×7 · Hard',
+        size_8: '8×8 · Expert',
+        btn_new: 'New puzzle',
+        btn_restart: 'Restart',
+        btn_hint: 'Hint',
+        btn_solve: 'Solve',
+        hud_kings: 'Kings',
+        hud_time: 'Time',
+        hud_best: 'Best',
+        tap_hint: 'Tap a square: empty → 👑 → ✕ → empty. Use ✕ to rule squares out.',
+        status_start: 'Tap a square to place a king.',
+        status_conflict: 'Some kings are attacking each other.',
+        status_progress: '{n} of {total} kings placed.',
+        status_win: 'Solved in {t}! 👑',
+        status_win_best: 'Solved in {t} — new best! 👑',
+        status_win_assisted: 'Solved with help in {t}. 👑',
+        cell_aria: 'Row {r}, column {c}',
+        cell_king: 'king',
+        cell_mark: 'ruled out',
+        cell_clue: 'given king',
+        how_title: 'How to play',
+        how_1: 'Place exactly one king in each row and each column. Kings attack every neighbouring square, so no two kings may sit next to each other horizontally, vertically, or diagonally. Because every row and column already holds exactly one king, the only way two can touch is on a diagonal — so keep neighbouring rows at least two columns apart.',
+        how_2: 'Tap an empty square to drop a king, tap again to mark it with ✕ (a note that no king goes there), and once more to clear it. The kings shown in colour are given and can’t be moved. Every puzzle is generated with a single unique solution.',
+        privacy: 'Runs entirely in your browser. Your puzzle, progress, and best times are saved only on this device.',
+        footer_back: '← back to all tools'
+      },
+      id: {
+        _title: 'Raja Penyendiri',
+        _meta: 'Teka-teki logika gratis: tempatkan satu raja per baris dan kolom agar tidak ada dua raja bersentuhan, bahkan diagonal. Papan bersolusi unik dari 4x4 hingga 8x8, di browser Anda.',
+        nav_site: 'Situs',
+        h1: 'Raja Penyendiri',
+        lede: 'Tempatkan satu raja di setiap baris dan kolom sehingga tidak ada dua raja yang bersentuhan — bahkan secara diagonal. Setiap teka-teki punya tepat satu solusi.',
+        diff_label: 'Ukuran teka-teki',
+        size_4: '4×4 · Pemanasan',
+        size_5: '5×5 · Mudah',
+        size_6: '6×6 · Sedang',
+        size_7: '7×7 · Sulit',
+        size_8: '8×8 · Ahli',
+        btn_new: 'Teka-teki baru',
+        btn_restart: 'Ulangi',
+        btn_hint: 'Petunjuk',
+        btn_solve: 'Pecahkan',
+        hud_kings: 'Raja',
+        hud_time: 'Waktu',
+        hud_best: 'Terbaik',
+        tap_hint: 'Ketuk kotak: kosong → 👑 → ✕ → kosong. Pakai ✕ untuk mencoret kotak.',
+        status_start: 'Ketuk kotak untuk menempatkan raja.',
+        status_conflict: 'Beberapa raja saling menyerang.',
+        status_progress: '{n} dari {total} raja ditempatkan.',
+        status_win: 'Terpecahkan dalam {t}! 👑',
+        status_win_best: 'Terpecahkan dalam {t} — rekor baru! 👑',
+        status_win_assisted: 'Terpecahkan dengan bantuan dalam {t}. 👑',
+        cell_aria: 'Baris {r}, kolom {c}',
+        cell_king: 'raja',
+        cell_mark: 'dicoret',
+        cell_clue: 'raja bawaan',
+        how_title: 'Cara bermain',
+        how_1: 'Tempatkan tepat satu raja di setiap baris dan kolom. Raja menyerang semua kotak tetangganya, jadi tidak boleh ada dua raja bersebelahan secara horizontal, vertikal, maupun diagonal. Karena setiap baris dan kolom sudah berisi tepat satu raja, satu-satunya cara dua raja bersentuhan adalah secara diagonal — jadi jaga agar baris bertetangga berjarak minimal dua kolom.',
+        how_2: 'Ketuk kotak kosong untuk menaruh raja, ketuk lagi untuk menandainya dengan ✕ (catatan bahwa tidak ada raja di situ), dan sekali lagi untuk mengosongkannya. Raja yang ditampilkan berwarna adalah bawaan dan tidak bisa dipindahkan. Setiap teka-teki dibuat dengan satu solusi unik.',
+        privacy: 'Berjalan sepenuhnya di browser Anda. Teka-teki, progres, dan waktu terbaik hanya disimpan di perangkat ini.',
+        footer_back: '← kembali ke semua alat'
+      }
+    };
+
+    function t(key) { return window.SiteLang.t(key); }
+    function tf(key, vars) {
+      var s = t(key);
+      for (var k in vars) {
+        if (Object.prototype.hasOwnProperty.call(vars, k)) s = s.replace('{' + k + '}', vars[k]);
+      }
+      return s;
+    }
+    function $(id) { return document.getElementById(id); }
+
+    function randInt(max) {
+      if (window.crypto && crypto.getRandomValues) {
+        var lim = Math.floor(4294967296 / max) * max;
+        var buf = new Uint32Array(1);
+        do { crypto.getRandomValues(buf); } while (buf[0] >= lim);
+        return buf[0] % max;
+      }
+      return Math.floor(Math.random() * max);
+    }
+    function shuffle(a) {
+      for (var i = a.length - 1; i > 0; i--) {
+        var j = randInt(i + 1);
+        var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+      }
+      return a;
+    }
+    function range(n) { var a = []; for (var i = 0; i < n; i++) a.push(i); return a; }
+
+    var CROWN = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M4 18l-1.6-9.2 4.5 3.4L12 5l5.1 7.2 4.5-3.4L20 18z"/><rect x="4" y="18.5" width="16" height="2.4" rx="0.6"/></svg>';
+    var XMARK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M7 7l10 10M17 7L7 17"/></svg>';
+
+    /* =====================================================
+       Puzzle generation & uniqueness
+       ===================================================== */
+
+    // A valid board is a permutation p (p[r] = column of the king in row r)
+    // with |p[r] - p[r-1]| >= 2 for every consecutive pair. That single
+    // constraint is exactly "no two kings adjacent" once one-per-row and
+    // one-per-column are guaranteed by the permutation.
+
+    function generateSolution(size) {
+      var cols = new Array(size).fill(-1);
+      var used = new Array(size).fill(false);
+      function dfs(r, prev) {
+        if (r === size) return true;
+        var order = shuffle(range(size));
+        for (var i = 0; i < order.length; i++) {
+          var c = order[i];
+          if (used[c]) continue;
+          if (prev >= 0 && Math.abs(c - prev) < 2) continue;
+          used[c] = true; cols[r] = c;
+          if (dfs(r + 1, c)) return true;
+          used[c] = false; cols[r] = -1;
+        }
+        return false;
+      }
+      return dfs(0, -1) ? cols.slice() : null;
+    }
+
+    // Counts valid completions consistent with `clues` (clues[r] = col or -1),
+    // capped at `limit` for speed.
+    function countSolutions(size, clues, limit) {
+      var count = 0;
+      var used = new Array(size).fill(false);
+      for (var r = 0; r < size; r++) if (clues[r] >= 0) used[clues[r]] = true;
+      function dfs(row, prev) {
+        if (count >= limit) return;
+        if (row === size) { count++; return; }
+        var fixed = clues[row];
+        if (fixed >= 0) {
+          if (prev >= 0 && Math.abs(fixed - prev) < 2) return;
+          dfs(row + 1, fixed);
+        } else {
+          for (var c = 0; c < size; c++) {
+            if (used[c]) continue;
+            if (prev >= 0 && Math.abs(c - prev) < 2) continue;
+            used[c] = true;
+            dfs(row + 1, c);
+            used[c] = false;
+            if (count >= limit) return;
+          }
+        }
+      }
+      dfs(0, -1);
+      return count;
+    }
+
+    // Full solution, then strip clues while the solution stays unique.
+    function makePuzzle(size) {
+      var sol = null, tries = 0;
+      while (!sol && tries < 300) { sol = generateSolution(size); tries++; }
+      if (!sol) return null;
+      var clues = sol.slice();
+      var order = shuffle(range(size));
+      for (var i = 0; i < order.length; i++) {
+        var r = order[i];
+        var saved = clues[r];
+        clues[r] = -1;
+        if (countSolutions(size, clues, 2) !== 1) clues[r] = saved;
+      }
+      return { solution: sol, clues: clues };
+    }
+
+    /* =====================================================
+       State
+       ===================================================== */
+
+    var size, solution, clues, player, marks, seconds, started, solved, assisted, newBest;
+    var timer = null;
+
+    var NS = 'kings.';
+    function bestFor(n) { try { return parseInt(localStorage.getItem(NS + 'best.' + n), 10) || 0; } catch (e) { return 0; } }
+    function setBest(n, v) { try { localStorage.setItem(NS + 'best.' + n, String(v)); } catch (e) { /* ignore */ } }
+
+    function saveState() {
+      try {
+        localStorage.setItem(NS + 'state', JSON.stringify({
+          size: size, solution: solution, clues: clues,
+          player: player, marks: marks,
+          seconds: seconds, started: started, solved: solved,
+          assisted: assisted, newBest: newBest
+        }));
+      } catch (e) { /* ignore */ }
+    }
+    function loadState() {
+      try {
+        var s = JSON.parse(localStorage.getItem(NS + 'state'));
+        if (!s || !Array.isArray(s.solution) || !Array.isArray(s.clues)) return false;
+        if (s.solution.length !== s.clues.length) return false;
+        size = s.solution.length;
+        if (size < 4 || size > 8) return false;
+        solution = s.solution; clues = s.clues;
+        player = Array.isArray(s.player) ? s.player : [];
+        marks = Array.isArray(s.marks) ? s.marks : [];
+        seconds = s.seconds || 0;
+        started = !!s.started; solved = !!s.solved;
+        assisted = !!s.assisted; newBest = !!s.newBest;
+        return true;
+      } catch (e) { return false; }
+    }
+
+    function key(r, c) { return r + ',' + c; }
+    function hasK(r, c) { return player.indexOf(key(r, c)) !== -1; }
+    function hasM(r, c) { return marks.indexOf(key(r, c)) !== -1; }
+    function isClue(r, c) { return clues[r] === c; }
+
+    /* ---------- All kings on the board (given + placed) ---------- */
+
+    function allKings() {
+      var list = [];
+      for (var r = 0; r < size; r++) if (clues[r] >= 0) list.push([r, clues[r]]);
+      player.forEach(function (k) {
+        var p = k.split(',');
+        list.push([+p[0], +p[1]]);
+      });
+      return list;
+    }
+
+    // Set of "r,c" keys for every king involved in a rule violation.
+    function conflictSet() {
+      var kings = allKings();
+      var bad = {};
+      for (var i = 0; i < kings.length; i++) {
+        for (var j = i + 1; j < kings.length; j++) {
+          var a = kings[i], b = kings[j];
+          var touch = (Math.abs(a[0] - b[0]) <= 1 && Math.abs(a[1] - b[1]) <= 1);
+          if (a[0] === b[0] || a[1] === b[1] || touch) {
+            bad[key(a[0], a[1])] = true;
+            bad[key(b[0], b[1])] = true;
+          }
+        }
+      }
+      return bad;
+    }
+
+    /* =====================================================
+       Timer
+       ===================================================== */
+
+    function fmtTime(s) {
+      var m = Math.floor(s / 60);
+      var r = s % 60;
+      return m + ':' + (r < 10 ? '0' : '') + r;
+    }
+    function startTimer() {
+      clearInterval(timer);
+      timer = setInterval(function () {
+        seconds++;
+        $('k-time').textContent = fmtTime(seconds);
+        if (seconds % 5 === 0) saveState();
+      }, 1000);
+    }
+    function stopTimer() { clearInterval(timer); timer = null; }
+
+    /* =====================================================
+       Rendering
+       ===================================================== */
+
+    var boardEl = $('k-board');
+
+    function buildBoard() {
+      boardEl.style.gridTemplateColumns = 'repeat(' + size + ', 1fr)';
+      boardEl.innerHTML = '';
+      for (var r = 0; r < size; r++) {
+        for (var c = 0; c < size; c++) {
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'cell';
+          btn.setAttribute('data-r', r);
+          btn.setAttribute('data-c', c);
+          boardEl.appendChild(btn);
+        }
+      }
+    }
+
+    function render() {
+      var bad = conflictSet();
+      var cells = boardEl.children;
+      for (var i = 0; i < cells.length; i++) {
+        var cell = cells[i];
+        var r = +cell.getAttribute('data-r');
+        var c = +cell.getAttribute('data-c');
+        var cls = 'cell' + ((r + c) % 2 ? ' alt' : '');
+        var html = '';
+        var stateLabel = '';
+        if (isClue(r, c)) {
+          cls += ' clue'; html = CROWN; stateLabel = t('cell_clue');
+          cell.disabled = solved;
+        } else if (hasK(r, c)) {
+          cls += ' king'; html = CROWN; stateLabel = t('cell_king');
+          cell.disabled = solved;
+        } else if (hasM(r, c)) {
+          cls += ' mark'; html = XMARK; stateLabel = t('cell_mark');
+          cell.disabled = solved;
+        } else {
+          cell.disabled = solved;
+        }
+        if (bad[key(r, c)]) cls += ' bad';
+        cell.className = cls;
+        cell.innerHTML = html;
+        cell.setAttribute('aria-label', tf('cell_aria', { r: r + 1, c: c + 1 }) + (stateLabel ? ' — ' + stateLabel : ''));
+      }
+      boardEl.className = 'board' + (solved ? ' solved' : '');
+      renderHud();
+      renderStatus(bad);
+    }
+
+    function kingCount() {
+      var n = player.length;
+      for (var r = 0; r < size; r++) if (clues[r] >= 0) n++;
+      return n;
+    }
+
+    function renderHud() {
+      $('k-kings').textContent = kingCount() + '/' + size;
+      $('k-time').textContent = fmtTime(seconds);
+      var b = bestFor(size);
+      $('k-best').textContent = b ? fmtTime(b) : '—';
+    }
+
+    function renderStatus(bad) {
+      var st = $('k-status');
+      if (solved) {
+        var msgKey = assisted ? 'status_win_assisted' : (newBest ? 'status_win_best' : 'status_win');
+        st.textContent = tf(msgKey, { t: fmtTime(seconds) });
+        return;
+      }
+      if (Object.keys(bad).length) { st.textContent = t('status_conflict'); return; }
+      var n = kingCount();
+      st.textContent = n === 0 ? t('status_start') : tf('status_progress', { n: n, total: size });
+    }
+
+    /* =====================================================
+       Game flow
+       ===================================================== */
+
+    function evaluate() {
+      var bad = conflictSet();
+      if (kingCount() === size && Object.keys(bad).length === 0) {
+        solved = true;
+        stopTimer();
+        if (!assisted) {
+          var prev = bestFor(size);
+          if (!prev || seconds < prev) { setBest(size, seconds); newBest = true; }
+        }
+      }
+    }
+
+    function newPuzzle(n) {
+      size = n;
+      var p = makePuzzle(size);
+      solution = p.solution;
+      clues = p.clues;
+      player = []; marks = [];
+      seconds = 0; started = false; solved = false; assisted = false; newBest = false;
+      stopTimer();
+      buildBoard();
+      saveState();
+      render();
+    }
+
+    function restart() {
+      player = []; marks = [];
+      seconds = 0; started = false; solved = false; assisted = false; newBest = false;
+      stopTimer();
+      saveState();
+      render();
+    }
+
+    function ensureStarted() {
+      if (!started && !solved) {
+        started = true;
+        startTimer();
+      }
+    }
+
+    function tapCell(r, c) {
+      if (solved || isClue(r, c)) return;
+      var kk = key(r, c);
+      if (hasK(r, c)) {
+        player.splice(player.indexOf(kk), 1);
+        marks.push(kk);           // king -> mark
+      } else if (hasM(r, c)) {
+        marks.splice(marks.indexOf(kk), 1);  // mark -> empty
+      } else {
+        player.push(kk);          // empty -> king
+      }
+      ensureStarted();
+      evaluate();
+      saveState();
+      render();
+    }
+
+    function hint() {
+      if (solved) return;
+      // rows whose current player king isn't the solution (or is missing)
+      var rows = [];
+      for (var r = 0; r < size; r++) {
+        if (clues[r] >= 0) continue;
+        if (!hasK(r, solution[r])) rows.push(r);
+      }
+      if (!rows.length) return;
+      var row = rows[randInt(rows.length)];
+      // clear any wrong king or mark in that row, place the correct king
+      for (var c = 0; c < size; c++) {
+        var kk = key(row, c);
+        var pi = player.indexOf(kk); if (pi !== -1) player.splice(pi, 1);
+        var mi = marks.indexOf(kk); if (mi !== -1) marks.splice(mi, 1);
+      }
+      player.push(key(row, solution[row]));
+      assisted = true;
+      ensureStarted();
+      evaluate();
+      saveState();
+      render();
+    }
+
+    function solveIt() {
+      player = []; marks = [];
+      for (var r = 0; r < size; r++) if (clues[r] < 0) player.push(key(r, solution[r]));
+      assisted = true;
+      solved = true;
+      newBest = false;
+      stopTimer();
+      saveState();
+      render();
+    }
+
+    /* ---------- Controls ---------- */
+
+    boardEl.addEventListener('click', function (e) {
+      var cell = e.target.closest && e.target.closest('.cell');
+      if (!cell) return;
+      tapCell(+cell.getAttribute('data-r'), +cell.getAttribute('data-c'));
+    });
+
+    $('k-new').addEventListener('click', function () { newPuzzle(parseInt($('k-size').value, 10)); });
+    $('k-size').addEventListener('change', function () {
+      try { localStorage.setItem(NS + 'size', $('k-size').value); } catch (e) { /* ignore */ }
+      newPuzzle(parseInt($('k-size').value, 10));
+    });
+    $('k-restart').addEventListener('click', restart);
+    $('k-hint').addEventListener('click', hint);
+    $('k-solve').addEventListener('click', solveIt);
+
+    /* =====================================================
+       Init
+       ===================================================== */
+
+    if (loadState()) {
+      $('k-size').value = String(size);
+      buildBoard();
+      if (started && !solved) startTimer();
+    } else {
+      var initial = 6;
+      try {
+        var sv = parseInt(localStorage.getItem(NS + 'size'), 10);
+        if (sv >= 4 && sv <= 8) initial = sv;
+      } catch (e) { /* ignore */ }
+      $('k-size').value = String(initial);
+      newPuzzle(initial);
+    }
+
+    window.SiteLang.init(I18N, function () { render(); });
+  })();
+  </script>
+</body>
+</html>
