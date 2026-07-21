@@ -22,6 +22,7 @@ Personal site and simple tools, served by [GitHub Pages](https://pages.github.co
 - **`/memory/`** — memory match game ([memory/index.html](memory/index.html))
 - **`/kings/`** — Lone Kings logic puzzle ([kings/index.html](kings/index.html))
 - **`/sudoku/`** — Sudoku ([sudoku/index.html](sudoku/index.html))
+- **`/slidepuzzle/`** — photo slide puzzle with offline download ([slidepuzzle/index.html](slidepuzzle/index.html))
 - **`/assets/style.css`** — shared design tokens and base styles used by every page
 - **`/assets/lang.js`** — shared English/Indonesian language switcher
 - **`/assets/theme.js`** — shared dark-mode toggle (system default, manual override in `localStorage['site.theme']`)
