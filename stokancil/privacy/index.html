@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stokancil — Privacy Policy</title>
+<style>
+  :root {
+    --bg: #f2f2f4;
+    --surface: #ffffff;
+    --surface-2: #e8e8ec;
+    --surface-3: #dadade;
+    --ink: #1b1b21;
+    --ink-dim: #56565f;
+    --ink-faint: #86868f;
+    --line: #d2d2d8;
+    --line-strong: #b4b4bc;
+    --accent: #4b3fa8;
+    --accent-strong: #372d84;
+    --accent-soft: #e6e3f7;
+    --ok: #1d6134;
+    --ok-soft: #dcefe1;
+    --font-sans: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-mono: ui-monospace, "Cascadia Code", "JetBrains Mono", Consolas, "SFMono-Regular", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #131317; --surface: #1c1c22; --surface-2: #24242c; --surface-3: #2e2e37;
+      --ink: #ecebf0; --ink-dim: #a8a7b2; --ink-faint: #76757f;
+      --line: #31313b; --line-strong: #43434f;
+      --accent: #a99cf0; --accent-strong: #c3b8ff; --accent-soft: #262146;
+      --ok: #7cc491; --ok-soft: #18301f;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #131317; --surface: #1c1c22; --surface-2: #24242c; --surface-3: #2e2e37;
+    --ink: #ecebf0; --ink-dim: #a8a7b2; --ink-faint: #76757f;
+    --line: #31313b; --line-strong: #43434f;
+    --accent: #a99cf0; --accent-strong: #c3b8ff; --accent-soft: #262146;
+    --ok: #7cc491; --ok-soft: #18301f;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 40px 22px 90px; }
+
+  header.hero { border-bottom: 1px solid var(--line); padding-bottom: 22px; margin-bottom: 22px; }
+  header.hero .eyebrow {
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .09em;
+    text-transform: uppercase; color: var(--accent-strong); margin: 0 0 10px;
+  }
+  header.hero h1 {
+    font-size: clamp(26px, 4vw, 34px); font-weight: 800; letter-spacing: -0.015em;
+    margin: 0 0 10px; text-wrap: balance;
+  }
+  header.hero p { color: var(--ink-dim); margin: 0; max-width: 64ch; font-size: 15px; }
+  header.hero p.dates {
+    font-family: var(--font-mono); font-size: 12px; color: var(--ink-faint); margin-top: 14px;
+  }
+
+  .callout {
+    display: flex; gap: 12px; align-items: flex-start;
+    background: var(--ok-soft); border: 1px solid var(--line);
+    border-left: 3px solid var(--ok);
+    border-radius: 8px; padding: 14px 16px; margin: 0 0 34px;
+  }
+  .callout .mark { color: var(--ok); font-size: 14px; line-height: 1.6; }
+  .callout p { margin: 0; font-size: 14px; color: var(--ink); max-width: 68ch; }
+
+  section { margin-bottom: 34px; }
+  section > h2 {
+    font-size: 13px; font-family: var(--font-mono); font-weight: 700;
+    letter-spacing: .05em; text-transform: uppercase; color: var(--ink-faint);
+    margin: 0 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--line);
+  }
+  section p { font-size: 15px; color: var(--ink-dim); margin: 0 0 12px; max-width: 72ch; }
+  section p strong { color: var(--ink); }
+  section ul { margin: 0 0 12px; padding-left: 20px; max-width: 72ch; }
+  section li { font-size: 15px; color: var(--ink-dim); margin-bottom: 8px; }
+  section li strong { color: var(--ink); }
+
+  code {
+    font-family: var(--font-mono); font-size: 13px;
+    background: var(--surface-2); border-radius: 4px; padding: 1px 5px;
+  }
+
+  .table-scroll { overflow-x: auto; margin: 0 0 12px; }
+  table { border-collapse: collapse; width: 100%; min-width: 480px; }
+  th, td {
+    text-align: left; padding: 11px 12px; border-bottom: 1px solid var(--line);
+    font-size: 14px; color: var(--ink-dim); vertical-align: top;
+  }
+  th {
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .05em;
+    text-transform: uppercase; color: var(--ink-faint); font-weight: 700;
+  }
+  td:first-child { color: var(--ink); font-family: var(--font-mono); font-size: 12.5px; white-space: nowrap; }
+
+  footer.end {
+    margin-top: 50px; padding-top: 18px; border-top: 1px solid var(--line);
+    font-size: 13px; color: var(--ink-faint);
+  }
+  footer.end a { color: var(--accent-strong); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <p class="eyebrow">Privacy Policy</p>
+    <h1>Stokancil Privacy Policy</h1>
+    <p>Stokancil is an offline point-of-sale and stock app for small shops. It keeps everything
+      you enter on your own device and sends none of it anywhere.</p>
+    <p class="dates">Effective 18 August 2026 &nbsp;&middot;&nbsp; Last updated 18 August 2026</p>
+  </header>
+
+  <div class="callout">
+    <span class="mark">&#9679;</span>
+    <p><strong>The short version.</strong> Stokancil collects nothing, transmits nothing and
+      contains no analytics, advertising or tracking. It has no user accounts and no server. The
+      app does not request internet access at all, so your sales, stock and shop details cannot
+      leave your device except when you deliberately share or export them yourself.</p>
+  </div>
+
+  <section>
+    <h2>Who This Policy Covers</h2>
+    <div class="table-scroll">
+      <table>
+        <tr><th>Item</th><th>Detail</th></tr>
+        <tr><td>App</td><td>Stokancil</td></tr>
+        <tr><td>Package</td><td>com.blankpoof.stokancil</td></tr>
+        <tr><td>Contact</td><td>stokanci.admin@gmail.com</td></tr>
+      </table>
+    </div>
+    <p>This policy covers the Stokancil Android application distributed through Google Play. It
+      does not cover any other app or service.</p>
+  </section>
+
+  <section>
+    <h2>What We Collect</h2>
+    <p><strong>Nothing.</strong> Stokancil has no servers, no accounts and no sign-in. We &mdash; the
+      developer &mdash; receive no personal information, no usage statistics, no crash reports, no
+      device identifiers and no shop data of any kind. There is no data for us to sell, share or
+      lose, because none of it ever reaches us.</p>
+    <p>The app does not declare the Android <code>INTERNET</code> permission. Android enforces this
+      at the operating-system level: an app without that permission cannot open a network
+      connection, so there is no route by which your data could be transmitted, whether
+      intentionally or by accident.</p>
+  </section>
+
+  <section>
+    <h2>What Stays on Your Device</h2>
+    <p>Everything you enter is written to a private database in the app's own storage area, which
+      other apps cannot read. That includes:</p>
+    <ul>
+      <li>Stock items, categories, descriptions, prices, quantities and SKUs</li>
+      <li>Sales, sale lines, discounts, tax settings and payment method</li>
+      <li>Stock adjustments, stocktake corrections and their notes</li>
+      <li>Shop details you enter for the receipt &mdash; name, address, contact line and footer text</li>
+      <li>Your settings, including the printer you selected and any logo image you chose</li>
+    </ul>
+    <p>None of this is analysed, indexed or uploaded. Uninstalling the app removes it.</p>
+  </section>
+
+  <section>
+    <h2>Permissions and Why They Exist</h2>
+    <div class="table-scroll">
+      <table>
+        <tr><th>Permission</th><th>What it is used for</th></tr>
+        <tr>
+          <td>Bluetooth</td>
+          <td>To list the thermal printers you have already paired in Android's own settings, and to
+            send receipt and label data to the one you chose. The app never scans for or discovers
+            nearby devices, and Bluetooth is never used to determine location.</td>
+        </tr>
+        <tr>
+          <td>Camera</td>
+          <td>To read a QR code or barcode when you tap a scan button. Frames are decoded on the
+            device as they arrive; no photo or video is recorded, stored or sent. The camera is
+            active only while a scanner screen is open.</td>
+        </tr>
+        <tr>
+          <td>USB</td>
+          <td>Granted per device by Android when you attach a printer, and used only to send print
+            data to it. No other USB device is accessed.</td>
+        </tr>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>When Data Leaves Your Device</h2>
+    <p>Only when you choose to move it, and only to a destination you pick:</p>
+    <ul>
+      <li><strong>Printing.</strong> Receipt and label data goes to your printer over Bluetooth or
+        USB &mdash; a direct connection between the two devices, not a network.</li>
+      <li><strong>Sharing a receipt.</strong> Using the share action hands a receipt PDF to
+        whichever app you select from the Android share sheet. What that app then does with it is
+        governed by that app's own privacy policy.</li>
+      <li><strong>Backups and CSV export.</strong> Creating a backup or exporting stock writes a
+        file to the location you choose. If you save it to a cloud folder, that provider's terms
+        apply to the file from that point on.</li>
+      <li><strong>Android system backup.</strong> Android may include the app's data in the
+        automatic backup of your phone to your own Google account, in line with your device's
+        backup settings. That copy belongs to you and your Google account; we have no access to it.
+        You can turn this off in your device's backup settings.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Third Parties</h2>
+    <p>Stokancil contains no advertising networks, no analytics providers and no crash-reporting
+      services. Its barcode scanning uses an open-source library that runs entirely on the device
+      and makes no network requests.</p>
+    <p>Google Play handles distribution, and Google collects its own installation and device
+      statistics as part of running the store. That is covered by Google's privacy policy, not by
+      this one, and we see only anonymous aggregate figures in the Play Console.</p>
+  </section>
+
+  <section>
+    <h2>Children</h2>
+    <p>Stokancil is a business tool for shop owners and staff. It is not directed at children and is
+      not intended for anyone under 18. It collects no information from anyone, of any age.</p>
+  </section>
+
+  <section>
+    <h2>Your Data and Your Rights</h2>
+    <p>Because your data never leaves your device, you already hold the only copy. There is no
+      account to close and no server-side record to request, correct or erase.</p>
+    <ul>
+      <li><strong>To export it:</strong> use the backup or CSV export in the app's settings.</li>
+      <li><strong>To delete it:</strong> uninstall the app, or clear its storage from Android's app
+        settings. Either removes the database permanently. Backup files you created yourself are
+        yours to delete separately.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Changes to This Policy</h2>
+    <p>If a future version of Stokancil adds a feature that sends data anywhere &mdash; optional
+      multi-device sync, for example &mdash; this policy will be updated to describe exactly what is
+      sent and why, and the change will be published here before that version is released. The date
+      at the top of this page shows when it was last revised.</p>
+  </section>
+
+  <section>
+    <h2>Contact</h2>
+    <p>Questions about this policy, or about Stokancil's handling of your data, can go to
+      <strong>stokanci.admin@gmail.com</strong>.</p>
+  </section>
+
+  <footer class="end">
+    Stokancil &nbsp;&middot;&nbsp; Privacy Policy &nbsp;&middot;&nbsp; 18 August 2026
+  </footer>
+</div>
+</body>
+</html>
