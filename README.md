@@ -23,6 +23,7 @@ Personal site and simple tools, served by [GitHub Pages](https://pages.github.co
 - **`/kings/`** — Lone Kings logic puzzle ([kings/index.html](kings/index.html))
 - **`/sudoku/`** — Sudoku ([sudoku/index.html](sudoku/index.html))
 - **`/slidepuzzle/`** — photo slide puzzle with offline download ([slidepuzzle/index.html](slidepuzzle/index.html))
+- **`/stokancil/`** — Stokancil app site: homepage ([stokancil/index.html](stokancil/index.html)) and privacy policy ([stokancil/privacy/index.html](stokancil/privacy/index.html))
 - **`/assets/style.css`** — shared design tokens and base styles used by every page
 - **`/assets/lang.js`** — shared English/Indonesian language switcher
 - **`/assets/theme.js`** — shared dark-mode toggle (system default, manual override in `localStorage['site.theme']`)

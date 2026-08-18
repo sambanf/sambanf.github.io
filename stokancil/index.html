@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stokancil — Offline POS &amp; Stock App for Small Shops</title>
+<meta name="description" content="Stokancil is a fully offline point-of-sale and stock app for small shops. No account, no internet permission, no ads. Sales, stock, barcode scanning and thermal receipt printing on Android.">
+<link rel="icon" href="assets/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/icon-512.png">
+<link rel="canonical" href="https://sambanf.github.io/stokancil/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Stokancil — Offline POS &amp; Stock App for Small Shops">
+<meta property="og:description" content="A till and a stock book for small shops, on the phone you already own. Fully offline: no account, no internet permission, no ads.">
+<meta property="og:url" content="https://sambanf.github.io/stokancil/">
+<meta property="og:image" content="https://sambanf.github.io/stokancil/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<script src="../assets/theme.js"></script>
+<style>
+  :root {
+    --bg: #f2f4f2;
+    --surface: #ffffff;
+    --surface-2: #e7ebe8;
+    --surface-3: #d9deda;
+    --ink: #17211b;
+    --ink-dim: #4f5a53;
+    --ink-faint: #7f8a83;
+    --line: #d3dad5;
+    --line-strong: #b3bdb7;
+    --accent: #1d6b47;
+    --accent-strong: #145236;
+    --accent-soft: #e0f0e7;
+    --brand-deep: #176945;
+    --brand-mid: #358c62;
+    --brand-mint: #85d9c1;
+    --hero-ink: #ffffff;
+    --hero-ink-dim: #cdeddd;
+    --font-sans: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-mono: ui-monospace, "Cascadia Code", "JetBrains Mono", Consolas, "SFMono-Regular", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #101512; --surface: #18201b; --surface-2: #202a24; --surface-3: #2a352d;
+      --ink: #e9efeb; --ink-dim: #a4b0a9; --ink-faint: #74807a;
+      --line: #2d3831; --line-strong: #3f4b44;
+      --accent: #74c9a1; --accent-strong: #93dcb7; --accent-soft: #12291f;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #101512; --surface: #18201b; --surface-2: #202a24; --surface-3: #2a352d;
+    --ink: #e9efeb; --ink-dim: #a4b0a9; --ink-faint: #74807a;
+    --line: #2d3831; --line-strong: #3f4b44;
+    --accent: #74c9a1; --accent-strong: #93dcb7; --accent-soft: #12291f;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  img { max-width: 100%; height: auto; }
+  a { color: var(--accent-strong); }
+
+  .wrap { max-width: 940px; margin: 0 auto; padding: 0 22px; }
+
+  /* ---------- Top bar ---------- */
+
+  .topbar { display: flex; align-items: center; gap: 14px; padding: 14px 0; }
+  .topbar .brand {
+    display: inline-flex; align-items: center; gap: 9px;
+    font-weight: 700; font-size: 15px; letter-spacing: -0.01em; color: var(--hero-ink);
+  }
+  .topbar .brand img { width: 26px; height: 26px; border-radius: 7px; display: block; }
+  .topbar .spacer { flex: 1 1 auto; }
+
+  .lang-toggle {
+    display: inline-flex; gap: 2px; padding: 3px;
+    border: 1px solid rgba(255,255,255,.28); border-radius: 999px;
+    background: rgba(255,255,255,.12);
+  }
+  .lang-toggle button {
+    display: inline-flex; align-items: center; gap: .4rem;
+    border: 0; background: transparent; color: var(--hero-ink-dim);
+    font: inherit; font-size: .8rem; font-weight: 600; letter-spacing: .03em;
+    padding: .3rem .7rem; border-radius: 999px; cursor: pointer;
+    transition: background .15s ease, color .15s ease;
+  }
+  .lang-toggle button:hover { color: #fff; }
+  .lang-toggle button[aria-pressed="true"] { background: #fff; color: var(--brand-deep); }
+  .lang-toggle .flag {
+    display: block; width: 20px; height: 10px; border-radius: 2px;
+    box-shadow: 0 0 0 1px rgba(0,0,0,.25);
+  }
+  .theme-toggle {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 2.15rem; height: 2.15rem; padding: 0;
+    border: 1px solid rgba(255,255,255,.28); border-radius: 999px;
+    background: rgba(255,255,255,.12); color: var(--hero-ink-dim); cursor: pointer;
+    transition: color .15s ease, border-color .15s ease;
+  }
+  .theme-toggle:hover { color: #fff; border-color: rgba(255,255,255,.6); }
+  .theme-toggle svg { display: block; }
+  .theme-toggle .icon-sun { display: none; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .theme-toggle .icon-sun { display: block; }
+    :root:not([data-theme="light"]) .theme-toggle .icon-moon { display: none; }
+  }
+  :root[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+  :root[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+
+  /* ---------- Hero ---------- */
+
+  .hero {
+    position: relative; overflow: hidden;
+    background: linear-gradient(150deg, var(--brand-mid) 0%, var(--brand-deep) 58%, #10402c 100%);
+    color: var(--hero-ink);
+  }
+  .hero::after {
+    content: ""; position: absolute; pointer-events: none;
+    width: 520px; height: 520px; top: -240px; right: -140px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(133,217,193,.38), transparent 68%);
+  }
+  .hero-inner {
+    position: relative; z-index: 1;
+    display: grid; grid-template-columns: 128px 1fr; gap: 26px;
+    align-items: start; padding: 34px 0 46px;
+  }
+  .hero-icon {
+    width: 128px; height: 128px; border-radius: 28px; display: block;
+    box-shadow: 0 14px 34px rgba(0,0,0,.3), 0 0 0 1px rgba(255,255,255,.16);
+  }
+  .hero h1 {
+    font-size: clamp(34px, 6.2vw, 52px); font-weight: 800; letter-spacing: -0.025em;
+    margin: 2px 0 8px; line-height: 1.05;
+  }
+  .hero .tagline {
+    font-size: clamp(17px, 2.4vw, 21px); font-weight: 600; color: #fff;
+    margin: 0 0 12px; max-width: 34ch; text-wrap: balance;
+  }
+  .hero .lede { font-size: 15.5px; color: var(--hero-ink-dim); margin: 0 0 22px; max-width: 58ch; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 24px; padding: 0; list-style: none; }
+  .chips li {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12.5px; font-weight: 600; color: #eafaf2;
+    background: rgba(255,255,255,.13); border: 1px solid rgba(255,255,255,.22);
+    border-radius: 999px; padding: 5px 12px;
+  }
+  .chips li::before { content: "\2713"; color: var(--brand-mint); font-weight: 700; }
+
+  .cta-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .btn-play {
+    display: inline-flex; align-items: center; gap: 11px;
+    background: #fff; color: #12271d; text-decoration: none;
+    border-radius: 12px; padding: 11px 20px 11px 16px;
+    box-shadow: 0 8px 22px rgba(0,0,0,.22);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .btn-play:hover { transform: translateY(-1px); box-shadow: 0 12px 28px rgba(0,0,0,.28); }
+  .btn-play svg { width: 26px; height: 26px; display: block; flex: 0 0 auto; }
+  .btn-play .label { display: flex; flex-direction: column; line-height: 1.2; text-align: left; }
+  .btn-play .label .sm {
+    font-size: 10px; letter-spacing: .07em; text-transform: uppercase;
+    font-weight: 700; color: #4c5a52;
+  }
+  .btn-play .label .lg { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+  .btn-ghost {
+    display: inline-flex; align-items: center; gap: 7px;
+    color: #eafaf2; text-decoration: none; font-size: 14px; font-weight: 600;
+    border: 1px solid rgba(255,255,255,.32); border-radius: 12px; padding: 12px 18px;
+    transition: background .15s ease, border-color .15s ease;
+  }
+  .btn-ghost:hover { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.6); }
+
+  @media (max-width: 640px) {
+    .hero-inner { grid-template-columns: 1fr; gap: 18px; padding: 26px 0 38px; }
+    .hero-icon { width: 96px; height: 96px; border-radius: 22px; }
+    .cta-row { flex-direction: column; align-items: stretch; }
+    .btn-play, .btn-ghost { justify-content: center; }
+  }
+
+  /* ---------- Sections ---------- */
+
+  main { padding-bottom: 20px; }
+  section { padding: 46px 0 0; }
+  section > h2 {
+    font-size: clamp(21px, 3.2vw, 27px); font-weight: 800; letter-spacing: -0.02em;
+    margin: 0 0 10px; text-wrap: balance;
+  }
+  section > .sub { font-size: 15.5px; color: var(--ink-dim); margin: 0 0 24px; max-width: 66ch; }
+  .eyebrow {
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .09em;
+    text-transform: uppercase; color: var(--accent-strong); margin: 0 0 9px; font-weight: 700;
+  }
+
+  .promise {
+    background: var(--surface); border: 1px solid var(--line);
+    border-left: 3px solid var(--accent); border-radius: 12px;
+    padding: 22px 24px; margin-bottom: 20px;
+  }
+  .promise p { font-size: 15px; color: var(--ink-dim); margin: 0 0 12px; max-width: 70ch; }
+  .promise p:last-child { margin-bottom: 0; }
+  .promise .kicker { color: var(--ink); font-weight: 600; font-size: 15.5px; }
+
+  .why-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
+  .why-grid div {
+    background: var(--surface-2); border-radius: 10px; padding: 16px 18px;
+    font-size: 14px; color: var(--ink-dim);
+  }
+  .why-grid strong { display: block; color: var(--ink); font-size: 14.5px; margin-bottom: 4px; }
+
+  .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(258px, 1fr)); gap: 16px; }
+  .card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px;
+  }
+  .card .ico {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 38px; height: 38px; border-radius: 10px;
+    background: var(--accent-soft); color: var(--accent-strong); margin-bottom: 12px;
+  }
+  .card .ico svg { width: 20px; height: 20px; display: block; }
+  .card h3 { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; margin: 0 0 6px; }
+  .card p { font-size: 14.5px; color: var(--ink-dim); margin: 0; }
+
+  .steps { list-style: none; counter-reset: s; margin: 0; padding: 0; display: grid; gap: 14px; }
+  .steps li {
+    counter-increment: s; position: relative; padding-left: 48px;
+    font-size: 15px; color: var(--ink-dim);
+  }
+  .steps li::before {
+    content: counter(s); position: absolute; left: 0; top: 0;
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--accent-soft); color: var(--accent-strong);
+    font-family: var(--font-mono); font-size: 14px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .steps li strong { display: block; color: var(--ink); font-size: 15.5px; margin-bottom: 2px; }
+
+  .table-scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; min-width: 460px; }
+  td {
+    text-align: left; padding: 12px; border-bottom: 1px solid var(--line);
+    font-size: 14.5px; color: var(--ink-dim); vertical-align: top;
+  }
+  td:first-child { color: var(--ink); font-weight: 600; white-space: nowrap; }
+
+  .faq { display: grid; gap: 10px; }
+  details {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0 18px;
+  }
+  details[open] { border-color: var(--line-strong); }
+  summary {
+    cursor: pointer; padding: 15px 0; font-size: 15.5px; font-weight: 600;
+    color: var(--ink); list-style: none; display: flex; align-items: center; gap: 10px;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::before {
+    content: "+"; flex: 0 0 auto; font-family: var(--font-mono); font-size: 17px;
+    font-weight: 700; color: var(--accent-strong); width: 16px;
+  }
+  details[open] summary::before { content: "\2212"; }
+  details p { font-size: 14.5px; color: var(--ink-dim); margin: 0 0 16px; max-width: 68ch; }
+
+  .closing {
+    margin-top: 52px; background: var(--surface); border: 1px solid var(--line);
+    border-radius: 14px; padding: 30px 26px; text-align: center;
+  }
+  .closing h2 { font-size: clamp(20px, 3vw, 25px); margin: 0 0 8px; letter-spacing: -0.02em; }
+  .closing p { font-size: 15px; color: var(--ink-dim); margin: 0 auto 20px; max-width: 52ch; }
+  .closing .btn-play { background: var(--accent); color: #fff; box-shadow: none; }
+  .closing .btn-play .label .sm { color: rgba(255,255,255,.8); }
+  .closing .btn-play:hover { background: var(--accent-strong); }
+  .closing .cta-row { justify-content: center; }
+  .closing .btn-ghost { color: var(--accent-strong); border-color: var(--line-strong); }
+  .closing .btn-ghost:hover { background: var(--accent-soft); border-color: var(--accent); }
+
+  footer.end {
+    margin-top: 46px; border-top: 1px solid var(--line);
+    padding: 22px 0 60px; font-size: 13.5px; color: var(--ink-faint);
+    display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center;
+  }
+  footer.end a { color: var(--accent-strong); }
+  footer.end .spacer { flex: 1 1 auto; }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <nav class="topbar">
+      <span class="brand">
+        <img src="assets/icon-192.png" alt="" width="26" height="26">
+        Stokancil
+      </span>
+      <span class="spacer"></span>
+      <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
+        <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0l60 30M60 0L0 30" stroke="#fff" stroke-width="6"/><path d="M0 0l60 30M60 0L0 30" stroke="#C8102E" stroke-width="2.5"/><path d="M30 0v30M0 15h60" stroke="#fff" stroke-width="10"/><path d="M30 0v30M0 15h60" stroke="#C8102E" stroke-width="6"/></svg>EN
+        </button>
+        <button type="button" data-lang="id" aria-pressed="false" aria-label="Bahasa Indonesia">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="15" fill="#E70011"/><rect y="15" width="60" height="15" fill="#F7F7F7"/></svg>ID
+        </button>
+      </div>
+      <button type="button" class="theme-toggle" aria-label="Dark mode / Mode gelap" aria-pressed="false">
+        <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+    </nav>
+
+    <div class="hero-inner">
+      <img class="hero-icon" src="assets/icon-512.png" width="128" height="128"
+           alt="Stokancil app icon" data-i18n-attr="alt:iconAlt">
+      <div>
+        <h1>Stokancil</h1>
+        <p class="tagline" data-i18n="tagline">Point of sale and stock, fully offline.</p>
+        <p class="lede" data-i18n="lede">A till and a stock book for small shops, on the phone you
+          already own. Stokancil records sales, tracks stock and prints receipts — and it does all of
+          it without ever asking for the internet.</p>
+        <ul class="chips">
+          <li data-i18n="chip1">No internet permission</li>
+          <li data-i18n="chip2">No account</li>
+          <li data-i18n="chip3">No ads or tracking</li>
+        </ul>
+        <div class="cta-row">
+          <a class="btn-play" href="https://play.google.com/store/apps/details?id=com.blankpoof.stokancil">
+            <svg viewBox="0 0 512 512" aria-hidden="true" focusable="false">
+              <path fill="#2196F3" d="M43.5 26.2C36.6 33.5 32.7 44.8 32.7 59.4v393.2c0 14.6 3.9 25.9 10.8 33.2l219.7-259.8z"/>
+              <path fill="#4CAF50" d="M43.5 26.2 263.2 226l91.2-91.2L96.9 8.2C77-2.5 57.4 12.3 43.5 26.2z"/>
+              <path fill="#FFC107" d="M354.4 134.8 263.2 226l91.2 91.2 96.8-56.4c19.4-11.3 19.4-39.5 0-50.8z"/>
+              <path fill="#F44336" d="M43.5 485.8c13.9 13.9 33.5 28.7 53.4 18l257.5-150.1-91.2-91.2z"/>
+            </svg>
+            <span class="label">
+              <span class="sm" data-i18n="playSm">Get it on</span>
+              <span class="lg">Google Play</span>
+            </span>
+          </a>
+          <a class="btn-ghost" href="privacy/" data-i18n="privacyCta">Read the privacy policy</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+
+    <section id="offline">
+      <p class="eyebrow" data-i18n="ebOffline">Offline by design</p>
+      <h2 data-i18n="h2Offline">The offline promise</h2>
+      <p class="sub" data-i18n="subOffline">Most shop apps need a signal, a login and a subscription.
+        Stokancil needs none of them.</p>
+
+      <div class="promise">
+        <p class="kicker" data-i18n="promise1">Stokancil does not declare Android's INTERNET
+          permission.</p>
+        <p data-i18n="promise2">That is not a setting you have to find, or a promise you have to take
+          on trust. Android enforces it at the operating-system level: an app without that permission
+          cannot open a network connection at all. Your prices, your takings and your customers'
+          purchases stay in the shop.</p>
+      </div>
+
+      <div class="why-grid">
+        <div><strong data-i18n="why1t">Works without a signal</strong><span data-i18n="why1b">A back room, a market stall, a basement, a dead spot on the road. If the phone turns on, the till works.</span></div>
+        <div><strong data-i18n="why2t">Nothing to renew</strong><span data-i18n="why2b">No sign-up, no monthly fee to forget, no server that can go down and take your shop with it.</span></div>
+        <div><strong data-i18n="why3t">Nothing can leak</strong><span data-i18n="why3b">No analytics, no advertising, no crash reporting. There is no data to lose because none of it can leave.</span></div>
+      </div>
+    </section>
+
+    <section id="features">
+      <p class="eyebrow" data-i18n="ebFeatures">What it does</p>
+      <h2 data-i18n="h2Features">Everything a small shop actually needs</h2>
+      <p class="sub" data-i18n="subFeatures">Ringing up a sale, knowing what's on the shelf, and
+        handing over a printed receipt. No modules to buy, no features held back.</p>
+
+      <div class="features">
+        <div class="card">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h2l2.4 11.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.5L21 8H6"/><circle cx="10" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/></svg></span>
+          <h3 data-i18n="f1t">Sell in a few taps</h3>
+          <p data-i18n="f1b">Build a sale line by line, apply a discount, set the tax and record how
+            the customer paid. The total is ready before they've found their wallet.</p>
+        </div>
+        <div class="card">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg></span>
+          <h3 data-i18n="f2t">Stock that stays honest</h3>
+          <p data-i18n="f2b">Items with categories, descriptions, prices, quantities and SKUs. Every
+            sale takes stock down; every delivery puts it back up.</p>
+        </div>
+        <div class="card">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 8v8M10.5 8v8M14 8v8M17 8v8"/></svg></span>
+          <h3 data-i18n="f3t">Scan instead of typing</h3>
+          <p data-i18n="f3b">Point the camera at a barcode or QR code to pull up an item. Frames are
+            decoded on the device as they arrive — nothing is photographed, stored or sent.</p>
+        </div>
+        <div class="card">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V3h12v6"/><path d="M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></svg></span>
+          <h3 data-i18n="f4t">Print real receipts</h3>
+          <p data-i18n="f4b">Send receipts and shelf labels straight to a thermal printer you've
+            paired over Bluetooth, or one plugged in over USB.</p>
+        </div>
+        <div class="card">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3h16v18l-3-2-3 2-3-2-3 2z"/><path d="M8 8h8M8 12h8M8 16h4"/></svg></span>
+          <h3 data-i18n="f5t">Your shop on the receipt</h3>
+          <p data-i18n="f5b">Put your shop's name, address, contact line, footer text and logo on
+            every receipt — or hand it over as a PDF instead of paper.</p>
+        </div>
+        <div class="card">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
+          <h3 data-i18n="f6t">Stocktake and corrections</h3>
+          <p data-i18n="f6b">Count the shelves, correct what doesn't match and leave a note saying
+            why. Adjustments are recorded, not quietly overwritten.</p>
+        </div>
+        <div class="card">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg></span>
+          <h3 data-i18n="f7t">Backups you control</h3>
+          <p data-i18n="f7b">Write a full backup, or a CSV of your stock, to wherever you choose —
+            the phone, an SD card, a cloud folder. It's your file, in your hands.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="start">
+      <p class="eyebrow" data-i18n="ebStart">Getting started</p>
+      <h2 data-i18n="h2Start">Open for business in an afternoon</h2>
+      <ol class="steps">
+        <li><strong data-i18n="s1t">Install it and open it</strong><span data-i18n="s1b">There is no account to create and no code to verify. The app is ready the moment it finishes installing.</span></li>
+        <li><strong data-i18n="s2t">Put your shop and stock in</strong><span data-i18n="s2b">Enter your shop details for the receipt, then add your items — by hand, or by scanning the barcodes already on them.</span></li>
+        <li><strong data-i18n="s3t">Pair a printer, if you want one</strong><span data-i18n="s3b">Pair a thermal printer in Android's Bluetooth settings or plug one in over USB, then pick it in Stokancil. Skip this and share receipts as PDFs instead.</span></li>
+        <li><strong data-i18n="s4t">Start selling</strong><span data-i18n="s4b">Ring up your first sale. Take a backup at the end of the day and keep it somewhere safe.</span></li>
+      </ol>
+    </section>
+
+    <section id="specs">
+      <p class="eyebrow" data-i18n="ebSpecs">At a glance</p>
+      <h2 data-i18n="h2Specs">The details</h2>
+      <div class="table-scroll">
+        <table>
+          <tbody>
+            <tr><td data-i18n="sp1k">Platform</td><td data-i18n="sp1v">Android, distributed through Google Play</td></tr>
+            <tr><td data-i18n="sp2k">Package</td><td>com.blankpoof.stokancil</td></tr>
+            <tr><td data-i18n="sp3k">Internet</td><td data-i18n="sp3v">Not requested — the app has no INTERNET permission, so it cannot connect</td></tr>
+            <tr><td data-i18n="sp4k">Account</td><td data-i18n="sp4v">None. No sign-up, no sign-in, no server</td></tr>
+            <tr><td data-i18n="sp5k">Permissions</td><td data-i18n="sp5v">Bluetooth and USB for printing, camera for barcode scanning. Nothing else</td></tr>
+            <tr><td data-i18n="sp6k">Your data</td><td data-i18n="sp6v">Kept in the app's own private storage, which other apps cannot read</td></tr>
+            <tr><td data-i18n="sp7k">Ads and analytics</td><td data-i18n="sp7v">None of either, and no crash reporting</td></tr>
+            <tr><td data-i18n="sp8k">Support</td><td>stokancil.admin@gmail.com</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="faq">
+      <p class="eyebrow" data-i18n="ebFaq">Questions</p>
+      <h2 data-i18n="h2Faq">Frequently asked</h2>
+      <div class="faq">
+        <details>
+          <summary data-i18n="q1">Do I need an internet connection?</summary>
+          <p data-i18n="a1">No — and you couldn't give it one if you tried. Stokancil has no INTERNET
+            permission, so every feature works with the phone in airplane mode.</p>
+        </details>
+        <details>
+          <summary data-i18n="q2">Is there an account or a subscription?</summary>
+          <p data-i18n="a2">Neither. There is nothing to sign up for, nothing to log into and no
+            server behind the app.</p>
+        </details>
+        <details>
+          <summary data-i18n="q3">Which printers work with it?</summary>
+          <p data-i18n="a3">Thermal printers you have already paired in Android's own Bluetooth
+            settings, and printers attached over USB. Stokancil never scans for nearby devices — it
+            only lists what you have already paired yourself.</p>
+        </details>
+        <details>
+          <summary data-i18n="q4">What happens to my data if I change phones?</summary>
+          <p data-i18n="a4">Take a backup from the app's settings and restore it on the new phone.
+            Android's own automatic backup may also carry the data across, if you have that turned
+            on for your device.</p>
+        </details>
+        <details>
+          <summary data-i18n="q5">Can I get my data out of the app?</summary>
+          <p data-i18n="a5">Yes. Export your stock as a CSV file, or take a full backup. Both write a
+            file to a location you pick, and the file is yours.</p>
+        </details>
+        <details>
+          <summary data-i18n="q6">How do I delete everything?</summary>
+          <p data-i18n="a6">Uninstall the app, or clear its storage from Android's app settings.
+            Either one removes the database permanently. Backup files you made yourself are yours to
+            delete separately.</p>
+        </details>
+      </div>
+    </section>
+
+    <div class="closing">
+      <h2 data-i18n="closeH">Your shop's data belongs in your shop</h2>
+      <p data-i18n="closeP">Stokancil keeps it there. Install it once and it works — on the counter,
+        in the storeroom, with or without a signal.</p>
+      <div class="cta-row">
+        <a class="btn-play" href="https://play.google.com/store/apps/details?id=com.blankpoof.stokancil">
+          <svg viewBox="0 0 512 512" aria-hidden="true" focusable="false">
+            <path fill="#fff" opacity=".95" d="M43.5 26.2C36.6 33.5 32.7 44.8 32.7 59.4v393.2c0 14.6 3.9 25.9 10.8 33.2l219.7-259.8z"/>
+            <path fill="#fff" opacity=".8" d="M43.5 26.2 263.2 226l91.2-91.2L96.9 8.2C77-2.5 57.4 12.3 43.5 26.2z"/>
+            <path fill="#fff" opacity=".66" d="M354.4 134.8 263.2 226l91.2 91.2 96.8-56.4c19.4-11.3 19.4-39.5 0-50.8z"/>
+            <path fill="#fff" opacity=".8" d="M43.5 485.8c13.9 13.9 33.5 28.7 53.4 18l257.5-150.1-91.2-91.2z"/>
+          </svg>
+          <span class="label">
+            <span class="sm" data-i18n="playSm">Get it on</span>
+            <span class="lg">Google Play</span>
+          </span>
+        </a>
+        <a class="btn-ghost" href="privacy/" data-i18n="privacyCta">Read the privacy policy</a>
+      </div>
+    </div>
+
+    <footer class="end">
+      <span>Stokancil</span>
+      <a href="privacy/" data-i18n="fPrivacy">Privacy policy</a>
+      <a href="mailto:stokancil.admin@gmail.com" data-i18n="fContact">Contact</a>
+      <span class="spacer"></span>
+      <a href="https://sambanf.github.io/" data-i18n="fBy">Made by Samba Nugraha</a>
+    </footer>
+
+  </div>
+</main>
+
+<script src="../assets/lang.js"></script>
+<script>
+var I18N = {
+  en: {
+    _title: 'Stokancil — Offline POS & Stock App for Small Shops',
+    _meta: 'Stokancil is a fully offline point-of-sale and stock app for small shops. No account, no internet permission, no ads. Sales, stock, barcode scanning and thermal receipt printing on Android.',
+    iconAlt: 'Stokancil app icon',
+    tagline: 'Point of sale and stock, fully offline.',
+    lede: 'A till and a stock book for small shops, on the phone you already own. Stokancil records sales, tracks stock and prints receipts — and it does all of it without ever asking for the internet.',
+    chip1: 'No internet permission',
+    chip2: 'No account',
+    chip3: 'No ads or tracking',
+    playSm: 'Get it on',
+    privacyCta: 'Read the privacy policy',
+
+    ebOffline: 'Offline by design',
+    h2Offline: 'The offline promise',
+    subOffline: 'Most shop apps need a signal, a login and a subscription. Stokancil needs none of them.',
+    promise1: "Stokancil does not declare Android's INTERNET permission.",
+    promise2: "That is not a setting you have to find, or a promise you have to take on trust. Android enforces it at the operating-system level: an app without that permission cannot open a network connection at all. Your prices, your takings and your customers' purchases stay in the shop.",
+    why1t: 'Works without a signal',
+    why1b: 'A back room, a market stall, a basement, a dead spot on the road. If the phone turns on, the till works.',
+    why2t: 'Nothing to renew',
+    why2b: 'No sign-up, no monthly fee to forget, no server that can go down and take your shop with it.',
+    why3t: 'Nothing can leak',
+    why3b: 'No analytics, no advertising, no crash reporting. There is no data to lose because none of it can leave.',
+
+    ebFeatures: 'What it does',
+    h2Features: 'Everything a small shop actually needs',
+    subFeatures: "Ringing up a sale, knowing what's on the shelf, and handing over a printed receipt. No modules to buy, no features held back.",
+    f1t: 'Sell in a few taps',
+    f1b: "Build a sale line by line, apply a discount, set the tax and record how the customer paid. The total is ready before they've found their wallet.",
+    f2t: 'Stock that stays honest',
+    f2b: 'Items with categories, descriptions, prices, quantities and SKUs. Every sale takes stock down; every delivery puts it back up.',
+    f3t: 'Scan instead of typing',
+    f3b: 'Point the camera at a barcode or QR code to pull up an item. Frames are decoded on the device as they arrive — nothing is photographed, stored or sent.',
+    f4t: 'Print real receipts',
+    f4b: "Send receipts and shelf labels straight to a thermal printer you've paired over Bluetooth, or one plugged in over USB.",
+    f5t: 'Your shop on the receipt',
+    f5b: "Put your shop's name, address, contact line, footer text and logo on every receipt — or hand it over as a PDF instead of paper.",
+    f6t: 'Stocktake and corrections',
+    f6b: "Count the shelves, correct what doesn't match and leave a note saying why. Adjustments are recorded, not quietly overwritten.",
+    f7t: 'Backups you control',
+    f7b: "Write a full backup, or a CSV of your stock, to wherever you choose — the phone, an SD card, a cloud folder. It's your file, in your hands.",
+
+    ebStart: 'Getting started',
+    h2Start: 'Open for business in an afternoon',
+    s1t: 'Install it and open it',
+    s1b: 'There is no account to create and no code to verify. The app is ready the moment it finishes installing.',
+    s2t: 'Put your shop and stock in',
+    s2b: 'Enter your shop details for the receipt, then add your items — by hand, or by scanning the barcodes already on them.',
+    s3t: 'Pair a printer, if you want one',
+    s3b: "Pair a thermal printer in Android's Bluetooth settings or plug one in over USB, then pick it in Stokancil. Skip this and share receipts as PDFs instead.",
+    s4t: 'Start selling',
+    s4b: 'Ring up your first sale. Take a backup at the end of the day and keep it somewhere safe.',
+
+    ebSpecs: 'At a glance',
+    h2Specs: 'The details',
+    sp1k: 'Platform',
+    sp1v: 'Android, distributed through Google Play',
+    sp2k: 'Package',
+    sp3k: 'Internet',
+    sp3v: 'Not requested — the app has no INTERNET permission, so it cannot connect',
+    sp4k: 'Account',
+    sp4v: 'None. No sign-up, no sign-in, no server',
+    sp5k: 'Permissions',
+    sp5v: 'Bluetooth and USB for printing, camera for barcode scanning. Nothing else',
+    sp6k: 'Your data',
+    sp6v: "Kept in the app's own private storage, which other apps cannot read",
+    sp7k: 'Ads and analytics',
+    sp7v: 'None of either, and no crash reporting',
+    sp8k: 'Support',
+
+    ebFaq: 'Questions',
+    h2Faq: 'Frequently asked',
+    q1: 'Do I need an internet connection?',
+    a1: "No — and you couldn't give it one if you tried. Stokancil has no INTERNET permission, so every feature works with the phone in airplane mode.",
+    q2: 'Is there an account or a subscription?',
+    a2: 'Neither. There is nothing to sign up for, nothing to log into and no server behind the app.',
+    q3: 'Which printers work with it?',
+    a3: "Thermal printers you have already paired in Android's own Bluetooth settings, and printers attached over USB. Stokancil never scans for nearby devices — it only lists what you have already paired yourself.",
+    q4: 'What happens to my data if I change phones?',
+    a4: "Take a backup from the app's settings and restore it on the new phone. Android's own automatic backup may also carry the data across, if you have that turned on for your device.",
+    q5: 'Can I get my data out of the app?',
+    a5: 'Yes. Export your stock as a CSV file, or take a full backup. Both write a file to a location you pick, and the file is yours.',
+    q6: 'How do I delete everything?',
+    a6: "Uninstall the app, or clear its storage from Android's app settings. Either one removes the database permanently. Backup files you made yourself are yours to delete separately.",
+
+    closeH: "Your shop's data belongs in your shop",
+    closeP: 'Stokancil keeps it there. Install it once and it works — on the counter, in the storeroom, with or without a signal.',
+    fPrivacy: 'Privacy policy',
+    fContact: 'Contact',
+    fBy: 'Made by Samba Nugraha'
+  },
+
+  id: {
+    _title: 'Stokancil — Aplikasi Kasir & Stok Offline untuk Toko Kecil',
+    _meta: 'Stokancil adalah aplikasi kasir dan stok yang sepenuhnya offline untuk toko kecil. Tanpa akun, tanpa izin internet, tanpa iklan. Penjualan, stok, pindai barcode, dan cetak struk termal di Android.',
+    iconAlt: 'Ikon aplikasi Stokancil',
+    tagline: 'Kasir dan stok, sepenuhnya offline.',
+    lede: 'Mesin kasir dan buku stok untuk toko kecil, di HP yang sudah Anda punya. Stokancil mencatat penjualan, memantau stok, dan mencetak struk — semuanya tanpa pernah meminta koneksi internet.',
+    chip1: 'Tanpa izin internet',
+    chip2: 'Tanpa akun',
+    chip3: 'Tanpa iklan atau pelacakan',
+    playSm: 'Dapatkan di',
+    privacyCta: 'Baca kebijakan privasi',
+
+    ebOffline: 'Offline sejak awal',
+    h2Offline: 'Janji offline',
+    subOffline: 'Sebagian besar aplikasi toko butuh sinyal, login, dan langganan. Stokancil tidak butuh semuanya.',
+    promise1: 'Stokancil tidak mendeklarasikan izin INTERNET Android.',
+    promise2: 'Ini bukan pengaturan yang harus Anda cari, atau janji yang harus Anda percayai begitu saja. Android menegakkannya di tingkat sistem operasi: aplikasi tanpa izin tersebut sama sekali tidak bisa membuka koneksi jaringan. Harga, pemasukan, dan pembelian pelanggan Anda tetap di dalam toko.',
+    why1t: 'Jalan tanpa sinyal',
+    why1b: 'Gudang belakang, kios pasar, ruang bawah tanah, atau area tanpa sinyal. Selama HP menyala, kasir tetap bekerja.',
+    why2t: 'Tidak ada yang perlu diperpanjang',
+    why2b: 'Tanpa pendaftaran, tanpa biaya bulanan yang bisa terlupa, tanpa server yang bisa mati dan menyeret toko Anda ikut berhenti.',
+    why3t: 'Tidak ada yang bisa bocor',
+    why3b: 'Tanpa analitik, tanpa iklan, tanpa laporan galat. Tidak ada data yang bisa hilang karena tidak ada yang bisa keluar.',
+
+    ebFeatures: 'Apa yang bisa dilakukan',
+    h2Features: 'Semua yang benar-benar dibutuhkan toko kecil',
+    subFeatures: 'Mencatat penjualan, tahu apa yang masih ada di rak, dan menyerahkan struk tercetak. Tanpa modul tambahan berbayar, tanpa fitur yang ditahan.',
+    f1t: 'Jualan dalam beberapa ketukan',
+    f1b: 'Susun transaksi baris per baris, beri diskon, atur pajak, dan catat cara pembayarannya. Totalnya siap sebelum pelanggan menemukan dompetnya.',
+    f2t: 'Stok yang selalu jujur',
+    f2b: 'Barang lengkap dengan kategori, deskripsi, harga, jumlah, dan SKU. Setiap penjualan mengurangi stok; setiap barang masuk menambahnya kembali.',
+    f3t: 'Pindai, bukan ketik',
+    f3b: 'Arahkan kamera ke barcode atau kode QR untuk memunculkan barang. Gambar diproses langsung di perangkat — tidak ada foto yang diambil, disimpan, atau dikirim.',
+    f4t: 'Cetak struk sungguhan',
+    f4b: 'Kirim struk dan label rak langsung ke printer termal yang sudah Anda pasangkan lewat Bluetooth, atau yang tersambung lewat USB.',
+    f5t: 'Identitas toko di setiap struk',
+    f5b: 'Cantumkan nama toko, alamat, kontak, teks penutup, dan logo Anda di setiap struk — atau serahkan sebagai PDF, tanpa kertas.',
+    f6t: 'Stock opname dan koreksi',
+    f6b: 'Hitung isi rak, perbaiki yang tidak cocok, dan tinggalkan catatan alasannya. Penyesuaian tercatat, bukan ditimpa diam-diam.',
+    f7t: 'Backup yang Anda kendalikan',
+    f7b: 'Tulis backup lengkap, atau CSV stok Anda, ke mana pun Anda pilih — HP, kartu SD, atau folder cloud. Itu file Anda, di tangan Anda.',
+
+    ebStart: 'Mulai',
+    h2Start: 'Siap berjualan dalam satu sore',
+    s1t: 'Pasang lalu buka',
+    s1b: 'Tidak ada akun yang perlu dibuat dan tidak ada kode yang perlu diverifikasi. Aplikasi langsung siap begitu selesai dipasang.',
+    s2t: 'Masukkan data toko dan stok',
+    s2b: 'Isi data toko untuk struk, lalu tambahkan barang Anda — diketik manual, atau dengan memindai barcode yang sudah ada di kemasannya.',
+    s3t: 'Pasangkan printer, kalau perlu',
+    s3b: 'Pasangkan printer termal di pengaturan Bluetooth Android atau sambungkan lewat USB, lalu pilih di Stokancil. Lewati langkah ini kalau Anda cukup membagikan struk sebagai PDF.',
+    s4t: 'Mulai berjualan',
+    s4b: 'Catat penjualan pertama Anda. Buat backup di akhir hari dan simpan di tempat yang aman.',
+
+    ebSpecs: 'Ringkasan',
+    h2Specs: 'Detailnya',
+    sp1k: 'Platform',
+    sp1v: 'Android, disalurkan lewat Google Play',
+    sp2k: 'Paket',
+    sp3k: 'Internet',
+    sp3v: 'Tidak diminta — aplikasi tidak punya izin INTERNET, jadi tidak bisa terhubung',
+    sp4k: 'Akun',
+    sp4v: 'Tidak ada. Tanpa pendaftaran, tanpa login, tanpa server',
+    sp5k: 'Izin',
+    sp5v: 'Bluetooth dan USB untuk mencetak, kamera untuk memindai barcode. Selain itu tidak ada',
+    sp6k: 'Data Anda',
+    sp6v: 'Disimpan di penyimpanan privat milik aplikasi, yang tidak bisa dibaca aplikasi lain',
+    sp7k: 'Iklan dan analitik',
+    sp7v: 'Keduanya tidak ada, begitu pula laporan galat',
+    sp8k: 'Dukungan',
+
+    ebFaq: 'Pertanyaan',
+    h2Faq: 'Sering ditanyakan',
+    q1: 'Apakah saya butuh koneksi internet?',
+    a1: 'Tidak — dan Anda memang tidak bisa memberinya, sekalipun mau. Stokancil tidak punya izin INTERNET, jadi semua fitur tetap bekerja meski HP dalam mode pesawat.',
+    q2: 'Apakah ada akun atau langganan?',
+    a2: 'Tidak keduanya. Tidak ada yang perlu didaftarkan, tidak ada yang perlu dimasuki, dan tidak ada server di belakang aplikasi ini.',
+    q3: 'Printer apa saja yang bisa dipakai?',
+    a3: 'Printer termal yang sudah Anda pasangkan di pengaturan Bluetooth Android, dan printer yang tersambung lewat USB. Stokancil tidak pernah memindai perangkat di sekitar — hanya menampilkan yang sudah Anda pasangkan sendiri.',
+    q4: 'Bagaimana data saya kalau ganti HP?',
+    a4: 'Buat backup dari pengaturan aplikasi, lalu pulihkan di HP baru. Backup otomatis milik Android juga bisa membawa datanya, jika fitur itu aktif di perangkat Anda.',
+    q5: 'Bisakah saya mengeluarkan data saya dari aplikasi?',
+    a5: 'Bisa. Ekspor stok Anda sebagai file CSV, atau buat backup lengkap. Keduanya menulis file ke lokasi yang Anda pilih, dan file itu milik Anda.',
+    q6: 'Bagaimana cara menghapus semuanya?',
+    a6: 'Hapus aplikasinya, atau bersihkan penyimpanannya dari pengaturan aplikasi Android. Keduanya menghapus database secara permanen. File backup yang Anda buat sendiri terpisah, dan Anda hapus sendiri.',
+
+    closeH: 'Data toko Anda tempatnya di toko Anda',
+    closeP: 'Stokancil menjaganya tetap di situ. Pasang sekali dan langsung bekerja — di meja kasir, di gudang, dengan atau tanpa sinyal.',
+    fPrivacy: 'Kebijakan privasi',
+    fContact: 'Kontak',
+    fBy: 'Dibuat oleh Samba Nugraha'
+  }
+};
+SiteLang.init(I18N);
+</script>
+</body>
+</html>
