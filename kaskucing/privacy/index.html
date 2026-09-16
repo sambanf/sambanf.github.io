@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kaskucing — Privacy Policy</title>
+<link rel="icon" href="../assets/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="../assets/icon-512.png">
+<link rel="canonical" href="https://sambanf.github.io/kaskucing/privacy/">
+<script src="../../assets/theme.js"></script>
+<style>
+  :root {
+    --bg: #f1f3f6;
+    --surface: #ffffff;
+    --surface-2: #e8ebf0;
+    --surface-3: #d9dee6;
+    --ink: #16202c;
+    --ink-dim: #4e5966;
+    --ink-faint: #7e8894;
+    --line: #d4dae2;
+    --line-strong: #b5bdc8;
+    --accent: #1b7f5f;
+    --accent-strong: #156049;
+    --accent-soft: #e8f6f1;
+    --ok: #1b7f5f;
+    --ok-soft: #e0f2ea;
+    --font-sans: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-mono: ui-monospace, "Cascadia Code", "JetBrains Mono", Consolas, "SFMono-Regular", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #10151c; --surface: #18202a; --surface-2: #202a36; --surface-3: #2a3543;
+      --ink: #e9eef4; --ink-dim: #a4afbb; --ink-faint: #74808c;
+      --line: #2d3843; --line-strong: #3f4b58;
+      --accent: #5fc9a5; --accent-strong: #7fdcbb; --accent-soft: #132a24;
+      --ok: #5fc9a5; --ok-soft: #14291f;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #10151c; --surface: #18202a; --surface-2: #202a36; --surface-3: #2a3543;
+    --ink: #e9eef4; --ink-dim: #a4afbb; --ink-faint: #74808c;
+    --line: #2d3843; --line-strong: #3f4b58;
+    --accent: #5fc9a5; --accent-strong: #7fdcbb; --accent-soft: #132a24;
+    --ok: #5fc9a5; --ok-soft: #14291f;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 40px 22px 90px; }
+
+  header.hero { border-bottom: 1px solid var(--line); padding-bottom: 22px; margin-bottom: 22px; }
+  header.hero .eyebrow {
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .09em;
+    text-transform: uppercase; color: var(--accent-strong); margin: 0 0 10px;
+  }
+  header.hero h1 {
+    font-size: clamp(26px, 4vw, 34px); font-weight: 800; letter-spacing: -0.015em;
+    margin: 0 0 10px; text-wrap: balance;
+  }
+  header.hero p { color: var(--ink-dim); margin: 0; max-width: 64ch; font-size: 15px; }
+  header.hero p.dates {
+    font-family: var(--font-mono); font-size: 12px; color: var(--ink-faint); margin-top: 14px;
+  }
+
+  header.hero .backlink {
+    display: block; font-family: var(--font-mono); font-size: 11px;
+    letter-spacing: .09em; text-transform: uppercase; color: var(--ink-faint);
+    text-decoration: none; margin: 0 0 12px;
+  }
+  header.hero .backlink:hover { color: var(--accent-strong); }
+
+  .callout {
+    display: flex; gap: 12px; align-items: flex-start;
+    background: var(--ok-soft); border: 1px solid var(--line);
+    border-left: 3px solid var(--ok);
+    border-radius: 8px; padding: 14px 16px; margin: 0 0 34px;
+  }
+  .callout .mark { color: var(--ok); font-size: 14px; line-height: 1.6; }
+  .callout p { margin: 0; font-size: 14px; color: var(--ink); max-width: 68ch; }
+
+  section { margin-bottom: 34px; }
+  section > h2 {
+    font-size: 13px; font-family: var(--font-mono); font-weight: 700;
+    letter-spacing: .05em; text-transform: uppercase; color: var(--ink-faint);
+    margin: 0 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--line);
+  }
+  section p { font-size: 15px; color: var(--ink-dim); margin: 0 0 12px; max-width: 72ch; }
+  section p strong { color: var(--ink); }
+  section ul { margin: 0 0 12px; padding-left: 20px; max-width: 72ch; }
+  section li { font-size: 15px; color: var(--ink-dim); margin-bottom: 8px; }
+  section li strong { color: var(--ink); }
+
+  code {
+    font-family: var(--font-mono); font-size: 13px;
+    background: var(--surface-2); border-radius: 4px; padding: 1px 5px;
+  }
+
+  .table-scroll { overflow-x: auto; margin: 0 0 12px; }
+  table { border-collapse: collapse; width: 100%; min-width: 480px; }
+  th, td {
+    text-align: left; padding: 11px 12px; border-bottom: 1px solid var(--line);
+    font-size: 14px; color: var(--ink-dim); vertical-align: top;
+  }
+  th {
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .05em;
+    text-transform: uppercase; color: var(--ink-faint); font-weight: 700;
+  }
+  td:first-child { color: var(--ink); font-family: var(--font-mono); font-size: 12.5px; white-space: nowrap; }
+
+  footer.end {
+    margin-top: 50px; padding-top: 18px; border-top: 1px solid var(--line);
+    font-size: 13px; color: var(--ink-faint);
+  }
+  footer.end a { color: var(--accent-strong); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <a class="backlink" href="../">&larr; Kaskucing</a>
+    <p class="eyebrow">Privacy Policy</p>
+    <h1>Kaskucing Privacy Policy</h1>
+    <p>Kaskucing is an offline daily cash book for Android. It keeps everything you enter on your
+      own device and sends none of it anywhere.</p>
+    <p class="dates">Effective 16 September 2026 &nbsp;&middot;&nbsp; Last updated 16 September 2026</p>
+  </header>
+
+  <div class="callout">
+    <span class="mark">&#9679;</span>
+    <p><strong>The short version.</strong> Kaskucing collects nothing, transmits nothing and
+      contains no analytics, advertising or tracking. It has no user accounts and no server. The
+      app does not request internet access at all, so your income, your spending and your balances
+      cannot leave your device except when you deliberately export or share them yourself.</p>
+  </div>
+
+  <section>
+    <h2>Who This Policy Covers</h2>
+    <div class="table-scroll">
+      <table>
+        <tr><th>Item</th><th>Detail</th></tr>
+        <tr><td>App</td><td>Kaskucing</td></tr>
+        <tr><td>Package</td><td>com.blankpoof.kaskucing</td></tr>
+        <tr><td>Contact</td><td>kaskucing.admin@gmail.com</td></tr>
+      </table>
+    </div>
+    <p>This policy covers the Kaskucing Android application distributed through Google Play. It
+      does not cover any other app or service.</p>
+  </section>
+
+  <section>
+    <h2>What We Collect</h2>
+    <p><strong>Nothing.</strong> Kaskucing has no servers, no accounts and no sign-in. We &mdash; the
+      developer &mdash; receive no personal information, no usage statistics, no crash reports, no
+      device identifiers and no financial data of any kind. There is no data for us to sell, share
+      or lose, because none of it ever reaches us.</p>
+    <p>The app does not declare the Android <code>INTERNET</code> permission. Android enforces this
+      at the operating-system level: an app without that permission cannot open a network
+      connection, so there is no route by which your data could be transmitted, whether
+      intentionally or by accident. The release build is checked for this automatically and fails
+      if any library adds the permission.</p>
+  </section>
+
+  <section>
+    <h2>What Stays on Your Device</h2>
+    <p>Everything you enter is written to a private database in the app's own storage area, which
+      other apps cannot read. That includes:</p>
+    <ul>
+      <li>Transactions &mdash; amount, date, type, wallet, category and any note you wrote</li>
+      <li>Wallets, their type, their opening balance and their current balance</li>
+      <li>Categories you use or create, and the order they appear in</li>
+      <li>Your monthly income figures, budget ceilings and how you divided them</li>
+      <li>Recurring rules, and the record of which occurrences have already been posted</li>
+      <li>Your settings &mdash; language, theme, currency, first day of the month and week</li>
+    </ul>
+    <p>None of this is analysed, indexed or uploaded. Uninstalling the app removes it.</p>
+  </section>
+
+  <section>
+    <h2>Permissions and Why They Exist</h2>
+    <div class="table-scroll">
+      <table>
+        <tr><th>Permission</th><th>What it is used for</th></tr>
+        <tr>
+          <td>Notifications</td>
+          <td>To tell you when a budget group passes 80% or 100% of its ceiling. On Android 13 and
+            later this is asked for only when you first switch a budget alert on, and declining it
+            costs you nothing else &mdash; the same warning is always shown on the budget card
+            itself. It is the only permission the app requests.</td>
+        </tr>
+      </table>
+    </div>
+    <p>Kaskucing asks for no camera, no contacts, no location, no storage and no SMS access. In
+      particular it never reads your messages: bank and e-wallet notifications are not scanned, and
+      every figure in the app is one you entered yourself.</p>
+  </section>
+
+  <section>
+    <h2>When Data Leaves Your Device</h2>
+    <p>Only when you choose to move it, and only to a destination you pick:</p>
+    <ul>
+      <li><strong>Backups and CSV export.</strong> Creating a backup or exporting your transactions
+        writes a file to the location you choose through Android's own file picker. If you save it
+        to a cloud folder, that provider's terms apply to the file from that point on.</li>
+      <li><strong>Sharing a backup.</strong> Using the share action hands the backup file to
+        whichever app you select from the Android share sheet &mdash; WhatsApp, Drive, email. The
+        receiving app is granted access to that one file and to nothing else in the app's storage.
+        What it then does with the file is governed by that app's own privacy policy.</li>
+    </ul>
+    <p><strong>Android's automatic cloud backup is switched off for this app.</strong> Your ledger
+      is deliberately excluded from Google's device backup and from Android's device-to-device
+      transfer, so a copy of your finances is never placed in your Google account without your
+      asking. Your own export is the only supported way the data moves &mdash; which also means
+      that if you reset the phone without exporting first, the data is gone.</p>
+  </section>
+
+  <section>
+    <h2>Third Parties</h2>
+    <p>Kaskucing contains no advertising networks, no analytics providers and no crash-reporting
+      services. Every library it uses runs entirely on the device, and none of them can reach the
+      network: the app has no permission to give them.</p>
+    <p>Google Play handles distribution, and Google collects its own installation and device
+      statistics as part of running the store. That is covered by Google's privacy policy, not by
+      this one, and we see only anonymous aggregate figures in the Play Console.</p>
+  </section>
+
+  <section>
+    <h2>Children</h2>
+    <p>Kaskucing is a personal record-keeping tool and is not directed at children. It collects no
+      information from anyone, of any age, and shows no advertising.</p>
+  </section>
+
+  <section>
+    <h2>Your Data and Your Rights</h2>
+    <p>Because your data never leaves your device, you already hold the only copy. There is no
+      account to close and no server-side record to request, correct or erase.</p>
+    <ul>
+      <li><strong>To export it:</strong> use the backup or CSV export in the app's settings. The
+        backup is a plain JSON file and the export is a plain CSV, both readable without Kaskucing
+        installed.</li>
+      <li><strong>To delete it:</strong> wipe all data from the app's settings, behind a double
+        confirmation &mdash; or uninstall the app, or clear its storage from Android's app settings.
+        Each removes the database permanently. Backup files you created yourself are yours to
+        delete separately.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Changes to This Policy</h2>
+    <p>If a future version of Kaskucing adds a feature that sends data anywhere &mdash; optional
+      multi-device sync, for example &mdash; this policy will be updated to describe exactly what is
+      sent and why, and the change will be published here before that version is released. The date
+      at the top of this page shows when it was last revised.</p>
+  </section>
+
+  <section>
+    <h2>Contact</h2>
+    <p>Questions about this policy, or about Kaskucing's handling of your data, can go to
+      <strong>kaskucing.admin@gmail.com</strong>.</p>
+  </section>
+
+  <footer class="end">
+    <a href="../">Kaskucing</a> &nbsp;&middot;&nbsp; Privacy Policy &nbsp;&middot;&nbsp; 16 September 2026
+  </footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kaskucing — Offline Daily Cash Book for Android</title>
+<meta name="description" content="Kaskucing is a fully offline daily money tracker for Android. No account, no internet permission, no ads. Record cash and e-wallet spending in under five seconds, with reports, budgets and backups you own.">
+<link rel="icon" href="assets/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/icon-512.png">
+<link rel="canonical" href="https://sambanf.github.io/kaskucing/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Kaskucing — Offline Daily Cash Book for Android">
+<meta property="og:description" content="A pocket cash book for cash and e-wallet money. Record in three taps, see where the month went — with no account, no signal and no data leaving your phone.">
+<meta property="og:url" content="https://sambanf.github.io/kaskucing/">
+<meta property="og:image" content="https://sambanf.github.io/kaskucing/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<script src="../assets/theme.js"></script>
+<style>
+  :root {
+    --bg: #f1f3f6;
+    --surface: #ffffff;
+    --surface-2: #e8ebf0;
+    --surface-3: #d9dee6;
+    --ink: #16202c;
+    --ink-dim: #4e5966;
+    --ink-faint: #7e8894;
+    --line: #d4dae2;
+    --line-strong: #b5bdc8;
+    --accent: #1b7f5f;
+    --accent-strong: #156049;
+    --accent-soft: #e8f6f1;
+    --brand-deep: #182b40;
+    --brand-mid: #33557a;
+    --brand-navy: #26405f;
+    --brand-mint: #7fd6b6;
+    --brand-amber: #f0b429;
+    --hero-ink: #ffffff;
+    --hero-ink-dim: #cfe3dd;
+    --font-sans: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-mono: ui-monospace, "Cascadia Code", "JetBrains Mono", Consolas, "SFMono-Regular", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #10151c; --surface: #18202a; --surface-2: #202a36; --surface-3: #2a3543;
+      --ink: #e9eef4; --ink-dim: #a4afbb; --ink-faint: #74808c;
+      --line: #2d3843; --line-strong: #3f4b58;
+      --accent: #5fc9a5; --accent-strong: #7fdcbb; --accent-soft: #132a24;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #10151c; --surface: #18202a; --surface-2: #202a36; --surface-3: #2a3543;
+    --ink: #e9eef4; --ink-dim: #a4afbb; --ink-faint: #74808c;
+    --line: #2d3843; --line-strong: #3f4b58;
+    --accent: #5fc9a5; --accent-strong: #7fdcbb; --accent-soft: #132a24;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  img { max-width: 100%; height: auto; }
+  a { color: var(--accent-strong); }
+
+  .wrap { max-width: 940px; margin: 0 auto; padding: 0 22px; }
+
+  /* ---------- Top bar ---------- */
+
+  .topbar { display: flex; align-items: center; gap: 14px; padding: 14px 0; }
+  .topbar .brand {
+    display: inline-flex; align-items: center; gap: 9px;
+    font-weight: 700; font-size: 15px; letter-spacing: -0.01em; color: var(--hero-ink);
+  }
+  .topbar .brand img { width: 26px; height: 26px; border-radius: 7px; display: block; }
+  .topbar .spacer { flex: 1 1 auto; }
+
+  .lang-toggle {
+    display: inline-flex; gap: 2px; padding: 3px;
+    border: 1px solid rgba(255,255,255,.28); border-radius: 999px;
+    background: rgba(255,255,255,.12);
+  }
+  .lang-toggle button {
+    display: inline-flex; align-items: center; gap: .4rem;
+    border: 0; background: transparent; color: var(--hero-ink-dim);
+    font: inherit; font-size: .8rem; font-weight: 600; letter-spacing: .03em;
+    padding: .3rem .7rem; border-radius: 999px; cursor: pointer;
+    transition: background .15s ease, color .15s ease;
+  }
+  .lang-toggle button:hover { color: #fff; }
+  .lang-toggle button[aria-pressed="true"] { background: #fff; color: var(--brand-navy); }
+  .lang-toggle .flag {
+    display: block; width: 20px; height: 10px; border-radius: 2px;
+    box-shadow: 0 0 0 1px rgba(0,0,0,.25);
+  }
+  .theme-toggle {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 2.15rem; height: 2.15rem; padding: 0;
+    border: 1px solid rgba(255,255,255,.28); border-radius: 999px;
+    background: rgba(255,255,255,.12); color: var(--hero-ink-dim); cursor: pointer;
+    transition: color .15s ease, border-color .15s ease;
+  }
+  .theme-toggle:hover { color: #fff; border-color: rgba(255,255,255,.6); }
+  .theme-toggle svg { display: block; }
+  .theme-toggle .icon-sun { display: none; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .theme-toggle .icon-sun { display: block; }
+    :root:not([data-theme="light"]) .theme-toggle .icon-moon { display: none; }
+  }
+  :root[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+  :root[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+
+  /* ---------- Hero ---------- */
+
+  .hero {
+    position: relative; overflow: hidden;
+    background: linear-gradient(150deg, var(--brand-mid) 0%, var(--brand-navy) 52%, var(--brand-deep) 100%);
+    color: var(--hero-ink);
+  }
+  .hero::after {
+    content: ""; position: absolute; pointer-events: none;
+    width: 520px; height: 520px; top: -240px; right: -140px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(47,163,127,.38), transparent 68%);
+  }
+  .hero-inner {
+    position: relative; z-index: 1;
+    display: grid; grid-template-columns: 128px 1fr; gap: 26px;
+    align-items: start; padding: 34px 0 46px;
+  }
+  .hero-icon {
+    width: 128px; height: 128px; border-radius: 28px; display: block;
+    box-shadow: 0 14px 34px rgba(0,0,0,.3), 0 0 0 1px rgba(255,255,255,.16);
+  }
+  .hero h1 {
+    font-size: clamp(34px, 6.2vw, 52px); font-weight: 800; letter-spacing: -0.025em;
+    margin: 2px 0 8px; line-height: 1.05;
+  }
+  .hero .tagline {
+    font-size: clamp(17px, 2.4vw, 21px); font-weight: 600; color: #fff;
+    margin: 0 0 12px; max-width: 34ch; text-wrap: balance;
+  }
+  .hero .lede { font-size: 15.5px; color: var(--hero-ink-dim); margin: 0 0 22px; max-width: 58ch; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 24px; padding: 0; list-style: none; }
+  .chips li {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12.5px; font-weight: 600; color: #eafaf4;
+    background: rgba(255,255,255,.13); border: 1px solid rgba(255,255,255,.22);
+    border-radius: 999px; padding: 5px 12px;
+  }
+  .chips li::before { content: "\2713"; color: var(--brand-mint); font-weight: 700; }
+
+  .cta-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .btn-play {
+    display: inline-flex; align-items: center; gap: 11px;
+    background: #fff; color: #16202c; text-decoration: none;
+    border-radius: 12px; padding: 11px 20px 11px 16px;
+    box-shadow: 0 8px 22px rgba(0,0,0,.22);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .btn-play:hover { transform: translateY(-1px); box-shadow: 0 12px 28px rgba(0,0,0,.28); }
+  .btn-play svg { width: 26px; height: 26px; display: block; flex: 0 0 auto; }
+  .btn-play .label { display: flex; flex-direction: column; line-height: 1.2; text-align: left; }
+  .btn-play .label .sm {
+    font-size: 10px; letter-spacing: .07em; text-transform: uppercase;
+    font-weight: 700; color: #525e6b;
+  }
+  .btn-play .label .lg { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+  .btn-ghost {
+    display: inline-flex; align-items: center; gap: 7px;
+    color: #eafaf4; text-decoration: none; font-size: 14px; font-weight: 600;
+    border: 1px solid rgba(255,255,255,.32); border-radius: 12px; padding: 12px 18px;
+    transition: background .15s ease, border-color .15s ease;
+  }
+  .btn-ghost:hover { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.6); }
+
+  @media (max-width: 640px) {
+    .hero-inner { grid-template-columns: 1fr; gap: 18px; padding: 26px 0 38px; }
+    .hero-icon { width: 96px; height: 96px; border-radius: 22px; }
+    .cta-row { flex-direction: column; align-items: stretch; }
+    .btn-play, .btn-ghost { justify-content: center; }
+  }
+
+  /* ---------- Sections ---------- */
+
+  main { padding-bottom: 20px; }
+  section { padding: 46px 0 0; }
+  section > h2 {
+    font-size: clamp(21px, 3.2vw, 27px); font-weight: 800; letter-spacing: -0.02em;
+    margin: 0 0 10px; text-wrap: balance;
+  }
+  section > .sub { font-size: 15.5px; color: var(--ink-dim); margin: 0 0 24px; max-width: 66ch; }
+  .eyebrow {
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .09em;
+    text-transform: uppercase; color: var(--accent-strong); margin: 0 0 9px; font-weight: 700;
+  }
+
+  .promise {
+    background: var(--surface); border: 1px solid var(--line);
+    border-left: 3px solid var(--accent); border-radius: 12px;
+    padding: 22px 24px; margin-bottom: 20px;
+  }
+  .promise p { font-size: 15px; color: var(--ink-dim); margin: 0 0 12px; max-width: 70ch; }
+  .promise p:last-child { margin-bottom: 0; }
+  .promise .kicker { color: var(--ink); font-weight: 600; font-size: 15.5px; }
+
+  .why-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
+  .why-grid div {
+    background: var(--surface-2); border-radius: 10px; padding: 16px 18px;
+    font-size: 14px; color: var(--ink-dim);
+  }
+  .why-grid strong { display: block; color: var(--ink); font-size: 14.5px; margin-bottom: 4px; }
+
+  .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(258px, 1fr)); gap: 16px; }
+  .card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px;
+  }
+  .card .ico {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 38px; height: 38px; border-radius: 10px;
+    background: var(--accent-soft); color: var(--accent-strong); margin-bottom: 12px;
+  }
+  .card .ico svg { width: 20px; height: 20px; display: block; }
+  .card h3 { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; margin: 0 0 6px; }
+  .card p { font-size: 14.5px; color: var(--ink-dim); margin: 0; }
+
+  .steps { list-style: none; counter-reset: s; margin: 0; padding: 0; display: grid; gap: 14px; }
+  .steps li {
+    counter-increment: s; position: relative; padding-left: 48px;
+    font-size: 15px; color: var(--ink-dim);
+  }
+  .steps li::before {
+    content: counter(s); position: absolute; left: 0; top: 0;
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--accent-soft); color: var(--accent-strong);
+    font-family: var(--font-mono); font-size: 14px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .steps li strong { display: block; color: var(--ink); font-size: 15.5px; margin-bottom: 2px; }
+
+  .table-scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; min-width: 460px; }
+  td {
+    text-align: left; padding: 12px; border-bottom: 1px solid var(--line);
+    font-size: 14.5px; color: var(--ink-dim); vertical-align: top;
+  }
+  td:first-child { color: var(--ink); font-weight: 600; white-space: nowrap; }
+
+  .faq { display: grid; gap: 10px; }
+  details {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0 18px;
+  }
+  details[open] { border-color: var(--line-strong); }
+  summary {
+    cursor: pointer; padding: 15px 0; font-size: 15.5px; font-weight: 600;
+    color: var(--ink); list-style: none; display: flex; align-items: center; gap: 10px;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::before {
+    content: "+"; flex: 0 0 auto; font-family: var(--font-mono); font-size: 17px;
+    font-weight: 700; color: var(--accent-strong); width: 16px;
+  }
+  details[open] summary::before { content: "\2212"; }
+  details p { font-size: 14.5px; color: var(--ink-dim); margin: 0 0 16px; max-width: 68ch; }
+
+  .closing {
+    margin-top: 52px; background: var(--surface); border: 1px solid var(--line);
+    border-radius: 14px; padding: 30px 26px; text-align: center;
+  }
+  .closing h2 { font-size: clamp(20px, 3vw, 25px); margin: 0 0 8px; letter-spacing: -0.02em; }
+  .closing p { font-size: 15px; color: var(--ink-dim); margin: 0 auto 20px; max-width: 52ch; }
+  .closing .btn-play { background: var(--accent); color: #fff; box-shadow: none; }
+  .closing .btn-play .label .sm { color: rgba(255,255,255,.8); }
+  .closing .btn-play:hover { background: var(--accent-strong); }
+  .closing .cta-row { justify-content: center; }
+  .closing .btn-ghost { color: var(--accent-strong); border-color: var(--line-strong); }
+  .closing .btn-ghost:hover { background: var(--accent-soft); border-color: var(--accent); }
+
+  footer.end {
+    margin-top: 46px; border-top: 1px solid var(--line);
+    padding: 22px 0 60px; font-size: 13.5px; color: var(--ink-faint);
+    display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center;
+  }
+  footer.end a { color: var(--accent-strong); }
+  footer.end .spacer { flex: 1 1 auto; }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <nav class="topbar">
+      <span class="brand">
+        <img src="assets/icon-192.png" alt="" width="26" height="26">
+        Kaskucing
+      </span>
+      <span class="spacer"></span>
+      <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
+        <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0l60 30M60 0L0 30" stroke="#fff" stroke-width="6"/><path d="M0 0l60 30M60 0L0 30" stroke="#C8102E" stroke-width="2.5"/><path d="M30 0v30M0 15h60" stroke="#fff" stroke-width="10"/><path d="M30 0v30M0 15h60" stroke="#C8102E" stroke-width="6"/></svg>EN
+        </button>
+        <button type="button" data-lang="id" aria-pressed="false" aria-label="Bahasa Indonesia">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="15" fill="#E70011"/><rect y="15" width="60" height="15" fill="#F7F7F7"/></svg>ID
+        </button>
+      </div>
+      <button type="button" class="theme-toggle" aria-label="Dark mode / Mode gelap" aria-pressed="false">
+        <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+    </nav>
+
+    <div class="hero-inner">
+      <img class="hero-icon" src="assets/icon-512.png" width="128" height="128"
+           alt="Kaskucing app icon" data-i18n-attr="alt:iconAlt">
+      <div>
+        <h1>Kaskucing</h1>
+        <p class="tagline" data-i18n="tagline">A daily cash book, fully offline.</p>
+        <p class="lede" data-i18n="lede">Cash, bank and e-wallet money in one place, on the phone you
+          already own. Kaskucing records a transaction in three taps and under five seconds — and it
+          does all of it without ever asking for the internet.</p>
+        <ul class="chips">
+          <li data-i18n="chip1">No internet permission</li>
+          <li data-i18n="chip2">No account</li>
+          <li data-i18n="chip3">No ads or tracking</li>
+        </ul>
+        <div class="cta-row">
+          <a class="btn-play" href="https://play.google.com/store/apps/details?id=com.blankpoof.kaskucing">
+            <svg viewBox="0 0 512 512" aria-hidden="true" focusable="false">
+              <path fill="#2196F3" d="M43.5 26.2C36.6 33.5 32.7 44.8 32.7 59.4v393.2c0 14.6 3.9 25.9 10.8 33.2l219.7-259.8z"/>
+              <path fill="#4CAF50" d="M43.5 26.2 263.2 226l91.2-91.2L96.9 8.2C77-2.5 57.4 12.3 43.5 26.2z"/>
+              <path fill="#FFC107" d="M354.4 134.8 263.2 226l91.2 91.2 96.8-56.4c19.4-11.3 19.4-39.5 0-50.8z"/>
+              <path fill="#F44336" d="M43.5 485.8c13.9 13.9 33.5 28.7 53.4 18l257.5-150.1-91.2-91.2z"/>
+            </svg>
+            <span class="label">
+              <span class="sm" data-i18n="playSm">Get it on</span>
+              <span class="lg">Google Play</span>
+            </span>
+          </a>
+          <a class="btn-ghost" href="privacy/" data-i18n="privacyCta">Read the privacy policy</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+
+    <section id="offline">
+      <p class="eyebrow" data-i18n="ebOffline">Offline by design</p>
+      <h2 data-i18n="h2Offline">The offline promise</h2>
+      <p class="sub" data-i18n="subOffline">Most money apps want a signal, a login and your financial
+        history on their server. Kaskucing wants none of them.</p>
+
+      <div class="promise">
+        <p class="kicker" data-i18n="promise1">Kaskucing does not declare Android's INTERNET
+          permission.</p>
+        <p data-i18n="promise2">That is not a setting you have to find, or a promise you have to take
+          on trust. Android enforces it at the operating-system level: an app without that permission
+          cannot open a network connection at all. What you earn, what you spend and what is left in
+          each wallet stays on your phone.</p>
+        <p data-i18n="promise3">It is also checked by the build itself. A release that picked up the
+          permission from any library — even by accident, even deep in a dependency — fails to build
+          rather than reaching Google Play.</p>
+      </div>
+
+      <div class="why-grid">
+        <div><strong data-i18n="why1t">Works with the quota gone</strong><span data-i18n="why1b">Out of data mid-month, on a train, in a basement. If the phone turns on, you can still record and still read the month.</span></div>
+        <div><strong data-i18n="why2t">Nothing to renew</strong><span data-i18n="why2b">No sign-up, no subscription pop-up in front of the report screen, no server that can go down and take your records with it.</span></div>
+        <div><strong data-i18n="why3t">Nothing can leak</strong><span data-i18n="why3b">No analytics, no advertising, no crash reporting. Your income is nobody's business because none of it can leave.</span></div>
+      </div>
+    </section>
+
+    <section id="features">
+      <p class="eyebrow" data-i18n="ebFeatures">What it does</p>
+      <h2 data-i18n="h2Features">Fast to write, honest to read</h2>
+      <p class="sub" data-i18n="subFeatures">Most money apps are abandoned in week two, because
+        recording costs more effort than the entry feels worth. Kaskucing is built around the first
+        five seconds — and then answers the question at month end.</p>
+
+      <div class="features">
+        <div class="card">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 4.5 13.5H11l-1 8.5 8.5-11.5H12z"/></svg></span>
+          <h3 data-i18n="f1t">Five seconds, three taps</h3>
+          <p data-i18n="f1b">Amount, category, done. The keypad has a calculator built in, so
+            12000+3500 saves as one line — and "save and add another" keeps the wallet,
+            category and date for the next one.</p>
+        </div>
+        <div class="card">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2"/><path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2H5a2 2 0 0 1-2-2z"/><circle cx="16.5" cy="13" r="1.2"/></svg></span>
+          <h3 data-i18n="f2t">Every wallet in one book</h3>
+          <p data-i18n="f2b">Cash, bank, e-wallet, credit and paylater, savings. Move money between
+            them with a transfer — which is counted as neither income nor expense, so it never
+            inflates a total.</p>
+        </div>
+        <div class="card">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.6 13.4 12 22l-9-9V4a1 1 0 0 1 1-1h9z"/><circle cx="7.5" cy="7.5" r="1.3"/></svg></span>
+          <h3 data-i18n="f3t">Categories already set up</h3>
+          <p data-i18n="f3b">Makanan, Transportasi, Tagihan and the rest are there on first launch.
+            The picker floats the ones you actually use to the top, and a missing one can be made
+            without losing the entry you're in the middle of.</p>
+        </div>
+        <div class="card">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9h-9z"/><path d="M14.5 2.5A8 8 0 0 1 21.5 9.5h-7z"/></svg></span>
+          <h3 data-i18n="f4t">Where the month actually went</h3>
+          <p data-i18n="f4b">Spending by category as a donut and a ranked list, income against
+            expense month by month, and your five biggest outgoings. Tap any slice to see the exact
+            transactions behind the number.</p>
+        </div>
+        <div class="card">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 18 0"/><path d="M12 12l4.5-3"/><path d="M3 12v3h18v-3"/></svg></span>
+          <h3 data-i18n="f5t">One income, four groups</h3>
+          <p data-i18n="f5b">Split what you earn between Needs, Recurring Needs, Flex Budget and
+            Saving — by percentage, so the plan works whatever the month brings in. A warning arrives
+            at 80% of a group, and again at 100%.</p>
+        </div>
+        <div class="card">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11a8 8 0 0 1 13.7-5.7L21 9"/><path d="M21 4v5h-5"/><path d="M21 13a8 8 0 0 1-13.7 5.7L3 15"/><path d="M3 20v-5h5"/></svg></span>
+          <h3 data-i18n="f6t">Rent and subscriptions post themselves</h3>
+          <p data-i18n="f6b">Set a rule once — daily, weekly, monthly or yearly — and let it run.
+            Leave the app closed for a fortnight and every missed occurrence appears on its own date,
+            not bundled onto today.</p>
+        </div>
+        <div class="card">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg></span>
+          <h3 data-i18n="f7t">Backups you own</h3>
+          <p data-i18n="f7b">One file holds everything, and it goes wherever you point it — the
+            phone, an SD card, WhatsApp, a cloud folder. Export to CSV for a spreadsheet, and restore
+            by replacing or merging.</p>
+        </div>
+        <div class="card">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12a10 10 0 1 0 20 0 10 10 0 0 0-20 0z"/><path d="M2 12h20"/><path d="M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20z"/></svg></span>
+          <h3 data-i18n="f8t">Yours to set up</h3>
+          <p data-i18n="f8b">Indonesian or English, light or dark, Rupiah formatted the way it is
+            written here. Your month can start on any date, and one tap hides every figure when
+            somebody is looking over your shoulder.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="start">
+      <p class="eyebrow" data-i18n="ebStart">Getting started</p>
+      <h2 data-i18n="h2Start">Recording within a minute of installing</h2>
+      <ol class="steps">
+        <li><strong data-i18n="s1t">Install it and open it</strong><span data-i18n="s1b">No account to create, no code to verify, no email. A cash wallet and a set of Indonesian categories are already there, so the first entry needs no setup at all.</span></li>
+        <li><strong data-i18n="s2t">Answer three questions — or skip them</strong><span data-i18n="s2b">What wallets you have and what is in them, what you earn in a month, and how you want to divide it. Every one of them is skippable, and none of them blocks the first transaction.</span></li>
+        <li><strong data-i18n="s3t">Record for a week</strong><span data-i18n="s3b">Log things as they happen — the point is that it costs seconds, not minutes. Backdate anything you missed; the date picker takes any day you like.</span></li>
+        <li><strong data-i18n="s4t">Read the month, then back it up</strong><span data-i18n="s4b">Open the report at month end and see where it went. Write a backup file and keep it somewhere safe, or send it to yourself.</span></li>
+      </ol>
+    </section>
+
+    <section id="specs">
+      <p class="eyebrow" data-i18n="ebSpecs">At a glance</p>
+      <h2 data-i18n="h2Specs">The details</h2>
+      <div class="table-scroll">
+        <table>
+          <tbody>
+            <tr><td data-i18n="sp1k">Platform</td><td data-i18n="sp1v">Android 7.0 and later, distributed through Google Play</td></tr>
+            <tr><td data-i18n="sp2k">Package</td><td>com.blankpoof.kaskucing</td></tr>
+            <tr><td data-i18n="sp3k">Internet</td><td data-i18n="sp3v">Not requested — the app has no INTERNET permission, so it cannot connect</td></tr>
+            <tr><td data-i18n="sp4k">Account</td><td data-i18n="sp4v">None. No sign-up, no sign-in, no server</td></tr>
+            <tr><td data-i18n="sp5k">Permissions</td><td data-i18n="sp5v">Notifications only, and only if you switch budget alerts on. Nothing else</td></tr>
+            <tr><td data-i18n="sp6k">Your data</td><td data-i18n="sp6v">Kept in the app's own private storage, which other apps cannot read</td></tr>
+            <tr><td data-i18n="sp7k">Amounts</td><td data-i18n="sp7v">Stored as exact whole Rupiah, never as decimals that can drift</td></tr>
+            <tr><td data-i18n="sp8k">Languages</td><td data-i18n="sp8v">Indonesian and English, switchable inside the app</td></tr>
+            <tr><td data-i18n="sp9k">Ads and analytics</td><td data-i18n="sp9v">None of either, and no crash reporting</td></tr>
+            <tr><td data-i18n="sp10k">Support</td><td>kaskucing.admin@gmail.com</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="faq">
+      <p class="eyebrow" data-i18n="ebFaq">Questions</p>
+      <h2 data-i18n="h2Faq">Frequently asked</h2>
+      <div class="faq">
+        <details>
+          <summary data-i18n="q1">Do I need an internet connection?</summary>
+          <p data-i18n="a1">No — and you couldn't give it one if you tried. Kaskucing has no INTERNET
+            permission, so every feature works with the phone in airplane mode.</p>
+        </details>
+        <details>
+          <summary data-i18n="q2">Is there an account or a subscription?</summary>
+          <p data-i18n="a2">Neither. There is nothing to sign up for, nothing to log into and no
+            server behind the app. No feature is held back behind a payment.</p>
+        </details>
+        <details>
+          <summary data-i18n="q3">Does it read my bank SMS or connect to my accounts?</summary>
+          <p data-i18n="a3">No, and that is deliberate. Reading transaction SMS needs a permission
+            that can see every message on the phone, and connecting to an account needs the internet.
+            Every figure in Kaskucing is one you entered yourself, which is also why it can be
+            trusted.</p>
+        </details>
+        <details>
+          <summary data-i18n="q4">Can I keep cash and my e-wallets apart?</summary>
+          <p data-i18n="a4">Yes. Make a wallet for each — cash, bank, GoPay, OVO, a credit card —
+            and each keeps its own balance. Moving money between them is a transfer, which is left
+            out of income and expense totals so your figures stay honest.</p>
+        </details>
+        <details>
+          <summary data-i18n="q5">What happens to my data if I change phones?</summary>
+          <p data-i18n="a5">Export a backup file from Settings and import it on the new phone. Send
+            it to yourself over WhatsApp or save it to a cloud folder — it is an ordinary file, and
+            it is yours.</p>
+        </details>
+        <details>
+          <summary data-i18n="q6">Can I get my data out of the app?</summary>
+          <p data-i18n="a6">Yes. A full backup as one JSON file, or your transactions as a CSV that
+            opens in Excel or Google Sheets. Both write to a location you pick.</p>
+        </details>
+        <details>
+          <summary data-i18n="q7">How do I delete everything?</summary>
+          <p data-i18n="a7">Wipe it from inside Settings, behind a double confirmation — or
+            uninstall the app, which removes the database permanently. Backup files you made
+            yourself are yours to delete separately.</p>
+        </details>
+      </div>
+    </section>
+
+    <div class="closing">
+      <h2 data-i18n="closeH">Your money is nobody else's business</h2>
+      <p data-i18n="closeP">Kaskucing keeps it that way. Install it once and it works — at the
+        warung, on the bus, with the data quota long gone.</p>
+      <div class="cta-row">
+        <a class="btn-play" href="https://play.google.com/store/apps/details?id=com.blankpoof.kaskucing">
+          <svg viewBox="0 0 512 512" aria-hidden="true" focusable="false">
+            <path fill="#fff" opacity=".95" d="M43.5 26.2C36.6 33.5 32.7 44.8 32.7 59.4v393.2c0 14.6 3.9 25.9 10.8 33.2l219.7-259.8z"/>
+            <path fill="#fff" opacity=".8" d="M43.5 26.2 263.2 226l91.2-91.2L96.9 8.2C77-2.5 57.4 12.3 43.5 26.2z"/>
+            <path fill="#fff" opacity=".66" d="M354.4 134.8 263.2 226l91.2 91.2 96.8-56.4c19.4-11.3 19.4-39.5 0-50.8z"/>
+            <path fill="#fff" opacity=".8" d="M43.5 485.8c13.9 13.9 33.5 28.7 53.4 18l257.5-150.1-91.2-91.2z"/>
+          </svg>
+          <span class="label">
+            <span class="sm" data-i18n="playSm">Get it on</span>
+            <span class="lg">Google Play</span>
+          </span>
+        </a>
+        <a class="btn-ghost" href="privacy/" data-i18n="privacyCta">Read the privacy policy</a>
+      </div>
+    </div>
+
+    <footer class="end">
+      <span>Kaskucing</span>
+      <a href="privacy/" data-i18n="fPrivacy">Privacy policy</a>
+      <a href="mailto:kaskucing.admin@gmail.com" data-i18n="fContact">Contact</a>
+      <span class="spacer"></span>
+      <a href="https://sambanf.github.io/" data-i18n="fBy">Made by Samba Nugraha</a>
+    </footer>
+
+  </div>
+</main>
+
+<script src="../assets/lang.js"></script>
+<script>
+var I18N = {
+  en: {
+    _title: 'Kaskucing — Offline Daily Cash Book for Android',
+    _meta: 'Kaskucing is a fully offline daily money tracker for Android. No account, no internet permission, no ads. Record cash and e-wallet spending in under five seconds, with reports, budgets and backups you own.',
+    iconAlt: 'Kaskucing app icon',
+    tagline: 'A daily cash book, fully offline.',
+    lede: 'Cash, bank and e-wallet money in one place, on the phone you already own. Kaskucing records a transaction in three taps and under five seconds — and it does all of it without ever asking for the internet.',
+    chip1: 'No internet permission',
+    chip2: 'No account',
+    chip3: 'No ads or tracking',
+    playSm: 'Get it on',
+    privacyCta: 'Read the privacy policy',
+
+    ebOffline: 'Offline by design',
+    h2Offline: 'The offline promise',
+    subOffline: 'Most money apps want a signal, a login and your financial history on their server. Kaskucing wants none of them.',
+    promise1: "Kaskucing does not declare Android's INTERNET permission.",
+    promise2: 'That is not a setting you have to find, or a promise you have to take on trust. Android enforces it at the operating-system level: an app without that permission cannot open a network connection at all. What you earn, what you spend and what is left in each wallet stays on your phone.',
+    promise3: 'It is also checked by the build itself. A release that picked up the permission from any library — even by accident, even deep in a dependency — fails to build rather than reaching Google Play.',
+    why1t: 'Works with the quota gone',
+    why1b: 'Out of data mid-month, on a train, in a basement. If the phone turns on, you can still record and still read the month.',
+    why2t: 'Nothing to renew',
+    why2b: 'No sign-up, no subscription pop-up in front of the report screen, no server that can go down and take your records with it.',
+    why3t: 'Nothing can leak',
+    why3b: "No analytics, no advertising, no crash reporting. Your income is nobody's business because none of it can leave.",
+
+    ebFeatures: 'What it does',
+    h2Features: 'Fast to write, honest to read',
+    subFeatures: 'Most money apps are abandoned in week two, because recording costs more effort than the entry feels worth. Kaskucing is built around the first five seconds — and then answers the question at month end.',
+    f1t: 'Five seconds, three taps',
+    f1b: 'Amount, category, done. The keypad has a calculator built in, so 12000+3500 saves as one line — and "save and add another" keeps the wallet, category and date for the next one.',
+    f2t: 'Every wallet in one book',
+    f2b: 'Cash, bank, e-wallet, credit and paylater, savings. Move money between them with a transfer — which is counted as neither income nor expense, so it never inflates a total.',
+    f3t: 'Categories already set up',
+    f3b: "Makanan, Transportasi, Tagihan and the rest are there on first launch. The picker floats the ones you actually use to the top, and a missing one can be made without losing the entry you're in the middle of.",
+    f4t: 'Where the month actually went',
+    f4b: 'Spending by category as a donut and a ranked list, income against expense month by month, and your five biggest outgoings. Tap any slice to see the exact transactions behind the number.',
+    f5t: 'One income, four groups',
+    f5b: 'Split what you earn between Needs, Recurring Needs, Flex Budget and Saving — by percentage, so the plan works whatever the month brings in. A warning arrives at 80% of a group, and again at 100%.',
+    f6t: 'Rent and subscriptions post themselves',
+    f6b: 'Set a rule once — daily, weekly, monthly or yearly — and let it run. Leave the app closed for a fortnight and every missed occurrence appears on its own date, not bundled onto today.',
+    f7t: 'Backups you own',
+    f7b: 'One file holds everything, and it goes wherever you point it — the phone, an SD card, WhatsApp, a cloud folder. Export to CSV for a spreadsheet, and restore by replacing or merging.',
+    f8t: 'Yours to set up',
+    f8b: 'Indonesian or English, light or dark, Rupiah formatted the way it is written here. Your month can start on any date, and one tap hides every figure when somebody is looking over your shoulder.',
+
+    ebStart: 'Getting started',
+    h2Start: 'Recording within a minute of installing',
+    s1t: 'Install it and open it',
+    s1b: 'No account to create, no code to verify, no email. A cash wallet and a set of Indonesian categories are already there, so the first entry needs no setup at all.',
+    s2t: 'Answer three questions — or skip them',
+    s2b: 'What wallets you have and what is in them, what you earn in a month, and how you want to divide it. Every one of them is skippable, and none of them blocks the first transaction.',
+    s3t: 'Record for a week',
+    s3b: 'Log things as they happen — the point is that it costs seconds, not minutes. Backdate anything you missed; the date picker takes any day you like.',
+    s4t: 'Read the month, then back it up',
+    s4b: 'Open the report at month end and see where it went. Write a backup file and keep it somewhere safe, or send it to yourself.',
+
+    ebSpecs: 'At a glance',
+    h2Specs: 'The details',
+    sp1k: 'Platform',
+    sp1v: 'Android 7.0 and later, distributed through Google Play',
+    sp2k: 'Package',
+    sp3k: 'Internet',
+    sp3v: 'Not requested — the app has no INTERNET permission, so it cannot connect',
+    sp4k: 'Account',
+    sp4v: 'None. No sign-up, no sign-in, no server',
+    sp5k: 'Permissions',
+    sp5v: 'Notifications only, and only if you switch budget alerts on. Nothing else',
+    sp6k: 'Your data',
+    sp6v: "Kept in the app's own private storage, which other apps cannot read",
+    sp7k: 'Amounts',
+    sp7v: 'Stored as exact whole Rupiah, never as decimals that can drift',
+    sp8k: 'Languages',
+    sp8v: 'Indonesian and English, switchable inside the app',
+    sp9k: 'Ads and analytics',
+    sp9v: 'None of either, and no crash reporting',
+    sp10k: 'Support',
+
+    ebFaq: 'Questions',
+    h2Faq: 'Frequently asked',
+    q1: 'Do I need an internet connection?',
+    a1: "No — and you couldn't give it one if you tried. Kaskucing has no INTERNET permission, so every feature works with the phone in airplane mode.",
+    q2: 'Is there an account or a subscription?',
+    a2: 'Neither. There is nothing to sign up for, nothing to log into and no server behind the app. No feature is held back behind a payment.',
+    q3: 'Does it read my bank SMS or connect to my accounts?',
+    a3: 'No, and that is deliberate. Reading transaction SMS needs a permission that can see every message on the phone, and connecting to an account needs the internet. Every figure in Kaskucing is one you entered yourself, which is also why it can be trusted.',
+    q4: 'Can I keep cash and my e-wallets apart?',
+    a4: 'Yes. Make a wallet for each — cash, bank, GoPay, OVO, a credit card — and each keeps its own balance. Moving money between them is a transfer, which is left out of income and expense totals so your figures stay honest.',
+    q5: 'What happens to my data if I change phones?',
+    a5: 'Export a backup file from Settings and import it on the new phone. Send it to yourself over WhatsApp or save it to a cloud folder — it is an ordinary file, and it is yours.',
+    q6: 'Can I get my data out of the app?',
+    a6: 'Yes. A full backup as one JSON file, or your transactions as a CSV that opens in Excel or Google Sheets. Both write to a location you pick.',
+    q7: 'How do I delete everything?',
+    a7: 'Wipe it from inside Settings, behind a double confirmation — or uninstall the app, which removes the database permanently. Backup files you made yourself are yours to delete separately.',
+
+    closeH: "Your money is nobody else's business",
+    closeP: 'Kaskucing keeps it that way. Install it once and it works — at the warung, on the bus, with the data quota long gone.',
+    fPrivacy: 'Privacy policy',
+    fContact: 'Contact',
+    fBy: 'Made by Samba Nugraha'
+  },
+
+  id: {
+    _title: 'Kaskucing — Aplikasi Catatan Keuangan Harian Offline',
+    _meta: 'Kaskucing adalah aplikasi catatan keuangan harian yang sepenuhnya offline untuk Android. Tanpa akun, tanpa izin internet, tanpa iklan. Catat pengeluaran tunai dan e-wallet dalam hitungan detik, lengkap dengan laporan, anggaran, dan backup milik Anda sendiri.',
+    iconAlt: 'Ikon aplikasi Kaskucing',
+    tagline: 'Catatan keuangan harian, sepenuhnya offline.',
+    lede: 'Uang tunai, rekening bank, dan e-wallet dalam satu catatan, di HP yang sudah Anda punya. Kaskucing mencatat satu transaksi dalam tiga ketukan dan kurang dari lima detik — semuanya tanpa pernah meminta koneksi internet.',
+    chip1: 'Tanpa izin internet',
+    chip2: 'Tanpa akun',
+    chip3: 'Tanpa iklan atau pelacakan',
+    playSm: 'Dapatkan di',
+    privacyCta: 'Baca kebijakan privasi',
+
+    ebOffline: 'Offline sejak awal',
+    h2Offline: 'Janji offline',
+    subOffline: 'Kebanyakan aplikasi keuangan menuntut sinyal, login, dan riwayat keuangan Anda tersimpan di server mereka. Kaskucing tidak menuntut satu pun.',
+    promise1: 'Kaskucing tidak mendeklarasikan izin INTERNET Android.',
+    promise2: 'Ini bukan pengaturan yang harus Anda cari, atau janji yang harus Anda percayai begitu saja. Android menegakkannya di tingkat sistem operasi: aplikasi tanpa izin tersebut sama sekali tidak bisa membuka koneksi jaringan. Berapa yang Anda dapat, berapa yang Anda habiskan, dan berapa sisa di tiap dompet tetap ada di HP Anda.',
+    promise3: 'Hal itu juga diperiksa oleh proses build-nya sendiri. Rilis yang sampai membawa izin tersebut dari pustaka mana pun — sekalipun tidak sengaja, sekalipun terselip jauh di dalam dependensi — akan gagal dibangun, bukan malah sampai ke Google Play.',
+    why1t: 'Jalan terus meski kuota habis',
+    why1b: 'Kuota habis di tengah bulan, di dalam kereta, di ruang bawah tanah. Selama HP menyala, Anda tetap bisa mencatat dan tetap bisa membaca laporan bulan ini.',
+    why2t: 'Tidak ada yang perlu diperpanjang',
+    why2b: 'Tanpa pendaftaran, tanpa pop-up langganan yang menghalangi layar laporan, tanpa server yang bisa mati dan membawa catatan Anda ikut hilang.',
+    why3t: 'Tidak ada yang bisa bocor',
+    why3b: 'Tanpa analitik, tanpa iklan, tanpa laporan galat. Penghasilan Anda bukan urusan siapa pun karena tidak ada satu pun yang bisa keluar.',
+
+    ebFeatures: 'Apa yang bisa dilakukan',
+    h2Features: 'Cepat dicatat, jujur dibaca',
+    subFeatures: 'Kebanyakan aplikasi keuangan ditinggalkan di minggu kedua, karena mencatat terasa lebih repot daripada nilai catatannya sendiri. Kaskucing dirancang untuk lima detik pertama — lalu menjawab pertanyaannya di akhir bulan.',
+    f1t: 'Lima detik, tiga ketukan',
+    f1b: 'Nominal, kategori, selesai. Keypad-nya sudah punya kalkulator, jadi 12000+3500 tersimpan sebagai satu baris — dan "simpan & tambah lagi" mempertahankan dompet, kategori, serta tanggalnya untuk entri berikutnya.',
+    f2t: 'Semua dompet dalam satu buku',
+    f2b: 'Tunai, bank, e-wallet, kartu kredit dan paylater, tabungan. Pindahkan uang antar dompet lewat transfer — yang tidak dihitung sebagai pemasukan maupun pengeluaran, jadi tidak pernah menggelembungkan total.',
+    f3t: 'Kategori sudah siap pakai',
+    f3b: 'Makanan, Transportasi, Tagihan, dan lainnya sudah ada sejak pertama dibuka. Pemilihnya menaikkan kategori yang benar-benar sering Anda pakai, dan kategori baru bisa dibuat tanpa kehilangan entri yang sedang Anda isi.',
+    f4t: 'Ke mana sebenarnya uang bulan ini',
+    f4b: 'Pengeluaran per kategori dalam bentuk donat dan daftar berperingkat, pemasukan versus pengeluaran bulan demi bulan, serta lima pengeluaran terbesar Anda. Ketuk salah satu bagiannya untuk melihat transaksi persis di balik angka itu.',
+    f5t: 'Satu penghasilan, empat kelompok',
+    f5b: 'Bagi penghasilan Anda ke dalam Kebutuhan, Kebutuhan Rutin, Anggaran Fleksibel, dan Tabungan — dalam persentase, sehingga rencananya tetap jalan berapa pun pemasukan bulan itu. Peringatan datang saat satu kelompok menyentuh 80%, lalu sekali lagi di 100%.',
+    f6t: 'Sewa dan langganan tercatat sendiri',
+    f6b: 'Atur aturannya sekali — harian, mingguan, bulanan, atau tahunan — lalu biarkan berjalan. Tinggalkan aplikasinya dua minggu dan setiap kejadian yang terlewat muncul pada tanggalnya masing-masing, bukan menumpuk di hari ini.',
+    f7t: 'Backup milik Anda sendiri',
+    f7b: 'Satu file memuat semuanya, dan bisa Anda simpan ke mana pun — HP, kartu SD, WhatsApp, folder cloud. Ekspor ke CSV untuk dibuka di spreadsheet, dan pulihkan dengan cara mengganti atau menggabungkan.',
+    f8t: 'Diatur sesuai selera Anda',
+    f8b: 'Bahasa Indonesia atau Inggris, terang atau gelap, Rupiah ditulis sebagaimana mestinya. Bulan Anda boleh dimulai di tanggal berapa pun, dan satu ketukan menyembunyikan semua angka saat ada yang mengintip layar.',
+
+    ebStart: 'Mulai',
+    h2Start: 'Mencatat dalam semenit setelah dipasang',
+    s1t: 'Pasang lalu buka',
+    s1b: 'Tidak ada akun yang perlu dibuat, tidak ada kode yang perlu diverifikasi, tidak ada email. Satu dompet tunai dan sekumpulan kategori berbahasa Indonesia sudah tersedia, jadi entri pertama sama sekali tidak butuh persiapan.',
+    s2t: 'Jawab tiga pertanyaan — atau lewati saja',
+    s2b: 'Dompet apa saja yang Anda punya dan berapa isinya, berapa penghasilan Anda sebulan, dan bagaimana ingin membaginya. Ketiganya boleh dilewati, dan tak satu pun menghalangi transaksi pertama.',
+    s3t: 'Catat selama seminggu',
+    s3b: 'Catat begitu kejadian — justru itu intinya: biayanya hitungan detik, bukan menit. Yang terlewat bisa dicatat mundur; pemilih tanggalnya menerima hari apa pun.',
+    s4t: 'Baca bulannya, lalu backup',
+    s4b: 'Buka laporan di akhir bulan dan lihat ke mana perginya. Buat file backup lalu simpan di tempat yang aman, atau kirimkan ke diri Anda sendiri.',
+
+    ebSpecs: 'Ringkasan',
+    h2Specs: 'Detailnya',
+    sp1k: 'Platform',
+    sp1v: 'Android 7.0 ke atas, disalurkan lewat Google Play',
+    sp2k: 'Paket',
+    sp3k: 'Internet',
+    sp3v: 'Tidak diminta — aplikasi tidak punya izin INTERNET, jadi tidak bisa terhubung',
+    sp4k: 'Akun',
+    sp4v: 'Tidak ada. Tanpa pendaftaran, tanpa login, tanpa server',
+    sp5k: 'Izin',
+    sp5v: 'Hanya notifikasi, itu pun kalau Anda menyalakan peringatan anggaran. Selain itu tidak ada',
+    sp6k: 'Data Anda',
+    sp6v: 'Disimpan di penyimpanan privat milik aplikasi, yang tidak bisa dibaca aplikasi lain',
+    sp7k: 'Nominal',
+    sp7v: 'Disimpan sebagai Rupiah bulat yang persis, bukan desimal yang bisa melenceng',
+    sp8k: 'Bahasa',
+    sp8v: 'Indonesia dan Inggris, bisa diganti dari dalam aplikasi',
+    sp9k: 'Iklan dan analitik',
+    sp9v: 'Keduanya tidak ada, begitu pula laporan galat',
+    sp10k: 'Dukungan',
+
+    ebFaq: 'Pertanyaan',
+    h2Faq: 'Sering ditanyakan',
+    q1: 'Apakah saya butuh koneksi internet?',
+    a1: 'Tidak — dan Anda memang tidak bisa memberinya, sekalipun mau. Kaskucing tidak punya izin INTERNET, jadi semua fitur tetap bekerja meski HP dalam mode pesawat.',
+    q2: 'Apakah ada akun atau langganan?',
+    a2: 'Tidak keduanya. Tidak ada yang perlu didaftarkan, tidak ada yang perlu dimasuki, dan tidak ada server di belakang aplikasi ini. Tidak ada fitur yang ditahan di balik pembayaran.',
+    q3: 'Apakah aplikasinya membaca SMS bank atau terhubung ke rekening saya?',
+    a3: 'Tidak, dan itu memang disengaja. Membaca SMS transaksi butuh izin yang bisa melihat seluruh pesan di HP, sedangkan menyambung ke rekening butuh internet. Setiap angka di Kaskucing adalah angka yang Anda masukkan sendiri — dan justru karena itulah angkanya bisa dipercaya.',
+    q4: 'Bisakah uang tunai dan e-wallet saya dipisah?',
+    a4: 'Bisa. Buat satu dompet untuk masing-masing — tunai, bank, GoPay, OVO, kartu kredit — dan tiap dompet punya saldonya sendiri. Memindahkan uang di antaranya dihitung sebagai transfer, yang dikecualikan dari total pemasukan dan pengeluaran supaya angka Anda tetap jujur.',
+    q5: 'Bagaimana data saya kalau ganti HP?',
+    a5: 'Ekspor file backup dari Pengaturan, lalu impor di HP baru. Kirimkan ke diri sendiri lewat WhatsApp atau simpan ke folder cloud — itu file biasa, dan itu milik Anda.',
+    q6: 'Bisakah saya mengeluarkan data saya dari aplikasi?',
+    a6: 'Bisa. Backup lengkap dalam satu file JSON, atau transaksi Anda sebagai CSV yang bisa dibuka di Excel maupun Google Sheets. Keduanya ditulis ke lokasi yang Anda pilih.',
+    q7: 'Bagaimana cara menghapus semuanya?',
+    a7: 'Hapus dari dalam Pengaturan, dengan konfirmasi dua kali — atau copot aplikasinya, yang menghapus databasenya secara permanen. File backup yang Anda buat sendiri terpisah, dan Anda hapus sendiri.',
+
+    closeH: 'Uang Anda bukan urusan orang lain',
+    closeP: 'Kaskucing menjaganya tetap begitu. Pasang sekali dan langsung bekerja — di warung, di dalam bus, saat kuota sudah lama habis.',
+    fPrivacy: 'Kebijakan privasi',
+    fContact: 'Kontak',
+    fBy: 'Dibuat oleh Samba Nugraha'
+  }
+};
+SiteLang.init(I18N);
+</script>
+</body>
+</html>

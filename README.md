@@ -24,6 +24,7 @@ Personal site and simple tools, served by [GitHub Pages](https://pages.github.co
 - **`/sudoku/`** — Sudoku ([sudoku/index.html](sudoku/index.html))
 - **`/slidepuzzle/`** — photo slide puzzle with offline download ([slidepuzzle/index.html](slidepuzzle/index.html))
 - **`/stokancil/`** — Stokancil app site: homepage ([stokancil/index.html](stokancil/index.html)) and privacy policy ([stokancil/privacy/index.html](stokancil/privacy/index.html))
+- **`/kaskucing/`** — Kaskucing app site: homepage ([kaskucing/index.html](kaskucing/index.html)) and privacy policy ([kaskucing/privacy/index.html](kaskucing/privacy/index.html))
 - **`/assets/style.css`** — shared design tokens and base styles used by every page
 - **`/assets/lang.js`** — shared English/Indonesian language switcher
 - **`/assets/theme.js`** — shared dark-mode toggle (system default, manual override in `localStorage['site.theme']`)
@@ -34,6 +35,19 @@ Personal site and simple tools, served by [GitHub Pages](https://pages.github.co
 2. Link the shared stylesheet: `<link rel="stylesheet" href="../assets/style.css">`.
 3. Add a card for it in the Tools section of the root `index.html`.
 4. Commit and push — it appears at `https://sambanf.github.io/mytool/`.
+
+## App landing pages
+
+The Android apps each get a folder holding a bilingual landing page, a privacy
+policy at `privacy/`, and an `assets/` folder with `icon-192.png`,
+`icon-512.png` and a 1200×630 `og.png` for link previews. They are listed in
+their own **Android apps** section above the Tools section of the root
+`index.html` — deliberately outside it, so the tool search never filters them
+away. Their cards use `.tool-icon.app-logo`, which swaps the line-glyph tile for
+the app's real launcher icon.
+
+Unlike the tools, these pages carry their own colour tokens inline rather than
+using `assets/style.css`, so each app keeps its own brand palette.
 
 ## Languages (EN / ID)
 

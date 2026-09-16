@@ -279,6 +279,23 @@
       transform: scale(1.08) rotate(-4deg);
     }
 
+    /* Android app cards carry the real launcher icon instead of a line glyph,
+       and give it a little more room — it is artwork, not a 2px stroke. */
+    .tool-icon.app-logo {
+      width: 3.25rem;
+      height: 3.25rem;
+      background: none;
+      overflow: hidden;
+      box-shadow: 0 0 0 1px var(--border);
+    }
+
+    .tool-icon.app-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
     .tool-card h3 {
       margin: 0;
     }
@@ -499,6 +516,40 @@
   </header>
 
   <main>
+
+    <!-- ============================================================
+         Apps — the published Android apps. Deliberately its own
+         section above Tools, and outside it: these are not browser
+         tools, and the tool search must never filter them away.
+         ============================================================ -->
+    <section class="section" id="apps" aria-labelledby="apps-heading">
+      <div class="container">
+        <h2 class="section-heading reveal" id="apps-heading" data-i18n="appsHeading">Android apps</h2>
+        <p class="section-intro reveal" data-i18n="appsIntro">Apps I publish on Google Play. Both are fully offline — no account, no internet permission, and nothing that leaves your phone.</p>
+
+        <ul class="tool-grid">
+
+          <li class="card tool-card reveal">
+            <span class="tool-icon app-logo" aria-hidden="true">
+              <img src="stokancil/assets/icon-192.png" alt="" width="52" height="52" decoding="async">
+            </span>
+            <h3><a href="stokancil/" data-i18n="toolStokancilTitle">Stokancil</a></h3>
+            <p data-i18n="toolStokancilDesc">Offline point-of-sale and stock book for small shops — sales, barcode scanning and thermal receipts, with no internet permission at all.</p>
+            <span class="tool-cta" aria-hidden="true" data-i18n="openApp">View app</span>
+          </li>
+
+          <li class="card tool-card reveal">
+            <span class="tool-icon app-logo" aria-hidden="true">
+              <img src="kaskucing/assets/icon-192.png" alt="" width="52" height="52" decoding="async">
+            </span>
+            <h3><a href="kaskucing/" data-i18n="toolKaskucingTitle">Kaskucing</a></h3>
+            <p data-i18n="toolKaskucingDesc">Offline daily cash book for Android — record what you spend in seconds, then see where the month actually went. No account, no signal needed.</p>
+            <span class="tool-cta" aria-hidden="true" data-i18n="openApp">View app</span>
+          </li>
+
+        </ul>
+      </div>
+    </section>
 
     <!-- ============================================================
          Tools — the heart of the page. To add a new tool, copy a
@@ -891,8 +942,14 @@
           typedPrefix: 'building',
           typedSr: 'building simple web tools',
           browseTools: 'Browse the tools',
+          appsHeading: 'Android apps',
+          appsIntro: 'Apps I publish on Google Play. Both are fully offline — no account, no internet permission, and nothing that leaves your phone.',
           toolsHeading: 'Tools',
           toolsIntro: 'Small, self-contained web tools. Free to use, no sign-up, everything runs in your browser.',
+          toolStokancilTitle: 'Stokancil',
+          toolStokancilDesc: 'Offline point-of-sale and stock book for small shops — sales, barcode scanning and thermal receipts, with no internet permission at all.',
+          toolKaskucingTitle: 'Kaskucing',
+          toolKaskucingDesc: 'Offline daily cash book for Android — record what you spend in seconds, then see where the month actually went. No account, no signal needed.',
           toolStockTitle: 'Stock Average Calculator',
           toolStockDesc: 'Work out your new average cost when buying more shares at a lower price, and see how far your break-even moves.',
           toolCharTitle: 'Character & Word Counter',
@@ -940,6 +997,7 @@
           catGames: 'Games',
           noResults: 'No tools match your search.',
           openTool: 'Open tool',
+          openApp: 'View app',
           aboutHeading: 'About',
           about1: "I'm a software engineer who enjoys turning small, recurring annoyances into simple tools that just work.",
           about2: 'This site is where I publish those tools — each one is a plain, fast web page with no accounts and no tracking.',
@@ -953,8 +1011,14 @@
           typedPrefix: 'membuat',
           typedSr: 'membuat alat web sederhana',
           browseTools: 'Lihat semua alat',
+          appsHeading: 'Aplikasi Android',
+          appsIntro: 'Aplikasi yang saya terbitkan di Google Play. Keduanya sepenuhnya offline — tanpa akun, tanpa izin internet, dan tidak ada apa pun yang keluar dari HP Anda.',
           toolsHeading: 'Alat',
           toolsIntro: 'Alat web kecil yang mandiri. Gratis, tanpa daftar, semuanya berjalan di browser Anda.',
+          toolStokancilTitle: 'Stokancil',
+          toolStokancilDesc: 'Aplikasi kasir dan stok offline untuk toko kecil — penjualan, pindai barcode, dan struk termal, sama sekali tanpa izin internet.',
+          toolKaskucingTitle: 'Kaskucing',
+          toolKaskucingDesc: 'Catatan keuangan harian offline untuk Android — catat pengeluaran dalam hitungan detik, lalu lihat ke mana sebenarnya uang bulan ini pergi. Tanpa akun, tanpa sinyal.',
           toolStockTitle: 'Kalkulator Average Saham',
           toolStockDesc: 'Hitung harga rata-rata baru saat membeli saham tambahan di harga yang lebih rendah, dan lihat seberapa jauh titik break-even Anda bergeser.',
           toolCharTitle: 'Penghitung Karakter & Kata',
@@ -1002,6 +1066,7 @@
           catGames: 'Permainan',
           noResults: 'Tidak ada alat yang cocok dengan pencarian Anda.',
           openTool: 'Buka alat',
+          openApp: 'Lihat aplikasi',
           aboutHeading: 'Tentang',
           about1: 'Saya software engineer yang senang mengubah gangguan kecil sehari-hari menjadi alat sederhana yang benar-benar berfungsi.',
           about2: 'Situs ini tempat saya memublikasikan alat-alat itu — masing-masing berupa halaman web sederhana dan cepat, tanpa akun dan tanpa pelacakan.',
