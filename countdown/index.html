@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Countdown Timer</title>
+  <meta name="description" content="Free countdown timer. Enter a duration in seconds, start it, and get an on-screen alert and sound when time runs out — all in your browser.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d9488'/%3E%3Cg stroke='%23ffffff' stroke-width='2.4' fill='none' stroke-linecap='round'%3E%3Cpath d='M13 4h6'/%3E%3Cpath d='M16 4v3'/%3E%3Cpath d='M7.5 18a8.5 8.5 0 1 0 17 0 8.5 8.5 0 1 0-17 0'/%3E%3Cpath d='M16 13v5l3 2'/%3E%3C/g%3E%3C/svg%3E">
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../assets/theme.js"></script>
+  <style>
+    .top-nav {
+      padding: 1.25rem 0 2.25rem; font-size: 0.9rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .top-nav a { color: var(--text-muted); text-decoration: none; }
+    .top-nav a:hover { color: var(--accent-strong); }
+    .lede { color: var(--text-muted); max-width: 44rem; margin-bottom: 0; }
+    .tool-card { margin: 1.75rem 0 1.25rem; }
+    .how-card { margin-bottom: 1rem; }
+
+    .cd-quick { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.75rem 0 0.25rem; }
+    .btn-sm { padding: 0.35rem 0.7rem; font-size: 0.8rem; }
+
+    .cd-wrap { text-align: center; margin: 1.75rem 0 0.5rem; }
+    .cd-display {
+      font-family: var(--mono); font-weight: 700;
+      font-size: clamp(2.75rem, 13vw, 5.25rem);
+      letter-spacing: 0.02em; font-variant-numeric: tabular-nums;
+      color: var(--text);
+    }
+    .cd-display.done { color: var(--negative); }
+    @media (prefers-reduced-motion: no-preference) {
+      .cd-display.done { animation: cd-pulse 1s ease-in-out infinite; }
+    }
+    @keyframes cd-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    .cd-track {
+      height: 10px; border-radius: 999px; margin: 1rem 0 1.4rem;
+      background: var(--surface-2); border: 1px solid var(--border); overflow: hidden;
+    }
+    .cd-bar { height: 100%; width: 100%; border-radius: inherit; background: var(--accent); transition: width 0.2s linear, background 0.2s ease; }
+    .cd-bar.done { background: var(--negative); }
+
+    .cd-status { text-align: center; min-height: 1.3em; margin: 0 0 1rem; color: var(--text-muted); font-size: 0.95rem; }
+
+    .cd-actions { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; margin-bottom: 0.25rem; }
+    .cd-actions .btn { min-width: 7.5rem; justify-content: center; }
+
+    .opt { display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem; font-size: 0.9rem; justify-content: center; }
+    .opt input { width: auto; }
+
+    .err { color: var(--negative); font-size: 0.9rem; min-height: 1.2em; margin: 0.5rem 0 0; text-align: center; }
+
+    @media (max-width: 520px) {
+      .card { padding: 1.1rem; }
+      .cd-actions .btn { min-width: 40%; flex: 1; }
+    }
+  </style>
+</head>
+<body>
+  <header class="container">
+    <nav class="top-nav" aria-label="Site" data-i18n-attr="aria-label:nav_site">
+      <a href="../">&#8592; samba nugraha</a>
+      <div class="nav-actions">
+      <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
+        <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0l60 30M60 0L0 30" stroke="#fff" stroke-width="6"/><path d="M0 0l60 30M60 0L0 30" stroke="#C8102E" stroke-width="2.5"/><path d="M30 0v30M0 15h60" stroke="#fff" stroke-width="10"/><path d="M30 0v30M0 15h60" stroke="#C8102E" stroke-width="6"/></svg>EN
+        </button>
+        <button type="button" data-lang="id" aria-pressed="false" aria-label="Bahasa Indonesia">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="15" fill="#E70011"/><rect y="15" width="60" height="15" fill="#F7F7F7"/></svg>ID
+        </button>
+      </div>
+      <button type="button" class="theme-toggle" aria-label="Dark mode / Mode gelap" aria-pressed="false">
+        <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+      </div>
+    </nav>
+    <h1 data-i18n="h1">Countdown Timer</h1>
+    <p class="lede" data-i18n="lede">Enter a duration in seconds, hit start, and get an on-screen alert and sound the moment it hits zero.</p>
+  </header>
+
+  <main class="container">
+    <noscript>
+      <div class="card" style="border-left:3px solid var(--negative)">This tool needs JavaScript to run. Please enable it and reload. / Alat ini membutuhkan JavaScript. Aktifkan lalu muat ulang.</div>
+    </noscript>
+
+    <div class="card tool-card">
+      <label for="cd-seconds" data-i18n="seconds_label">Seconds</label>
+      <input id="cd-seconds" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" placeholder="e.g. 90" data-i18n-attr="placeholder:seconds_ph">
+
+      <div class="cd-quick">
+        <button type="button" class="btn btn-sm" data-add="10" data-i18n="quick_10">+10s</button>
+        <button type="button" class="btn btn-sm" data-add="30" data-i18n="quick_30">+30s</button>
+        <button type="button" class="btn btn-sm" data-add="60" data-i18n="quick_60">+1m</button>
+        <button type="button" class="btn btn-sm" data-add="300" data-i18n="quick_300">+5m</button>
+        <button type="button" class="btn btn-sm" id="cd-clear" data-i18n="btn_clear">Clear</button>
+      </div>
+
+      <p class="err" id="cd-err"></p>
+
+      <div class="cd-wrap">
+        <div class="cd-display" id="cd-display">00:00</div>
+      </div>
+      <div class="cd-track" aria-hidden="true"><div class="cd-bar" id="cd-bar"></div></div>
+      <p class="cd-status" id="cd-status" aria-live="polite" data-i18n="status_idle">Ready to start.</p>
+
+      <div class="cd-actions">
+        <button type="button" class="btn btn-primary" id="cd-toggle" data-i18n="btn_start">Start</button>
+        <button type="button" class="btn" id="cd-reset" data-i18n="btn_reset">Reset</button>
+      </div>
+
+      <label class="opt" for="cd-sound">
+        <input type="checkbox" id="cd-sound" checked>
+        <span data-i18n="sound_label">Play a sound when it ends</span>
+      </label>
+    </div>
+
+    <section class="card how-card" aria-labelledby="how-heading">
+      <h2 id="how-heading" data-i18n="how_title">How it works</h2>
+      <p data-i18n="how_1">The countdown is based on your device's clock, so it stays accurate even if this tab loses focus — though the display may only catch up once you switch back to it.</p>
+      <p class="muted small" data-i18n="privacy">Everything runs in your browser — nothing is uploaded and nothing is tracked.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p><a href="../" data-i18n="footer_back">&#8592; back to all tools</a> &middot; &copy; 2026 Samba Nugraha</p>
+    </div>
+  </footer>
+
+  <script src="../assets/lang.js"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    var MAX_SECONDS = 359999; // 99:59:59
+
+    var I18N = {
+      en: {
+        _title: 'Countdown Timer',
+        _meta: 'Free countdown timer. Enter a duration in seconds, start it, and get an on-screen alert and sound when time runs out — all in your browser.',
+        nav_site: 'Site',
+        h1: 'Countdown Timer',
+        lede: 'Enter a duration in seconds, hit start, and get an on-screen alert and sound the moment it hits zero.',
+        seconds_label: 'Seconds',
+        seconds_ph: 'e.g. 90',
+        quick_10: '+10s',
+        quick_30: '+30s',
+        quick_60: '+1m',
+        quick_300: '+5m',
+        btn_clear: 'Clear',
+        btn_start: 'Start',
+        btn_pause: 'Pause',
+        btn_resume: 'Resume',
+        btn_reset: 'Reset',
+        sound_label: 'Play a sound when it ends',
+        status_idle: 'Ready to start.',
+        status_running: 'Counting down…',
+        status_paused: 'Paused.',
+        status_done: "Time's up!",
+        err_seconds: 'Enter a whole number of seconds, from 1 to 359999 (99:59:59).',
+        title_done: "⏰ Time's up!",
+        how_title: 'How it works',
+        how_1: "The countdown is based on your device's clock, so it stays accurate even if this tab loses focus — though the display may only catch up once you switch back to it.",
+        privacy: 'Everything runs in your browser — nothing is uploaded and nothing is tracked.',
+        footer_back: '← back to all tools'
+      },
+      id: {
+        _title: 'Timer Hitung Mundur',
+        _meta: 'Timer hitung mundur gratis. Masukkan durasi dalam detik, mulai, dan dapatkan peringatan di layar serta suara saat waktu habis — semuanya di browser Anda.',
+        nav_site: 'Situs',
+        h1: 'Timer Hitung Mundur',
+        lede: 'Masukkan durasi dalam detik, tekan mulai, dan dapatkan peringatan di layar serta suara begitu waktu habis.',
+        seconds_label: 'Detik',
+        seconds_ph: 'mis. 90',
+        quick_10: '+10d',
+        quick_30: '+30d',
+        quick_60: '+1m',
+        quick_300: '+5m',
+        btn_clear: 'Hapus',
+        btn_start: 'Mulai',
+        btn_pause: 'Jeda',
+        btn_resume: 'Lanjutkan',
+        btn_reset: 'Reset',
+        sound_label: 'Bunyikan suara saat selesai',
+        status_idle: 'Siap dimulai.',
+        status_running: 'Menghitung mundur…',
+        status_paused: 'Dijeda.',
+        status_done: 'Waktu habis!',
+        err_seconds: 'Masukkan bilangan bulat detik, dari 1 sampai 359999 (99:59:59).',
+        title_done: '⏰ Waktu habis!',
+        how_title: 'Cara kerja',
+        how_1: 'Hitung mundur ini mengikuti jam perangkat Anda, jadi tetap akurat walau tab ini tidak aktif — hanya saja tampilannya mungkin baru menyusul begitu Anda kembali ke tab ini.',
+        privacy: 'Semuanya berjalan di browser Anda — tidak ada yang diunggah dan tidak ada pelacakan.',
+        footer_back: '← kembali ke semua alat'
+      }
+    };
+
+    function t(key) { return window.SiteLang.t(key); }
+    function $(id) { return document.getElementById(id); }
+
+    var secondsInput = $('cd-seconds');
+    var errEl = $('cd-err');
+    var displayEl = $('cd-display');
+    var barEl = $('cd-bar');
+    var statusEl = $('cd-status');
+    var toggleBtn = $('cd-toggle');
+    var resetBtn = $('cd-reset');
+    var clearBtn = $('cd-clear');
+    var soundEl = $('cd-sound');
+
+    /* ---------- localStorage ---------- */
+
+    var NS = 'countdown.';
+    function save(key, value) { try { localStorage.setItem(NS + key, value); } catch (e) { /* ignore */ } }
+    function load(key) { try { return localStorage.getItem(NS + key); } catch (e) { return null; } }
+
+    /* ---------- Pure helpers ---------- */
+
+    function parseSeconds(raw) {
+      var s = (raw || '').trim();
+      if (!/^\d+$/.test(s)) return null;
+      var n = parseInt(s, 10);
+      if (!isFinite(n) || n < 1 || n > MAX_SECONDS) return null;
+      return n;
+    }
+
+    function formatMs(ms) {
+      var total = Math.max(0, Math.ceil(ms / 1000));
+      var h = Math.floor(total / 3600);
+      var m = Math.floor((total % 3600) / 60);
+      var s = total % 60;
+      function pad(n) { return (n < 10 ? '0' : '') + n; }
+      return h > 0 ? (h + ':' + pad(m) + ':' + pad(s)) : (pad(m) + ':' + pad(s));
+    }
+
+    /* ---------- Audio (short triple beep, no external files) ---------- */
+
+    var audioCtx = null;
+    function ensureAudio() {
+      if (audioCtx) { if (audioCtx.state === 'suspended') audioCtx.resume(); return; }
+      try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { /* unsupported */ }
+    }
+
+    function beep() {
+      if (!soundEl.checked || !audioCtx) return;
+      try {
+        var t0 = audioCtx.currentTime;
+        [0, 0.3, 0.6].forEach(function (delay) {
+          var osc = audioCtx.createOscillator();
+          var gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.value = 880;
+          gain.gain.setValueAtTime(0.0001, t0 + delay);
+          gain.gain.exponentialRampToValueAtTime(0.3, t0 + delay + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, t0 + delay + 0.26);
+          osc.connect(gain).connect(audioCtx.destination);
+          osc.start(t0 + delay);
+          osc.stop(t0 + delay + 0.28);
+        });
+      } catch (e) { /* ignore */ }
+    }
+
+    /* ---------- State machine: idle | running | paused | done ---------- */
+
+    var state = 'idle';
+    var durationMs = 0;
+    var remainingMs = 0;
+    var endAt = 0;
+    var tickTimer = null;
+    var lastErrKey = null;
+
+    function setErr(key) {
+      lastErrKey = key;
+      errEl.textContent = key ? t(key) : '';
+    }
+
+    function paint() {
+      var locked = state === 'running' || state === 'paused';
+      secondsInput.disabled = locked;
+      clearBtn.disabled = locked;
+      document.querySelectorAll('[data-add]').forEach(function (b) { b.disabled = locked; });
+      resetBtn.disabled = state === 'idle';
+
+      toggleBtn.textContent = t(
+        state === 'running' ? 'btn_pause' :
+        state === 'paused' ? 'btn_resume' : 'btn_start'
+      );
+      statusEl.textContent = t('status_' + state);
+      displayEl.classList.toggle('done', state === 'done');
+      barEl.classList.toggle('done', state === 'done');
+
+      if (locked) {
+        var pct = durationMs > 0 ? Math.max(0, Math.min(100, (remainingMs / durationMs) * 100)) : 0;
+        barEl.style.width = pct + '%';
+      } else {
+        barEl.style.width = '100%';
+      }
+    }
+
+    function previewIdle() {
+      if (state === 'running' || state === 'paused') return;
+      var n = parseInt((secondsInput.value || '').trim(), 10);
+      if (!isFinite(n) || n < 0) n = 0;
+      if (n > MAX_SECONDS) n = MAX_SECONDS;
+      displayEl.textContent = formatMs(n * 1000);
+    }
+
+    function dismissIfDone() {
+      if (state !== 'done') return;
+      state = 'idle';
+      document.title = t('_title');
+      paint();
+    }
+
+    function tick() {
+      var left = endAt - Date.now();
+      if (left <= 0) { finish(); return; }
+      remainingMs = left;
+      displayEl.textContent = formatMs(left);
+      var pct = durationMs > 0 ? Math.max(0, Math.min(100, (left / durationMs) * 100)) : 0;
+      barEl.style.width = pct + '%';
+    }
+
+    function finish() {
+      clearInterval(tickTimer); tickTimer = null;
+      remainingMs = 0;
+      state = 'done';
+      displayEl.textContent = formatMs(0);
+      paint();
+      beep();
+      document.title = t('title_done');
+    }
+
+    function onToggle() {
+      ensureAudio();
+      if (state === 'running') {
+        remainingMs = Math.max(0, endAt - Date.now());
+        clearInterval(tickTimer); tickTimer = null;
+        state = 'paused';
+        paint();
+        return;
+      }
+      if (state === 'paused') {
+        endAt = Date.now() + remainingMs;
+        state = 'running';
+        tickTimer = setInterval(tick, 200);
+        paint();
+        return;
+      }
+      // idle or done -> (re)start from the seconds field
+      var n = parseSeconds(secondsInput.value);
+      if (n === null) {
+        setErr('err_seconds');
+        secondsInput.focus();
+        return;
+      }
+      setErr(null);
+      durationMs = n * 1000;
+      remainingMs = durationMs;
+      endAt = Date.now() + remainingMs;
+      state = 'running';
+      document.title = t('_title');
+      displayEl.textContent = formatMs(remainingMs);
+      tickTimer = setInterval(tick, 200);
+      paint();
+    }
+
+    function onReset() {
+      clearInterval(tickTimer); tickTimer = null;
+      state = 'idle';
+      durationMs = 0;
+      remainingMs = 0;
+      setErr(null);
+      document.title = t('_title');
+      paint();
+      previewIdle();
+    }
+
+    toggleBtn.addEventListener('click', onToggle);
+    resetBtn.addEventListener('click', onReset);
+
+    clearBtn.addEventListener('click', function () {
+      if (state === 'running' || state === 'paused') return;
+      dismissIfDone();
+      secondsInput.value = '';
+      save('seconds', '');
+      setErr(null);
+      previewIdle();
+      secondsInput.focus();
+    });
+
+    document.querySelectorAll('[data-add]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (state === 'running' || state === 'paused') return;
+        dismissIfDone();
+        var add = parseInt(btn.getAttribute('data-add'), 10);
+        var cur = parseInt(secondsInput.value, 10);
+        if (!isFinite(cur) || cur < 0) cur = 0;
+        var next = Math.min(MAX_SECONDS, cur + add);
+        secondsInput.value = String(next);
+        save('seconds', secondsInput.value);
+        setErr(null);
+        previewIdle();
+      });
+    });
+
+    secondsInput.addEventListener('input', function () {
+      dismissIfDone();
+      save('seconds', secondsInput.value);
+      setErr(null);
+      previewIdle();
+    });
+
+    secondsInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); onToggle(); }
+    });
+
+    soundEl.addEventListener('change', function () {
+      save('sound', soundEl.checked ? '1' : '0');
+    });
+
+    window.addEventListener('focus', function () {
+      if (state === 'done') document.title = t('_title');
+    });
+
+    /* ---------- Restore, then first render ---------- */
+
+    var savedSeconds = load('seconds');
+    if (typeof savedSeconds === 'string') secondsInput.value = savedSeconds;
+    if (load('sound') === '0') soundEl.checked = false;
+
+    window.SiteLang.init(I18N, function () {
+      paint();
+      previewIdle();
+      setErr(lastErrKey);
+    });
+  })();
+  </script>
+</body>
+</html>

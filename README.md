@@ -14,6 +14,7 @@ Personal site and simple tools, served by [GitHub Pages](https://pages.github.co
 - **`/password/`** — password generator ([password/index.html](password/index.html))
 - **`/cron/`** — cron expression builder ([cron/index.html](cron/index.html))
 - **`/randompick/`** — random list picker ([randompick/index.html](randompick/index.html))
+- **`/countdown/`** — countdown timer, input in seconds ([countdown/index.html](countdown/index.html))
 - **`/diff/`** — text diff checker ([diff/index.html](diff/index.html))
 - **`/color/`** — color converter & contrast checker ([color/index.html](color/index.html))
 - **`/tictactoe/`** — tic-tac-toe vs AI or 2 players ([tictactoe/index.html](tictactoe/index.html))
