@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Snake</title>
   <meta name="description" content="Free Snake game. Eat, grow, and don't hit the walls — arrow keys or swipe, with your high score saved. Runs entirely in your browser.">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232563eb'/%3E%3Cpath d='M7 10h12a3.5 3.5 0 0 1 0 7H12a3.5 3.5 0 0 0 0 7h13' stroke='%23ffffff' stroke-width='2.6' fill='none' stroke-linecap='round'/%3E%3Ccircle cx='26' cy='9' r='2' fill='%23ffffff'/%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231e40af'/%3E%3Cpath d='M7 10h12a3.5 3.5 0 0 1 0 7H12a3.5 3.5 0 0 0 0 7h13' stroke='%23ffffff' stroke-width='2.6' fill='none' stroke-linecap='round'/%3E%3Ccircle cx='26' cy='9' r='2' fill='%23ffffff'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="../assets/style.css">
   <script src="../assets/theme.js"></script>
   <style>
@@ -268,10 +268,10 @@
     }
 
     function draw() {
-      var accent = cssVar('--accent') || '#2563eb';
-      var accentStrong = cssVar('--accent-strong') || '#1d4ed8';
+      var accent = cssVar('--accent') || '#1e40af';
+      var accentStrong = cssVar('--accent-strong') || '#1e3a8a';
       var neg = cssVar('--negative') || '#dc2626';
-      var gridCol = cssVar('--border') || '#e7e5e4';
+      var gridCol = cssVar('--border') || '#dde2ea';
 
       ctx.clearRect(0, 0, SIZE, SIZE);
 

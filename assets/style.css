@@ -5,15 +5,15 @@
    ============================================================ */
 
 :root {
-  --bg: #fafaf9;
+  --bg: #f6f7f9;
   --surface: #ffffff;
-  --surface-2: #f5f5f4;
-  --text: #1c1917;
-  --text-muted: #78716c;
-  --border: #e7e5e4;
-  --accent: #2563eb;
-  --accent-strong: #1d4ed8;
-  --accent-soft: #dbeafe;
+  --surface-2: #eef1f5;
+  --text: #0a0f1a;
+  --text-muted: #5b6475;
+  --border: #dde2ea;
+  --accent: #1e40af;
+  --accent-strong: #1e3a8a;
+  --accent-soft: #dce5f8;
   --accent-contrast: #ffffff;
   --positive: #16a34a;
   --negative: #dc2626;
@@ -28,16 +28,16 @@
    theme toggle (data-theme is set by assets/theme.js). */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0c0a09;
-    --surface: #1c1917;
-    --surface-2: #292524;
-    --text: #e7e5e4;
-    --text-muted: #a8a29e;
-    --border: #33302c;
-    --accent: #60a5fa;
-    --accent-strong: #93c5fd;
-    --accent-soft: #1e3a8a;
-    --accent-contrast: #172554;
+    --bg: #05070b;
+    --surface: #0d1118;
+    --surface-2: #151b25;
+    --text: #e6eaf0;
+    --text-muted: #8b95a7;
+    --border: #1f2733;
+    --accent: #3b82f6;
+    --accent-strong: #60a5fa;
+    --accent-soft: #0f1f45;
+    --accent-contrast: #020617;
     --positive: #4ade80;
     --negative: #f87171;
     --shadow: 0 1px 3px rgb(0 0 0 / 0.4), 0 4px 16px rgb(0 0 0 / 0.4);
@@ -47,16 +47,16 @@
 /* Explicit dark choice — same tokens as the media query above.
    Keep the two blocks in sync when changing colors. */
 :root[data-theme="dark"] {
-  --bg: #0c0a09;
-  --surface: #1c1917;
-  --surface-2: #292524;
-  --text: #e7e5e4;
-  --text-muted: #a8a29e;
-  --border: #33302c;
-  --accent: #60a5fa;
-  --accent-strong: #93c5fd;
-  --accent-soft: #1e3a8a;
-  --accent-contrast: #172554;
+  --bg: #05070b;
+  --surface: #0d1118;
+  --surface-2: #151b25;
+  --text: #e6eaf0;
+  --text-muted: #8b95a7;
+  --border: #1f2733;
+  --accent: #3b82f6;
+  --accent-strong: #60a5fa;
+  --accent-soft: #0f1f45;
+  --accent-contrast: #020617;
   --positive: #4ade80;
   --negative: #f87171;
   --shadow: 0 1px 3px rgb(0 0 0 / 0.4), 0 4px 16px rgb(0 0 0 / 0.4);
