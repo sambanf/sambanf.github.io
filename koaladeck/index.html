@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Koala Deck — ESP32 Volume Controller for Windows</title>
+<meta name="description" content="Koala Deck is the Windows companion app for an ESP32 USB audio controller. Turn physical knobs to set Master, per-app and microphone volume, with two-way sync back to the deck. Free download on GitHub.">
+<link rel="icon" href="assets/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/icon-512.png">
+<link rel="canonical" href="https://sambanf.github.io/koaladeck/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Koala Deck — ESP32 Volume Controller for Windows">
+<meta property="og:description" content="Physical knobs for Windows audio. Master, Chat and Music channels, mic mute, and the real Windows state synced back to the deck.">
+<meta property="og:url" content="https://sambanf.github.io/koaladeck/">
+<meta property="og:image" content="https://sambanf.github.io/koaladeck/assets/screenshot.png">
+<meta property="og:image:width" content="1180">
+<meta property="og:image:height" content="920">
+<meta name="twitter:card" content="summary_large_image">
+<script src="../assets/theme.js"></script>
+<style>
+  :root {
+    --bg: #f2f4f8;
+    --surface: #ffffff;
+    --surface-2: #e8ebf2;
+    --surface-3: #dadfe9;
+    --ink: #161b26;
+    --ink-dim: #4d5566;
+    --ink-faint: #7d8596;
+    --line: #d5dae4;
+    --line-strong: #b4bccb;
+    --accent: #2563c9;
+    --accent-strong: #1b4ea3;
+    --accent-soft: #e2ebfb;
+    --brand-deep: #141821;
+    --brand-mid: #2a3246;
+    --brand-glow: #38b6f5;
+    --hero-ink: #ffffff;
+    --hero-ink-dim: #c3cbdb;
+    --font-sans: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-mono: ui-monospace, "Cascadia Code", "JetBrains Mono", Consolas, "SFMono-Regular", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f121a; --surface: #171b26; --surface-2: #1f2431; --surface-3: #292f3e;
+      --ink: #e8ecf3; --ink-dim: #a3acbd; --ink-faint: #737c8e;
+      --line: #2a3040; --line-strong: #3d4558;
+      --accent: #5ab8f5; --accent-strong: #84cbf8; --accent-soft: #14253a;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0f121a; --surface: #171b26; --surface-2: #1f2431; --surface-3: #292f3e;
+    --ink: #e8ecf3; --ink-dim: #a3acbd; --ink-faint: #737c8e;
+    --line: #2a3040; --line-strong: #3d4558;
+    --accent: #5ab8f5; --accent-strong: #84cbf8; --accent-soft: #14253a;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  img { max-width: 100%; height: auto; }
+  a { color: var(--accent-strong); }
+  code { font-family: var(--font-mono); font-size: .88em; }
+
+  .wrap { max-width: 940px; margin: 0 auto; padding: 0 22px; }
+
+  /* ---------- Top bar ---------- */
+
+  .topbar { display: flex; align-items: center; gap: 14px; padding: 14px 0; }
+  .topbar .brand {
+    display: inline-flex; align-items: center; gap: 9px;
+    font-weight: 700; font-size: 15px; letter-spacing: -0.01em; color: var(--hero-ink);
+  }
+  .topbar .brand img { width: 26px; height: 26px; border-radius: 7px; display: block; }
+  .topbar .spacer { flex: 1 1 auto; }
+
+  .lang-toggle {
+    display: inline-flex; gap: 2px; padding: 3px;
+    border: 1px solid rgba(255,255,255,.28); border-radius: 999px;
+    background: rgba(255,255,255,.12);
+  }
+  .lang-toggle button {
+    display: inline-flex; align-items: center; gap: .4rem;
+    border: 0; background: transparent; color: var(--hero-ink-dim);
+    font: inherit; font-size: .8rem; font-weight: 600; letter-spacing: .03em;
+    padding: .3rem .7rem; border-radius: 999px; cursor: pointer;
+    transition: background .15s ease, color .15s ease;
+  }
+  .lang-toggle button:hover { color: #fff; }
+  .lang-toggle button[aria-pressed="true"] { background: #fff; color: var(--brand-deep); }
+  .lang-toggle .flag {
+    display: block; width: 20px; height: 10px; border-radius: 2px;
+    box-shadow: 0 0 0 1px rgba(0,0,0,.25);
+  }
+  .theme-toggle {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 2.15rem; height: 2.15rem; padding: 0;
+    border: 1px solid rgba(255,255,255,.28); border-radius: 999px;
+    background: rgba(255,255,255,.12); color: var(--hero-ink-dim); cursor: pointer;
+    transition: color .15s ease, border-color .15s ease;
+  }
+  .theme-toggle:hover { color: #fff; border-color: rgba(255,255,255,.6); }
+  .theme-toggle svg { display: block; }
+  .theme-toggle .icon-sun { display: none; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .theme-toggle .icon-sun { display: block; }
+    :root:not([data-theme="light"]) .theme-toggle .icon-moon { display: none; }
+  }
+  :root[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+  :root[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+
+  /* ---------- Hero ---------- */
+
+  .hero {
+    position: relative; overflow: hidden;
+    background: linear-gradient(150deg, var(--brand-mid) 0%, #1b2130 55%, var(--brand-deep) 100%);
+    color: var(--hero-ink);
+  }
+  .hero::after {
+    content: ""; position: absolute; pointer-events: none;
+    width: 520px; height: 520px; top: -240px; right: -140px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(56,182,245,.32), transparent 68%);
+  }
+  .hero::before {
+    content: ""; position: absolute; pointer-events: none;
+    width: 420px; height: 420px; bottom: -260px; left: -120px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(124,131,255,.22), transparent 68%);
+  }
+  .hero-inner {
+    position: relative; z-index: 1;
+    display: grid; grid-template-columns: 128px 1fr; gap: 26px;
+    align-items: start; padding: 34px 0 46px;
+  }
+  .hero-icon {
+    width: 128px; height: 128px; border-radius: 28px; display: block;
+    box-shadow: 0 14px 34px rgba(0,0,0,.4), 0 0 0 1px rgba(255,255,255,.14);
+  }
+  .hero h1 {
+    font-size: clamp(34px, 6.2vw, 52px); font-weight: 800; letter-spacing: -0.025em;
+    margin: 2px 0 8px; line-height: 1.05;
+  }
+  .hero .tagline {
+    font-size: clamp(17px, 2.4vw, 21px); font-weight: 600; color: #fff;
+    margin: 0 0 12px; max-width: 34ch; text-wrap: balance;
+  }
+  .hero .lede { font-size: 15.5px; color: var(--hero-ink-dim); margin: 0 0 22px; max-width: 58ch; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 24px; padding: 0; list-style: none; }
+  .chips li {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12.5px; font-weight: 600; color: #e6edf8;
+    background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
+    border-radius: 999px; padding: 5px 12px;
+  }
+  .chips li::before { content: "\2713"; color: var(--brand-glow); font-weight: 700; }
+
+  .cta-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .btn-dl {
+    display: inline-flex; align-items: center; gap: 11px;
+    background: #fff; color: #161b26; text-decoration: none;
+    border-radius: 12px; padding: 11px 20px 11px 16px;
+    box-shadow: 0 8px 22px rgba(0,0,0,.28);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .btn-dl:hover { transform: translateY(-1px); box-shadow: 0 12px 28px rgba(0,0,0,.34); }
+  .btn-dl svg { width: 26px; height: 26px; display: block; flex: 0 0 auto; }
+  .btn-dl .label { display: flex; flex-direction: column; line-height: 1.2; text-align: left; }
+  .btn-dl .label .sm {
+    font-size: 10px; letter-spacing: .07em; text-transform: uppercase;
+    font-weight: 700; color: #545c6c;
+  }
+  .btn-dl .label .lg { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+  .btn-ghost {
+    display: inline-flex; align-items: center; gap: 8px;
+    color: #e6edf8; text-decoration: none; font-size: 14px; font-weight: 600;
+    border: 1px solid rgba(255,255,255,.32); border-radius: 12px; padding: 12px 18px;
+    transition: background .15s ease, border-color .15s ease;
+  }
+  .btn-ghost:hover { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.6); }
+  .btn-ghost svg { display: block; flex: 0 0 auto; }
+  .hero .note { font-size: 12.5px; color: var(--hero-ink-dim); margin: 14px 0 0; }
+
+  @media (max-width: 640px) {
+    .hero-inner { grid-template-columns: 1fr; gap: 18px; padding: 26px 0 38px; }
+    .hero-icon { width: 96px; height: 96px; border-radius: 22px; }
+    .cta-row { flex-direction: column; align-items: stretch; }
+    .btn-dl, .btn-ghost { justify-content: center; }
+  }
+
+  /* ---------- Sections ---------- */
+
+  main { padding-bottom: 20px; }
+  section { padding: 46px 0 0; }
+  section > h2 {
+    font-size: clamp(21px, 3.2vw, 27px); font-weight: 800; letter-spacing: -0.02em;
+    margin: 0 0 10px; text-wrap: balance;
+  }
+  section > .sub { font-size: 15.5px; color: var(--ink-dim); margin: 0 0 24px; max-width: 66ch; }
+  .eyebrow {
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .09em;
+    text-transform: uppercase; color: var(--accent-strong); margin: 0 0 9px; font-weight: 700;
+  }
+
+  .shot {
+    margin: 0; border-radius: 14px; overflow: hidden;
+    border: 1px solid var(--line); background: #0d1017;
+    box-shadow: 0 18px 40px rgba(15,20,30,.18);
+  }
+  .shot img { display: block; width: 100%; }
+  .shot-pair { display: grid; grid-template-columns: 1.6fr 1fr; gap: 16px; margin-top: 16px; align-items: start; }
+  .shot-pair .shot { box-shadow: none; }
+  figcaption {
+    font-size: 13px; color: var(--ink-faint); padding: 10px 14px;
+    background: var(--surface); border-top: 1px solid var(--line);
+  }
+  @media (max-width: 640px) { .shot-pair { grid-template-columns: 1fr; } }
+
+  .flow {
+    display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 12px; align-items: stretch;
+  }
+  .flow .node {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px;
+  }
+  .flow .node strong { display: block; font-size: 15px; margin-bottom: 4px; }
+  .flow .node span { font-size: 14px; color: var(--ink-dim); }
+  .flow .arrow {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+    font-family: var(--font-mono); font-size: 11px; color: var(--ink-faint);
+  }
+  .flow .arrow svg { color: var(--accent); }
+  @media (max-width: 760px) {
+    .flow { grid-template-columns: 1fr; }
+    .flow .arrow { flex-direction: row; padding: 2px 0; }
+    .flow .arrow svg { transform: rotate(90deg); }
+  }
+
+  .protocol {
+    margin-top: 16px; background: var(--surface); border: 1px solid var(--line);
+    border-left: 3px solid var(--accent); border-radius: 12px; padding: 18px 22px;
+  }
+  .protocol p { font-size: 14.5px; color: var(--ink-dim); margin: 0 0 10px; max-width: 70ch; }
+  .protocol p:last-child { margin-bottom: 0; }
+  .protocol pre {
+    margin: 0 0 12px; padding: 12px 14px; border-radius: 8px; overflow-x: auto;
+    background: var(--surface-2); font-family: var(--font-mono); font-size: 13px; color: var(--ink);
+  }
+
+  .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(258px, 1fr)); gap: 16px; }
+  .card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px;
+  }
+  .card .ico {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 38px; height: 38px; border-radius: 10px;
+    background: var(--accent-soft); color: var(--accent-strong); margin-bottom: 12px;
+  }
+  .card .ico svg { width: 20px; height: 20px; display: block; }
+  .card h3 { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; margin: 0 0 6px; }
+  .card p { font-size: 14.5px; color: var(--ink-dim); margin: 0; }
+
+  .steps { list-style: none; counter-reset: s; margin: 0; padding: 0; display: grid; gap: 14px; }
+  .steps li {
+    counter-increment: s; position: relative; padding-left: 48px;
+    font-size: 15px; color: var(--ink-dim);
+  }
+  .steps li::before {
+    content: counter(s); position: absolute; left: 0; top: 0;
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--accent-soft); color: var(--accent-strong);
+    font-family: var(--font-mono); font-size: 14px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .steps li strong { display: block; color: var(--ink); font-size: 15.5px; margin-bottom: 2px; }
+
+  .table-scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; min-width: 460px; }
+  td {
+    text-align: left; padding: 12px; border-bottom: 1px solid var(--line);
+    font-size: 14.5px; color: var(--ink-dim); vertical-align: top;
+  }
+  td:first-child { color: var(--ink); font-weight: 600; white-space: nowrap; }
+
+  .faq { display: grid; gap: 10px; }
+  details {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0 18px;
+  }
+  details[open] { border-color: var(--line-strong); }
+  summary {
+    cursor: pointer; padding: 15px 0; font-size: 15.5px; font-weight: 600;
+    color: var(--ink); list-style: none; display: flex; align-items: center; gap: 10px;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::before {
+    content: "+"; flex: 0 0 auto; font-family: var(--font-mono); font-size: 17px;
+    font-weight: 700; color: var(--accent-strong); width: 16px;
+  }
+  details[open] summary::before { content: "\2212"; }
+  details p { font-size: 14.5px; color: var(--ink-dim); margin: 0 0 16px; max-width: 68ch; }
+
+  .closing {
+    margin-top: 52px; background: var(--surface); border: 1px solid var(--line);
+    border-radius: 14px; padding: 30px 26px; text-align: center;
+  }
+  .closing h2 { font-size: clamp(20px, 3vw, 25px); margin: 0 0 8px; letter-spacing: -0.02em; }
+  .closing p { font-size: 15px; color: var(--ink-dim); margin: 0 auto 20px; max-width: 52ch; }
+  .closing .btn-dl { background: var(--accent); color: #fff; box-shadow: none; }
+  .closing .btn-dl .label .sm { color: rgba(255,255,255,.8); }
+  .closing .btn-dl:hover { background: var(--accent-strong); }
+  :root[data-theme="dark"] .closing .btn-dl { color: #0f121a; }
+  :root[data-theme="dark"] .closing .btn-dl .label .sm { color: rgba(15,18,26,.7); }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .closing .btn-dl { color: #0f121a; }
+    :root:not([data-theme="light"]) .closing .btn-dl .label .sm { color: rgba(15,18,26,.7); }
+  }
+  .closing .cta-row { justify-content: center; }
+  .closing .btn-ghost { color: var(--accent-strong); border-color: var(--line-strong); }
+  .closing .btn-ghost:hover { background: var(--accent-soft); border-color: var(--accent); }
+
+  footer.end {
+    margin-top: 46px; border-top: 1px solid var(--line);
+    padding: 22px 0 60px; font-size: 13.5px; color: var(--ink-faint);
+    display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center;
+  }
+  footer.end a { color: var(--accent-strong); }
+  footer.end .spacer { flex: 1 1 auto; }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <nav class="topbar">
+      <span class="brand">
+        <img src="assets/icon-192.png" alt="" width="26" height="26">
+        Koala Deck
+      </span>
+      <span class="spacer"></span>
+      <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
+        <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0l60 30M60 0L0 30" stroke="#fff" stroke-width="6"/><path d="M0 0l60 30M60 0L0 30" stroke="#C8102E" stroke-width="2.5"/><path d="M30 0v30M0 15h60" stroke="#fff" stroke-width="10"/><path d="M30 0v30M0 15h60" stroke="#C8102E" stroke-width="6"/></svg>EN
+        </button>
+        <button type="button" data-lang="id" aria-pressed="false" aria-label="Bahasa Indonesia">
+          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="15" fill="#E70011"/><rect y="15" width="60" height="15" fill="#F7F7F7"/></svg>ID
+        </button>
+      </div>
+      <button type="button" class="theme-toggle" aria-label="Dark mode / Mode gelap" aria-pressed="false">
+        <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+    </nav>
+
+    <div class="hero-inner">
+      <img class="hero-icon" src="assets/icon-512.png" width="128" height="128"
+           alt="Koala Deck app icon" data-i18n-attr="alt:iconAlt">
+      <div>
+        <h1>Koala Deck</h1>
+        <p class="tagline" data-i18n="tagline">Real knobs for Windows audio.</p>
+        <p class="lede" data-i18n="lede">The Windows companion app for an ESP32 USB audio controller.
+          Turn a knob to set the Master volume, your voice chat or your music — each on its own —
+          and tap a button to mute the microphone. It lives quietly in the system tray.</p>
+        <ul class="chips">
+          <li data-i18n="chip1">Free download</li>
+          <li data-i18n="chip2">No account</li>
+          <li data-i18n="chip3">Source on GitHub</li>
+        </ul>
+        <div class="cta-row">
+          <a class="btn-dl" href="https://github.com/sambanf/koaladeck/releases/latest">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path fill="#2563c9" d="M2 4.6 10 3.5v7.7H2zM11 3.4 22 2v9.2H11zM2 12.2h8v7.7l-8-1.1zM11 12.2h11V22l-11-1.5z"/>
+            </svg>
+            <span class="label">
+              <span class="sm" data-i18n="dlSm">Download for</span>
+              <span class="lg">Windows</span>
+            </span>
+          </a>
+          <a class="btn-ghost" href="https://github.com/sambanf/koaladeck">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.42 7.42 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+            <span data-i18n="sourceCta">View on GitHub</span>
+          </a>
+        </div>
+        <p class="note" data-i18n="heroNote">Windows 10 (1809+) or 11, 64-bit · installer or portable exe · from GitHub Releases</p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+
+    <section id="look">
+      <p class="eyebrow" data-i18n="ebLook">The dashboard</p>
+      <h2 data-i18n="h2Look">Three channels, one microphone, everything live</h2>
+      <p class="sub" data-i18n="subLook">Each channel shows its volume, its output device and the apps
+        inside it, with live audio levels. Close the window and it keeps running in the tray.</p>
+
+      <figure class="shot">
+        <img src="assets/screenshot.png" width="1180" height="920" loading="lazy" decoding="async"
+             alt="Koala Deck dashboard with Master, Chat and Music channels, a microphone card and an activity log"
+             data-i18n-attr="alt:shot1Alt">
+      </figure>
+      <div class="shot-pair">
+        <figure class="shot">
+          <img src="assets/drag-and-drop.png" loading="lazy" decoding="async"
+               alt="Dragging an app from one channel to another" data-i18n-attr="alt:shot2Alt">
+          <figcaption data-i18n="shot2Cap">Drag an app between channels to move it.</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="assets/add-app-popup.png" loading="lazy" decoding="async"
+               alt="The add-app popup listing running and installed apps with a search box" data-i18n-attr="alt:shot3Alt">
+          <figcaption data-i18n="shot3Cap">Add running or installed apps with a search.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section id="how">
+      <p class="eyebrow" data-i18n="ebHow">How it works</p>
+      <h2 data-i18n="h2How">A plain text line over USB, both ways</h2>
+      <p class="sub" data-i18n="subHow">The deck sends a short command when you turn a knob. Koala Deck
+        applies it in Windows and answers with the real state, so the deck's display never drifts.</p>
+
+      <div class="flow">
+        <div class="node"><strong data-i18n="n1t">Your ESP32 deck</strong><span data-i18n="n1b">Rotary encoders and buttons, plugged in over USB.</span></div>
+        <div class="arrow" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9h14l-4-4M19 15H5l4 4"/></svg>
+          115200
+        </div>
+        <div class="node"><strong>Koala Deck</strong><span data-i18n="n2b">Reads commands, sends back SYNC lines. Runs in the tray.</span></div>
+        <div class="arrow" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9h14l-4-4M19 15H5l4 4"/></svg>
+          Core Audio
+        </div>
+        <div class="node"><strong data-i18n="n3t">Windows audio</strong><span data-i18n="n3b">Master volume, each app's volume, outputs and the microphone.</span></div>
+      </div>
+
+      <div class="protocol">
+        <pre><code>VOL_UP_2            <span data-i18n="pc1">&#8594; Chat volume up one step</span>
+MIC_TOGGLE          <span data-i18n="pc2">&#8594; mute or unmute the microphone</span>
+SYNC:12,50,80,0,0,0,1   <span data-i18n="pc3">&#8592; the real Windows state, back to the deck</span></code></pre>
+        <p data-i18n="protoP">One command per line. A SYNC: line goes back after every command,
+          on request, and whenever the volume changes anywhere else in Windows — so 12% shows as 12%,
+          not the nearest step. The full protocol and an Arduino example are in the README.</p>
+      </div>
+    </section>
+
+    <section id="features">
+      <p class="eyebrow" data-i18n="ebFeatures">What it does</p>
+      <h2 data-i18n="h2Features">More than a volume knob</h2>
+      <p class="sub" data-i18n="subFeatures">Group apps into channels, send each channel to its own
+        speakers or headset, and let the deck show what Windows actually did.</p>
+
+      <div class="features">
+        <div class="card">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4v16M12 4v16M18 4v16M4 14h4M10 8h4M16 15h4"/></svg></span>
+          <h3 data-i18n="f1t">Three channels</h3>
+          <p data-i18n="f1b">Master, Chat and Music. One knob each, plus mute. Chat starts with
+            Discord; put any apps you like in Chat or Music.</p>
+        </div>
+        <div class="card">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="6" rx="2"/><rect x="3" y="14" width="18" height="6" rx="2"/><path d="M7 7h.01M7 17h.01"/></svg></span>
+          <h3 data-i18n="f2t">App groups by drag and drop</h3>
+          <p data-i18n="f2b">Drag apps between channels, or add them from a searchable list of running
+            and installed apps. Group members are remembered even while the app is closed.</p>
+        </div>
+        <div class="card">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 14v-3a9 9 0 0 1 18 0v3"/><path d="M21 15a2 2 0 0 1-2 2h-1v-6h1a2 2 0 0 1 2 2zM3 15a2 2 0 0 0 2 2h1v-6H5a2 2 0 0 0-2 2z"/></svg></span>
+          <h3 data-i18n="f3t">An output per channel</h3>
+          <p data-i18n="f3b">Send Chat to your headset and Music to your speakers. Chat can follow the
+            Windows communications device, and apps that start later are routed automatically.</p>
+        </div>
+        <div class="card">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v4M8 21h8"/></svg></span>
+          <h3 data-i18n="f4t">Microphone mute that sticks</h3>
+          <p data-i18n="f4b">Mutes the default recording device and the communications device if they
+            differ — which is usually what Discord or Teams is listening to.</p>
+        </div>
+        <div class="card">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 1-15.5 6.2M3 12a9 9 0 0 1 15.5-6.2"/><path d="M21 4v5h-5M3 20v-5h5"/></svg></span>
+          <h3 data-i18n="f5t">Two-way sync</h3>
+          <p data-i18n="f5b">Change the volume with the mouse, the keyboard or the Volume mixer, and the
+            deck hears about it. Its display always matches Windows.</p>
+        </div>
+        <div class="card">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 2v6M15 2v6M7 8h10v4a5 5 0 0 1-10 0zM12 17v5"/></svg></span>
+          <h3 data-i18n="f6t">Plug in and forget</h3>
+          <p data-i18n="f6b">ESP32 USB chips are detected and picked automatically. Pull the cable and
+            plug it back — even on a new COM port — and Koala Deck reconnects by itself.</p>
+        </div>
+        <div class="card">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 17l6-6-6-6M12 19h8"/></svg></span>
+          <h3 data-i18n="f7t">Simulator built in</h3>
+          <p data-i18n="f7b">No hardware yet? Type commands like VOL_UP_2 in the Activity
+            panel and watch them work — and see the SYNC line the deck would receive.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="start">
+      <p class="eyebrow" data-i18n="ebStart">Getting started</p>
+      <h2 data-i18n="h2Start">From download to first knob turn</h2>
+      <ol class="steps">
+        <li><strong data-i18n="s1t">Download from GitHub Releases</strong><span data-i18n="s1b">Pick the installer (recommended) or the portable exe. Both are self-contained — no .NET install needed.</span></li>
+        <li><strong data-i18n="s2t">Get past SmartScreen</strong><span data-i18n="s2b">The files aren't code-signed yet, so Windows may say it protected your PC. Click More info, then Run anyway.</span></li>
+        <li><strong data-i18n="s3t">Plug in your deck</strong><span data-i18n="s3b">Koala Deck finds the ESP32's COM port and connects. The tray koala turns green when it's linked.</span></li>
+        <li><strong data-i18n="s4t">Put apps in channels</strong><span data-i18n="s4b">Drag apps into Chat and Music, pick an output for each, and turn Start with Windows on if you want it always there.</span></li>
+      </ol>
+    </section>
+
+    <section id="specs">
+      <p class="eyebrow" data-i18n="ebSpecs">At a glance</p>
+      <h2 data-i18n="h2Specs">The details</h2>
+      <div class="table-scroll">
+        <table>
+          <tbody>
+            <tr><td data-i18n="sp1k">Platform</td><td data-i18n="sp1v">Windows 10 (1809 or later) or Windows 11, 64-bit</td></tr>
+            <tr><td data-i18n="sp2k">Downloads</td><td data-i18n="sp2v">Installer (~50 MB, per-user, no admin rights) or portable exe (~67 MB)</td></tr>
+            <tr><td data-i18n="sp3k">Hardware</td><td data-i18n="sp3v">An ESP32 board over USB serial at 115200 baud — Espressif native USB, CP210x, CH340/CH9102 or FTDI</td></tr>
+            <tr><td data-i18n="sp4k">Built with</td><td>C# · .NET 10 · WPF · NAudio</td></tr>
+            <tr><td data-i18n="sp5k">Account</td><td data-i18n="sp5v">None. Nothing to sign up for</td></tr>
+            <tr><td data-i18n="sp6k">Your settings</td><td data-i18n="sp6v">A JSON file in your own AppData folder</td></tr>
+            <tr><td data-i18n="sp7k">Source</td><td><a href="https://github.com/sambanf/koaladeck">github.com/sambanf/koaladeck</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="faq">
+      <p class="eyebrow" data-i18n="ebFaq">Questions</p>
+      <h2 data-i18n="h2Faq">Frequently asked</h2>
+      <div class="faq">
+        <details>
+          <summary data-i18n="q1">Do I need to build the hardware myself?</summary>
+          <p data-i18n="a1">Yes — Koala Deck is the PC side. Any ESP32 that prints commands like
+            VOL_UP_1 over USB serial will work. The README has the full command list and an Arduino
+            example that reads the SYNC lines back.</p>
+        </details>
+        <details>
+          <summary data-i18n="q2">Can I try it without an ESP32?</summary>
+          <p data-i18n="a2">Yes. Type commands into the Simulator box in the Activity panel and Koala
+            Deck acts on them exactly as if the deck had sent them.</p>
+        </details>
+        <details>
+          <summary data-i18n="q3">Why does Windows warn me when I run it?</summary>
+          <p data-i18n="a3">The installer and exe aren't code-signed yet, so SmartScreen doesn't
+            recognise them. Click More info, then Run anyway. The release page lists SHA-256 hashes
+            if you want to check the file.</p>
+        </details>
+        <details>
+          <summary data-i18n="q4">My Chat or Music channel says "No audio".</summary>
+          <p data-i18n="a4">The app in that group hasn't opened an audio session yet — Spotify, for
+            example, doesn't until it plays something. Settings still apply the moment it starts.</p>
+        </details>
+        <details>
+          <summary data-i18n="q5">Another program is using the COM port.</summary>
+          <p data-i18n="a5">Close the Arduino IDE or PlatformIO serial monitor. Koala Deck connects on
+            its own as soon as the port is free.</p>
+        </details>
+        <details>
+          <summary data-i18n="q6">How do I update or uninstall?</summary>
+          <p data-i18n="a6">Run the newer installer over the old one — it closes Koala Deck for you and
+            keeps your settings. Uninstall from Apps &amp; features; it asks whether to keep your
+            settings and logs.</p>
+        </details>
+      </div>
+    </section>
+
+    <div class="closing">
+      <h2 data-i18n="closeH">Give your volume a knob</h2>
+      <p data-i18n="closeP">Free on GitHub. Download the latest release, plug in your deck, and stop
+        hunting for the Volume mixer.</p>
+      <div class="cta-row">
+        <a class="btn-dl" href="https://github.com/sambanf/koaladeck/releases/latest">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path fill="currentColor" d="M2 4.6 10 3.5v7.7H2zM11 3.4 22 2v9.2H11zM2 12.2h8v7.7l-8-1.1zM11 12.2h11V22l-11-1.5z"/>
+          </svg>
+          <span class="label">
+            <span class="sm" data-i18n="dlSm">Download for</span>
+            <span class="lg">Windows</span>
+          </span>
+        </a>
+        <a class="btn-ghost" href="https://github.com/sambanf/koaladeck">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.42 7.42 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+          <span data-i18n="sourceCta">View on GitHub</span>
+        </a>
+      </div>
+    </div>
+
+    <footer class="end">
+      <span>Koala Deck</span>
+      <a href="https://github.com/sambanf/koaladeck/releases" data-i18n="fReleases">Releases</a>
+      <a href="https://github.com/sambanf/koaladeck/issues" data-i18n="fIssues">Report an issue</a>
+      <span class="spacer"></span>
+      <a href="https://sambanf.github.io/" data-i18n="fBy">Made by Samba Nugraha</a>
+    </footer>
+
+  </div>
+</main>
+
+<script src="../assets/lang.js"></script>
+<script>
+var I18N = {
+  en: {
+    _title: 'Koala Deck — ESP32 Volume Controller for Windows',
+    _meta: 'Koala Deck is the Windows companion app for an ESP32 USB audio controller. Turn physical knobs to set Master, per-app and microphone volume, with two-way sync back to the deck. Free download on GitHub.',
+    iconAlt: 'Koala Deck app icon',
+    tagline: 'Real knobs for Windows audio.',
+    lede: 'The Windows companion app for an ESP32 USB audio controller. Turn a knob to set the Master volume, your voice chat or your music — each on its own — and tap a button to mute the microphone. It lives quietly in the system tray.',
+    chip1: 'Free download',
+    chip2: 'No account',
+    chip3: 'Source on GitHub',
+    dlSm: 'Download for',
+    sourceCta: 'View on GitHub',
+    heroNote: 'Windows 10 (1809+) or 11, 64-bit · installer or portable exe · from GitHub Releases',
+
+    ebLook: 'The dashboard',
+    h2Look: 'Three channels, one microphone, everything live',
+    subLook: 'Each channel shows its volume, its output device and the apps inside it, with live audio levels. Close the window and it keeps running in the tray.',
+    shot1Alt: 'Koala Deck dashboard with Master, Chat and Music channels, a microphone card and an activity log',
+    shot2Alt: 'Dragging an app from one channel to another',
+    shot2Cap: 'Drag an app between channels to move it.',
+    shot3Alt: 'The add-app popup listing running and installed apps with a search box',
+    shot3Cap: 'Add running or installed apps with a search.',
+
+    ebHow: 'How it works',
+    h2How: 'A plain text line over USB, both ways',
+    subHow: "The deck sends a short command when you turn a knob. Koala Deck applies it in Windows and answers with the real state, so the deck's display never drifts.",
+    n1t: 'Your ESP32 deck',
+    n1b: 'Rotary encoders and buttons, plugged in over USB.',
+    n2b: 'Reads commands, sends back SYNC lines. Runs in the tray.',
+    n3t: 'Windows audio',
+    n3b: "Master volume, each app's volume, outputs and the microphone.",
+    pc1: '→ Chat volume up one step',
+    pc2: '→ mute or unmute the microphone',
+    pc3: '← the real Windows state, back to the deck',
+    protoP: 'One command per line. A SYNC: line goes back after every command, on request, and whenever the volume changes anywhere else in Windows — so 12% shows as 12%, not the nearest step. The full protocol and an Arduino example are in the README.',
+
+    ebFeatures: 'What it does',
+    h2Features: 'More than a volume knob',
+    subFeatures: 'Group apps into channels, send each channel to its own speakers or headset, and let the deck show what Windows actually did.',
+    f1t: 'Three channels',
+    f1b: 'Master, Chat and Music. One knob each, plus mute. Chat starts with Discord; put any apps you like in Chat or Music.',
+    f2t: 'App groups by drag and drop',
+    f2b: 'Drag apps between channels, or add them from a searchable list of running and installed apps. Group members are remembered even while the app is closed.',
+    f3t: 'An output per channel',
+    f3b: 'Send Chat to your headset and Music to your speakers. Chat can follow the Windows communications device, and apps that start later are routed automatically.',
+    f4t: 'Microphone mute that sticks',
+    f4b: 'Mutes the default recording device and the communications device if they differ — which is usually what Discord or Teams is listening to.',
+    f5t: 'Two-way sync',
+    f5b: 'Change the volume with the mouse, the keyboard or the Volume mixer, and the deck hears about it. Its display always matches Windows.',
+    f6t: 'Plug in and forget',
+    f6b: 'ESP32 USB chips are detected and picked automatically. Pull the cable and plug it back — even on a new COM port — and Koala Deck reconnects by itself.',
+    f7t: 'Simulator built in',
+    f7b: 'No hardware yet? Type commands like VOL_UP_2 in the Activity panel and watch them work — and see the SYNC line the deck would receive.',
+
+    ebStart: 'Getting started',
+    h2Start: 'From download to first knob turn',
+    s1t: 'Download from GitHub Releases',
+    s1b: 'Pick the installer (recommended) or the portable exe. Both are self-contained — no .NET install needed.',
+    s2t: 'Get past SmartScreen',
+    s2b: "The files aren't code-signed yet, so Windows may say it protected your PC. Click More info, then Run anyway.",
+    s3t: 'Plug in your deck',
+    s3b: "Koala Deck finds the ESP32's COM port and connects. The tray koala turns green when it's linked.",
+    s4t: 'Put apps in channels',
+    s4b: 'Drag apps into Chat and Music, pick an output for each, and turn Start with Windows on if you want it always there.',
+
+    ebSpecs: 'At a glance',
+    h2Specs: 'The details',
+    sp1k: 'Platform',
+    sp1v: 'Windows 10 (1809 or later) or Windows 11, 64-bit',
+    sp2k: 'Downloads',
+    sp2v: 'Installer (~50 MB, per-user, no admin rights) or portable exe (~67 MB)',
+    sp3k: 'Hardware',
+    sp3v: 'An ESP32 board over USB serial at 115200 baud — Espressif native USB, CP210x, CH340/CH9102 or FTDI',
+    sp4k: 'Built with',
+    sp5k: 'Account',
+    sp5v: 'None. Nothing to sign up for',
+    sp6k: 'Your settings',
+    sp6v: 'A JSON file in your own AppData folder',
+    sp7k: 'Source',
+
+    ebFaq: 'Questions',
+    h2Faq: 'Frequently asked',
+    q1: 'Do I need to build the hardware myself?',
+    a1: 'Yes — Koala Deck is the PC side. Any ESP32 that prints commands like VOL_UP_1 over USB serial will work. The README has the full command list and an Arduino example that reads the SYNC lines back.',
+    q2: 'Can I try it without an ESP32?',
+    a2: 'Yes. Type commands into the Simulator box in the Activity panel and Koala Deck acts on them exactly as if the deck had sent them.',
+    q3: 'Why does Windows warn me when I run it?',
+    a3: "The installer and exe aren't code-signed yet, so SmartScreen doesn't recognise them. Click More info, then Run anyway. The release page lists SHA-256 hashes if you want to check the file.",
+    q4: 'My Chat or Music channel says "No audio".',
+    a4: "The app in that group hasn't opened an audio session yet — Spotify, for example, doesn't until it plays something. Settings still apply the moment it starts.",
+    q5: 'Another program is using the COM port.',
+    a5: 'Close the Arduino IDE or PlatformIO serial monitor. Koala Deck connects on its own as soon as the port is free.',
+    q6: 'How do I update or uninstall?',
+    a6: 'Run the newer installer over the old one — it closes Koala Deck for you and keeps your settings. Uninstall from Apps & features; it asks whether to keep your settings and logs.',
+
+    closeH: 'Give your volume a knob',
+    closeP: 'Free on GitHub. Download the latest release, plug in your deck, and stop hunting for the Volume mixer.',
+    fReleases: 'Releases',
+    fIssues: 'Report an issue',
+    fBy: 'Made by Samba Nugraha'
+  },
+
+  id: {
+    _title: 'Koala Deck — Kontroler Volume ESP32 untuk Windows',
+    _meta: 'Koala Deck adalah aplikasi pendamping Windows untuk kontroler audio USB berbasis ESP32. Putar knob fisik untuk mengatur volume Master, per aplikasi, dan mikrofon, dengan sinkronisasi dua arah ke deck. Unduh gratis di GitHub.',
+    iconAlt: 'Ikon aplikasi Koala Deck',
+    tagline: 'Knob sungguhan untuk audio Windows.',
+    lede: 'Aplikasi pendamping Windows untuk kontroler audio USB berbasis ESP32. Putar knob untuk mengatur volume Master, voice chat, atau musik — masing-masing terpisah — dan tekan tombol untuk membisukan mikrofon. Berjalan tenang di system tray.',
+    chip1: 'Unduh gratis',
+    chip2: 'Tanpa akun',
+    chip3: 'Kode sumber di GitHub',
+    dlSm: 'Unduh untuk',
+    sourceCta: 'Lihat di GitHub',
+    heroNote: 'Windows 10 (1809+) atau 11, 64-bit · installer atau exe portabel · dari GitHub Releases',
+
+    ebLook: 'Dasbor',
+    h2Look: 'Tiga kanal, satu mikrofon, semuanya langsung',
+    subLook: 'Setiap kanal menampilkan volume, perangkat output, dan aplikasi di dalamnya, lengkap dengan level audio langsung. Tutup jendelanya dan aplikasi tetap berjalan di tray.',
+    shot1Alt: 'Dasbor Koala Deck dengan kanal Master, Chat, dan Music, kartu mikrofon, dan log aktivitas',
+    shot2Alt: 'Menyeret aplikasi dari satu kanal ke kanal lain',
+    shot2Cap: 'Seret aplikasi antarkanal untuk memindahkannya.',
+    shot3Alt: 'Popup tambah aplikasi berisi aplikasi yang berjalan dan terpasang, dengan kotak pencarian',
+    shot3Cap: 'Tambahkan aplikasi yang berjalan atau terpasang lewat pencarian.',
+
+    ebHow: 'Cara kerja',
+    h2How: 'Satu baris teks lewat USB, dua arah',
+    subHow: 'Deck mengirim perintah singkat saat knob diputar. Koala Deck menerapkannya di Windows dan membalas dengan kondisi sebenarnya, jadi tampilan deck tidak pernah meleset.',
+    n1t: 'Deck ESP32 Anda',
+    n1b: 'Rotary encoder dan tombol, tersambung lewat USB.',
+    n2b: 'Membaca perintah, mengirim balik baris SYNC. Berjalan di tray.',
+    n3t: 'Audio Windows',
+    n3b: 'Volume Master, volume tiap aplikasi, output, dan mikrofon.',
+    pc1: '→ volume Chat naik satu langkah',
+    pc2: '→ bisukan atau aktifkan mikrofon',
+    pc3: '← kondisi Windows sebenarnya, kembali ke deck',
+    protoP: 'Satu perintah per baris. Baris SYNC: dikirim balik setelah setiap perintah, saat diminta, dan setiap kali volume berubah dari mana pun di Windows — jadi 12% tampil sebagai 12%, bukan dibulatkan ke langkah terdekat. Protokol lengkap dan contoh Arduino ada di README.',
+
+    ebFeatures: 'Apa yang bisa dilakukan',
+    h2Features: 'Lebih dari sekadar knob volume',
+    subFeatures: 'Kelompokkan aplikasi ke dalam kanal, kirim tiap kanal ke speaker atau headset sendiri, dan biarkan deck menampilkan apa yang benar-benar dilakukan Windows.',
+    f1t: 'Tiga kanal',
+    f1b: 'Master, Chat, dan Music. Satu knob untuk masing-masing, plus mute. Chat berisi Discord sejak awal; masukkan aplikasi apa pun ke Chat atau Music.',
+    f2t: 'Grup aplikasi dengan seret dan lepas',
+    f2b: 'Seret aplikasi antarkanal, atau tambahkan dari daftar aplikasi yang berjalan dan terpasang yang bisa dicari. Anggota grup tetap diingat meski aplikasinya ditutup.',
+    f3t: 'Output untuk tiap kanal',
+    f3b: 'Kirim Chat ke headset dan Music ke speaker. Chat bisa mengikuti perangkat komunikasi Windows, dan aplikasi yang baru mulai nanti diarahkan otomatis.',
+    f4t: 'Mute mikrofon yang benar-benar mute',
+    f4b: 'Membisukan perangkat rekam default dan perangkat komunikasi jika keduanya berbeda — biasanya itulah yang didengarkan Discord atau Teams.',
+    f5t: 'Sinkronisasi dua arah',
+    f5b: 'Ubah volume dengan mouse, keyboard, atau Volume mixer, dan deck ikut tahu. Tampilannya selalu sama dengan Windows.',
+    f6t: 'Colok lalu lupakan',
+    f6b: 'Chip USB ESP32 terdeteksi dan dipilih otomatis. Cabut kabelnya lalu colok lagi — bahkan di port COM baru — dan Koala Deck tersambung kembali sendiri.',
+    f7t: 'Simulator bawaan',
+    f7b: 'Belum punya hardware? Ketik perintah seperti VOL_UP_2 di panel Activity dan lihat hasilnya — termasuk baris SYNC yang akan diterima deck.',
+
+    ebStart: 'Mulai',
+    h2Start: 'Dari unduhan sampai putaran knob pertama',
+    s1t: 'Unduh dari GitHub Releases',
+    s1b: 'Pilih installer (disarankan) atau exe portabel. Keduanya mandiri — tidak perlu memasang .NET.',
+    s2t: 'Lewati SmartScreen',
+    s2b: 'File belum ditandatangani kode, jadi Windows mungkin bilang telah melindungi PC Anda. Klik More info, lalu Run anyway.',
+    s3t: 'Colokkan deck Anda',
+    s3b: 'Koala Deck menemukan port COM milik ESP32 lalu menyambung. Koala di tray berubah hijau saat sudah tersambung.',
+    s4t: 'Masukkan aplikasi ke kanal',
+    s4b: 'Seret aplikasi ke Chat dan Music, pilih output untuk masing-masing, dan nyalakan Start with Windows jika ingin selalu aktif.',
+
+    ebSpecs: 'Ringkasan',
+    h2Specs: 'Detailnya',
+    sp1k: 'Platform',
+    sp1v: 'Windows 10 (1809 atau lebih baru) atau Windows 11, 64-bit',
+    sp2k: 'Unduhan',
+    sp2v: 'Installer (~50 MB, per pengguna, tanpa hak admin) atau exe portabel (~67 MB)',
+    sp3k: 'Hardware',
+    sp3v: 'Board ESP32 lewat serial USB 115200 baud — USB native Espressif, CP210x, CH340/CH9102, atau FTDI',
+    sp4k: 'Dibuat dengan',
+    sp5k: 'Akun',
+    sp5v: 'Tidak ada. Tidak perlu mendaftar',
+    sp6k: 'Pengaturan Anda',
+    sp6v: 'File JSON di folder AppData milik Anda sendiri',
+    sp7k: 'Kode sumber',
+
+    ebFaq: 'Pertanyaan',
+    h2Faq: 'Sering ditanyakan',
+    q1: 'Apakah saya harus membuat hardware-nya sendiri?',
+    a1: 'Ya — Koala Deck adalah sisi PC-nya. ESP32 apa pun yang mengirim perintah seperti VOL_UP_1 lewat serial USB akan berfungsi. README berisi daftar perintah lengkap dan contoh Arduino yang membaca balik baris SYNC.',
+    q2: 'Bisakah saya mencobanya tanpa ESP32?',
+    a2: 'Bisa. Ketik perintah di kotak Simulator pada panel Activity dan Koala Deck menjalankannya persis seperti dikirim dari deck.',
+    q3: 'Kenapa Windows memberi peringatan saat saya menjalankannya?',
+    a3: 'Installer dan exe belum ditandatangani kode, jadi SmartScreen belum mengenalinya. Klik More info, lalu Run anyway. Halaman rilis mencantumkan hash SHA-256 jika Anda ingin memeriksa filenya.',
+    q4: 'Kanal Chat atau Music saya menampilkan "No audio".',
+    a4: 'Aplikasi di grup itu belum membuka sesi audio — Spotify, misalnya, belum membukanya sampai memutar sesuatu. Pengaturan tetap berlaku begitu aplikasinya mulai.',
+    q5: 'Port COM sedang dipakai program lain.',
+    a5: 'Tutup Arduino IDE atau serial monitor PlatformIO. Koala Deck akan menyambung sendiri begitu port bebas.',
+    q6: 'Bagaimana cara memperbarui atau menghapus?',
+    a6: 'Jalankan installer yang lebih baru di atas yang lama — installer menutup Koala Deck untuk Anda dan menyimpan pengaturan. Hapus lewat Apps & features; Anda akan ditanya apakah ingin menyimpan pengaturan dan log.',
+
+    closeH: 'Beri volume Anda sebuah knob',
+    closeP: 'Gratis di GitHub. Unduh rilis terbaru, colokkan deck Anda, dan berhenti mencari-cari Volume mixer.',
+    fReleases: 'Rilis',
+    fIssues: 'Laporkan masalah',
+    fBy: 'Dibuat oleh Samba Nugraha'
+  }
+};
+SiteLang.init(I18N);
+</script>
+</body>
+</html>
