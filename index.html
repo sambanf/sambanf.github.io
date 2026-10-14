@@ -83,9 +83,19 @@
       padding-top: 1.25rem;
     }
 
+    /* The homepage gets a wider column than the tool pages so the card
+       grid can run three across on desktop. */
+    .container { max-width: 1100px; }
+
     .hero {
       position: relative;
-      padding: 3.25rem 0 4rem;
+      padding-block: 3.25rem 4rem;
+    }
+
+    @media (min-width: 768px) {
+      .hero { padding-block: 4.5rem 5.5rem; }
+      .hero h1 { font-size: clamp(2.5rem, 5vw, 3.4rem); }
+      .hero-tagline { font-size: 1.2rem; }
     }
 
     .hero-eyebrow {
@@ -466,9 +476,18 @@
       .tool-grid .reveal:nth-child(4) { transition-delay: 0.24s; }
     }
 
+    @media (min-width: 768px) {
+      .section { padding: 4.5rem 0; }
+      .tool-grid { gap: 1.5rem; }
+    }
+
     @media (max-width: 480px) {
-      .hero { padding: 3.25rem 0 3rem; }
-      .section { padding: 2.5rem 0; }
+      .hero { padding-block: 2.25rem 2.75rem; }
+      .section { padding: 2.75rem 0; }
+      .section-intro { margin-bottom: 1.5rem; }
+      .tool-grid { gap: 1rem; }
+      .tools-search { max-width: none; }
+      .hero-actions .btn { flex: 1 1 auto; justify-content: center; }
     }
   </style>
 </head>

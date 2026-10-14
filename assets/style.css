@@ -96,10 +96,17 @@ code, .mono { font-family: var(--mono); font-size: 0.95em; }
 
 .muted { color: var(--text-muted); }
 
+/* Side gutter grows with the viewport: ~24px on phones, 40px on desktop.
+   Pages adding vertical padding to a .container should use padding-block
+   so they don't wipe out this gutter. */
 .container {
   max-width: 860px;
   margin: 0 auto;
-  padding: 0 1.25rem;
+  padding-inline: clamp(1.4rem, 3vw + 0.75rem, 2.5rem);
+}
+
+@media (max-width: 520px) {
+  .card { padding: 1.25rem; }
 }
 
 .card {
