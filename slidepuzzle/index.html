@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Photo Slide Puzzle</title>
   <meta name="description" content="Free sliding puzzle game with your own photos. Upload a picture, scramble it, and slide the tiles to solve — then download a standalone HTML file to play offline on any device.">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d9488'/%3E%3Cg fill='%23ffffff'%3E%3Crect x='6' y='6' width='9' height='9' rx='1.5'/%3E%3Crect x='17' y='6' width='9' height='9' rx='1.5'/%3E%3Crect x='6' y='17' width='9' height='9' rx='1.5'/%3E%3C/g%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232563eb'/%3E%3Cg fill='%23ffffff'%3E%3Crect x='6' y='6' width='9' height='9' rx='1.5'/%3E%3Crect x='17' y='6' width='9' height='9' rx='1.5'/%3E%3Crect x='6' y='17' width='9' height='9' rx='1.5'/%3E%3C/g%3E%3C/svg%3E">
   <link rel="stylesheet" href="../assets/style.css">
   <script src="../assets/theme.js"></script>
   <style>
@@ -279,7 +279,7 @@
       cv.width = cv.height = 600;
       var ctx = cv.getContext('2d');
       var g = ctx.createLinearGradient(0, 0, 600, 600);
-      g.addColorStop(0, '#0d9488'); g.addColorStop(0.55, '#0f766e'); g.addColorStop(1, '#6366f1');
+      g.addColorStop(0, '#2563eb'); g.addColorStop(0.55, '#1d4ed8'); g.addColorStop(1, '#6366f1');
       ctx.fillStyle = g; ctx.fillRect(0, 0, 600, 600);
       ctx.strokeStyle = 'rgba(255,255,255,0.18)'; ctx.lineWidth = 2;
       for (var i = -6; i < 12; i++) { ctx.beginPath(); ctx.moveTo(i * 60, 0); ctx.lineTo(i * 60 + 600, 600); ctx.stroke(); }
@@ -482,8 +482,8 @@
       doc += '<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n';
       doc += '<title>' + S.title + '</title>\n';
       doc += '<style>\n';
-      doc += ':root{--bg:#fafaf9;--fg:#1c1917;--muted:#78716c;--surf:#f5f5f4;--bd:#d6d3d1;--ac:#0d9488;--acs:#0f766e;--acc:#fff}\n';
-      doc += '@media(prefers-color-scheme:dark){:root{--bg:#0c0a09;--fg:#e7e5e4;--muted:#a8a29e;--surf:#1c1917;--bd:#33302c;--ac:#2dd4bf;--acs:#5eead4;--acc:#042f2e}}\n';
+      doc += ':root{--bg:#fafaf9;--fg:#1c1917;--muted:#78716c;--surf:#f5f5f4;--bd:#d6d3d1;--ac:#2563eb;--acs:#1d4ed8;--acc:#fff}\n';
+      doc += '@media(prefers-color-scheme:dark){:root{--bg:#0c0a09;--fg:#e7e5e4;--muted:#a8a29e;--surf:#1c1917;--bd:#33302c;--ac:#60a5fa;--acs:#93c5fd;--acc:#172554}}\n';
       doc += '*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--fg);line-height:1.5;padding:1.25rem}\n';
       doc += '.wrap{max-width:30rem;margin:0 auto}h1{font-size:1.4rem;margin:0 0 .25rem}p.sub{color:var(--muted);margin:0 0 1.25rem;font-size:.92rem}\n';
       doc += '.row{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;justify-content:center;margin-bottom:1rem}\n';
