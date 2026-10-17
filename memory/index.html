@@ -8,17 +8,8 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231e40af'/%3E%3Cg fill='none' stroke='%23ffffff' stroke-width='2.2'%3E%3Crect x='6' y='9' width='12' height='16' rx='2.5'/%3E%3Crect x='14' y='6' width='12' height='16' rx='2.5' fill='%231e40af'/%3E%3C/g%3E%3C/svg%3E">
   <link rel="stylesheet" href="../assets/style.css">
   <script src="../assets/theme.js"></script>
+  <script src="../assets/motion.js"></script>
   <style>
-    .top-nav {
-      padding: 1.25rem 0 2.25rem; font-size: 0.9rem;
-      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
-    }
-    .top-nav a { color: var(--text-muted); text-decoration: none; }
-    .top-nav a:hover { color: var(--accent-strong); }
-    .lede { color: var(--text-muted); max-width: 44rem; margin-bottom: 0; }
-    .tool-card { margin: 1.75rem 0 1.25rem; }
-    .how-card { margin-bottom: 1rem; }
-
     .topbar-game { display: flex; flex-wrap: wrap; align-items: end; justify-content: center; gap: 1rem; margin-bottom: 1.1rem; }
     .topbar-game .grp { display: flex; align-items: center; gap: 0.6rem; }
     .topbar-game label { margin: 0; }
@@ -71,7 +62,7 @@
 <body>
   <header class="container">
     <nav class="top-nav" aria-label="Site" data-i18n-attr="aria-label:nav_site">
-      <a href="../">&#8592; samba nugraha</a>
+      <a class="home-link" href="../"><span class="brand-mark" aria-hidden="true">SN</span><span class="home-name">samba nugraha</span></a>
       <div class="nav-actions">
       <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
         <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
@@ -88,7 +79,7 @@
       </div>
     </nav>
     <h1 data-i18n="h1">Memory Match</h1>
-    <p class="lede" data-i18n="lede">Flip two cards at a time and find all the pairs. Fewer moves is better — can you beat your best?</p>
+    <p class="lede" data-i18n="lede">Flip two cards at a time and find every pair, in as few moves as you can.</p>
   </header>
 
   <main class="container">
@@ -96,7 +87,7 @@
       <div class="card" style="border-left:3px solid var(--negative)">This game needs JavaScript to run. Please enable it and reload. / Permainan ini membutuhkan JavaScript. Aktifkan lalu muat ulang.</div>
     </noscript>
 
-    <div class="card tool-card">
+    <div class="card tool-card" data-reveal>
       <div class="topbar-game">
         <div class="grp">
           <label for="mm-diff" data-i18n="diff_label">Difficulty</label>
@@ -119,10 +110,10 @@
       <p class="status" id="mm-status" aria-live="polite"></p>
     </div>
 
-    <section class="card how-card" aria-labelledby="how-heading">
+    <section class="card how-card" data-reveal aria-labelledby="how-heading">
       <h2 id="how-heading" data-i18n="how_title">Rules</h2>
-      <p data-i18n="how_1">All cards start face down. Flip any two — if they match, they stay open; if not, they flip back. The timer starts on your first flip, and every two flips count as one move. Find all pairs to win; your best (fewest moves) is saved per difficulty.</p>
-      <p class="muted small" data-i18n="privacy">Runs entirely in your browser. Best scores are remembered only on this device.</p>
+      <p data-i18n="how_1">Flip any two cards: a match stays open, a miss flips back. The timer starts on your first flip, and two flips make one move. Your best (fewest moves) is saved for each difficulty.</p>
+      <p class="muted small" data-i18n="privacy">Runs in your browser. Best scores are saved on this device only.</p>
     </section>
   </main>
 
@@ -143,7 +134,7 @@
         _meta: 'Free memory matching game. Flip cards to find emoji pairs, with a move counter, timer, and three difficulty levels — runs entirely in your browser.',
         nav_site: 'Site',
         h1: 'Memory Match',
-        lede: 'Flip two cards at a time and find all the pairs. Fewer moves is better — can you beat your best?',
+        lede: 'Flip two cards at a time and find every pair, in as few moves as you can.',
         diff_label: 'Difficulty',
         diff_easy: 'Easy (6 pairs)',
         diff_med: 'Medium (8 pairs)',
@@ -156,8 +147,8 @@
         win_best: 'New best: {m} moves! 🎉',
         card_aria: 'Card {n}',
         how_title: 'Rules',
-        how_1: 'All cards start face down. Flip any two — if they match, they stay open; if not, they flip back. The timer starts on your first flip, and every two flips count as one move. Find all pairs to win; your best (fewest moves) is saved per difficulty.',
-        privacy: 'Runs entirely in your browser. Best scores are remembered only on this device.',
+        how_1: 'Flip any two cards: a match stays open, a miss flips back. The timer starts on your first flip, and two flips make one move. Your best (fewest moves) is saved for each difficulty.',
+        privacy: 'Runs in your browser. Best scores are saved on this device only.',
         footer_back: '← back to all tools'
       },
       id: {
@@ -165,7 +156,7 @@
         _meta: 'Permainan mencocokkan kartu gratis. Balik kartu untuk menemukan pasangan emoji, dengan penghitung langkah, timer, dan tiga tingkat kesulitan — berjalan sepenuhnya di browser Anda.',
         nav_site: 'Situs',
         h1: 'Cari Pasangan (Memory)',
-        lede: 'Balik dua kartu sekaligus dan temukan semua pasangan. Makin sedikit langkah makin baik — bisa kalahkan rekor Anda?',
+        lede: 'Balik dua kartu sekaligus dan temukan semua pasangan, dengan langkah sesedikit mungkin.',
         diff_label: 'Kesulitan',
         diff_easy: 'Mudah (6 pasang)',
         diff_med: 'Sedang (8 pasang)',
@@ -178,8 +169,8 @@
         win_best: 'Rekor baru: {m} langkah! 🎉',
         card_aria: 'Kartu {n}',
         how_title: 'Aturan',
-        how_1: 'Semua kartu mulai tertutup. Balik dua kartu — jika cocok, keduanya tetap terbuka; jika tidak, tertutup kembali. Timer mulai pada balikan pertama, dan setiap dua balikan dihitung satu langkah. Temukan semua pasangan untuk menang; rekor terbaik (langkah paling sedikit) disimpan per tingkat kesulitan.',
-        privacy: 'Berjalan sepenuhnya di browser Anda. Rekor hanya diingat di perangkat ini.',
+        how_1: 'Balik dua kartu: yang cocok tetap terbuka, yang tidak tertutup kembali. Timer mulai pada balikan pertama, dan dua balikan dihitung satu langkah. Rekor terbaik (langkah paling sedikit) disimpan untuk tiap tingkat.',
+        privacy: 'Berjalan di browser Anda. Rekor hanya disimpan di perangkat ini.',
         footer_back: '← kembali ke semua alat'
       }
     };

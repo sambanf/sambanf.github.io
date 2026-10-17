@@ -8,17 +8,8 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231e40af'/%3E%3Cg fill='%23ffffff'%3E%3Crect x='6' y='6' width='9' height='9' rx='1.5'/%3E%3Crect x='17' y='6' width='9' height='9' rx='1.5'/%3E%3Crect x='6' y='17' width='9' height='9' rx='1.5'/%3E%3C/g%3E%3C/svg%3E">
   <link rel="stylesheet" href="../assets/style.css">
   <script src="../assets/theme.js"></script>
+  <script src="../assets/motion.js"></script>
   <style>
-    .top-nav {
-      padding: 1.25rem 0 2.25rem; font-size: 0.9rem;
-      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
-    }
-    .top-nav a { color: var(--text-muted); text-decoration: none; }
-    .top-nav a:hover { color: var(--accent-strong); }
-    .lede { color: var(--text-muted); max-width: 44rem; margin-bottom: 0; }
-    .tool-card { margin: 1.75rem 0 1.25rem; }
-    .how-card { margin-bottom: 1rem; }
-
     .setup { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.6rem 0.9rem; margin-bottom: 1.1rem; }
     .setup .grp { display: flex; align-items: center; gap: 0.5rem; }
     .setup label.field { margin: 0; }
@@ -77,7 +68,7 @@
 <body>
   <header class="container">
     <nav class="top-nav" aria-label="Site" data-i18n-attr="aria-label:nav_site">
-      <a href="../">&#8592; samba nugraha</a>
+      <a class="home-link" href="../"><span class="brand-mark" aria-hidden="true">SN</span><span class="home-name">samba nugraha</span></a>
       <div class="nav-actions">
       <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
         <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
@@ -94,7 +85,7 @@
       </div>
     </nav>
     <h1 data-i18n="h1">Photo Slide Puzzle</h1>
-    <p class="lede" data-i18n="lede">Upload your own photo, scramble it into a sliding puzzle, and slide the tiles back into place. Then download a standalone file to play it offline — your photo baked right in.</p>
+    <p class="lede" data-i18n="lede">Turn your photo into a sliding puzzle, solve it, then download it to play offline.</p>
   </header>
 
   <main class="container">
@@ -102,7 +93,7 @@
       <div class="card" style="border-left:3px solid var(--negative)">This game needs JavaScript to run. Please enable it and reload. / Permainan ini membutuhkan JavaScript. Aktifkan lalu muat ulang.</div>
     </noscript>
 
-    <div class="card tool-card">
+    <div class="card tool-card" data-reveal>
       <div class="setup">
         <input type="file" id="sp-file" accept="image/*" hidden>
         <label class="btn btn-primary field" for="sp-file" data-i18n="btn_upload">Upload photo</label>
@@ -137,16 +128,16 @@
 
       <div class="download-row">
         <button type="button" class="btn btn-primary" id="sp-download" data-i18n="btn_download">Download to play offline</button>
-        <p class="note" data-i18n="download_note">Saves a single self-contained HTML file with your photo inside. Open it on any device — phone, tablet, laptop — to play with no internet, no app, and nothing uploaded anywhere.</p>
+        <p class="note" data-i18n="download_note">One self-contained HTML file with your photo inside. Opens on any device — no internet, no app, nothing uploaded.</p>
         <p class="msg" id="sp-msg" aria-live="polite"></p>
       </div>
     </div>
 
-    <section class="card how-card" aria-labelledby="how-heading">
+    <section class="card how-card" data-reveal aria-labelledby="how-heading">
       <h2 id="how-heading" data-i18n="how_title">How it works</h2>
-      <p data-i18n="how_1">Tap a tile next to the empty space to slide it in (or use the arrow keys). One tile is always missing — rearrange the rest until your photo is whole again. Bigger grids are harder. "Numbers" shows each tile's home position, and "Peek" reveals the finished picture.</p>
-      <p data-i18n="how_2">Your photo never leaves your device: it is cropped to a square and resized right here in your browser. The download button bundles the game and your picture into one HTML file you can keep, replay offline, or share by sending the file itself.</p>
-      <p class="muted small" data-i18n="privacy">Nothing is uploaded and nothing is tracked. Your current puzzle is saved only on this device.</p>
+      <p data-i18n="how_1">Tap a tile next to the gap to slide it (or use the arrow keys) until your photo is whole again. Bigger grids are harder. "Numbers" shows where each tile belongs; "Peek" shows the finished picture.</p>
+      <p data-i18n="how_2">Your photo never leaves your device: it's cropped and resized right here. The download bundles the game and your picture into one HTML file to keep, replay offline, or send to a friend.</p>
+      <p class="muted small" data-i18n="privacy">Nothing is uploaded or tracked. Your current puzzle is saved on this device only.</p>
     </section>
   </main>
 
@@ -167,7 +158,7 @@
         _meta: 'Free sliding puzzle game with your own photos. Upload a picture, scramble it, and slide the tiles to solve — then download a standalone HTML file to play offline on any device.',
         nav_site: 'Site',
         h1: 'Photo Slide Puzzle',
-        lede: 'Upload your own photo, scramble it into a sliding puzzle, and slide the tiles back into place. Then download a standalone file to play it offline — your photo baked right in.',
+        lede: 'Turn your photo into a sliding puzzle, solve it, then download it to play offline.',
         btn_upload: 'Upload photo',
         size_label: 'Grid',
         size_3: '3 × 3 · Easy',
@@ -181,20 +172,20 @@
         btn_numbers_off: 'Numbers: off',
         btn_peek: 'Peek',
         btn_download: 'Download to play offline',
-        download_note: 'Saves a single self-contained HTML file with your photo inside. Open it on any device — phone, tablet, laptop — to play with no internet, no app, and nothing uploaded anywhere.',
+        download_note: 'One self-contained HTML file with your photo inside. Opens on any device — no internet, no app, nothing uploaded.',
         status_scrambled: 'Slide the tiles to rebuild the picture.',
         status_solved: 'Solved in {m} moves and {t}! 🎉',
         status_solved_best: 'Solved in {m} moves and {t} — new best! 🎉',
         msg_reading: 'Reading your photo…',
-        msg_bad_image: 'That file could not be read as an image. Try another.',
+        msg_bad_image: 'Couldn\'t read that file as an image. Try another.',
         msg_downloaded: 'Downloaded “slide-puzzle.html”. Open it on any device to play offline.',
         msg_download_fail: 'Could not build the file in this browser.',
         offline_subtitle: 'A photo slide puzzle you can play offline.',
         offline_change: 'Change photo',
         how_title: 'How it works',
-        how_1: 'Tap a tile next to the empty space to slide it in (or use the arrow keys). One tile is always missing — rearrange the rest until your photo is whole again. Bigger grids are harder. "Numbers" shows each tile’s home position, and "Peek" reveals the finished picture.',
-        how_2: 'Your photo never leaves your device: it is cropped to a square and resized right here in your browser. The download button bundles the game and your picture into one HTML file you can keep, replay offline, or share by sending the file itself.',
-        privacy: 'Nothing is uploaded and nothing is tracked. Your current puzzle is saved only on this device.',
+        how_1: 'Tap a tile next to the gap to slide it (or use the arrow keys) until your photo is whole again. Bigger grids are harder. "Numbers" shows where each tile belongs; "Peek" shows the finished picture.',
+        how_2: 'Your photo never leaves your device: it\'s cropped and resized right here. The download bundles the game and your picture into one HTML file to keep, replay offline, or send to a friend.',
+        privacy: 'Nothing is uploaded or tracked. Your current puzzle is saved on this device only.',
         footer_back: '← back to all tools'
       },
       id: {
@@ -202,7 +193,7 @@
         _meta: 'Permainan puzzle geser gratis dengan foto Anda sendiri. Unggah gambar, acak, dan geser ubin untuk menyelesaikannya — lalu unduh berkas HTML mandiri untuk dimainkan offline di perangkat apa pun.',
         nav_site: 'Situs',
         h1: 'Puzzle Geser Foto',
-        lede: 'Unggah foto Anda sendiri, acak menjadi puzzle geser, lalu geser ubin kembali ke tempatnya. Kemudian unduh berkas mandiri untuk dimainkan offline — foto Anda tertanam di dalamnya.',
+        lede: 'Ubah foto Anda jadi puzzle geser, selesaikan, lalu unduh untuk dimainkan offline.',
         btn_upload: 'Unggah foto',
         size_label: 'Kisi',
         size_3: '3 × 3 · Mudah',
@@ -216,20 +207,20 @@
         btn_numbers_off: 'Angka: mati',
         btn_peek: 'Intip',
         btn_download: 'Unduh untuk main offline',
-        download_note: 'Menyimpan satu berkas HTML mandiri dengan foto Anda di dalamnya. Buka di perangkat apa pun — ponsel, tablet, laptop — untuk bermain tanpa internet, tanpa aplikasi, dan tanpa apa pun diunggah.',
+        download_note: 'Satu berkas HTML mandiri dengan foto Anda di dalamnya. Bisa dibuka di perangkat apa pun — tanpa internet, tanpa aplikasi, tanpa unggahan.',
         status_scrambled: 'Geser ubin untuk menyusun kembali gambar.',
         status_solved: 'Selesai dalam {m} langkah dan {t}! 🎉',
         status_solved_best: 'Selesai dalam {m} langkah dan {t} — rekor baru! 🎉',
         msg_reading: 'Membaca foto Anda…',
-        msg_bad_image: 'Berkas itu tidak bisa dibaca sebagai gambar. Coba yang lain.',
+        msg_bad_image: 'Berkas itu tidak terbaca sebagai gambar. Coba yang lain.',
         msg_downloaded: 'Terunduh “slide-puzzle.html”. Buka di perangkat apa pun untuk main offline.',
         msg_download_fail: 'Tidak bisa membuat berkas di browser ini.',
         offline_subtitle: 'Puzzle geser foto yang bisa Anda mainkan offline.',
         offline_change: 'Ganti foto',
         how_title: 'Cara kerja',
-        how_1: 'Ketuk ubin di sebelah ruang kosong untuk menggesernya (atau pakai tombol panah). Selalu ada satu ubin yang hilang — susun ulang sisanya sampai foto Anda utuh kembali. Kisi lebih besar lebih sulit. "Angka" menampilkan posisi asal tiap ubin, dan "Intip" memperlihatkan gambar jadinya.',
-        how_2: 'Foto Anda tidak pernah keluar dari perangkat: foto dipotong menjadi persegi dan diperkecil langsung di browser ini. Tombol unduh menggabungkan permainan dan gambar Anda menjadi satu berkas HTML yang bisa Anda simpan, mainkan ulang offline, atau bagikan dengan mengirim berkasnya.',
-        privacy: 'Tidak ada yang diunggah dan tidak ada pelacakan. Puzzle Anda saat ini hanya disimpan di perangkat ini.',
+        how_1: 'Ketuk ubin di sebelah ruang kosong untuk menggesernya (atau pakai tombol panah) sampai foto Anda utuh kembali. Kisi lebih besar lebih sulit. "Angka" menunjukkan tempat asal tiap ubin; "Intip" menampilkan gambar jadinya.',
+        how_2: 'Foto Anda tidak pernah keluar dari perangkat: dipotong dan diperkecil langsung di sini. Unduhan menggabungkan permainan dan foto Anda jadi satu berkas HTML untuk disimpan, dimainkan ulang offline, atau dikirim ke teman.',
+        privacy: 'Tidak ada yang diunggah atau dilacak. Puzzle Anda saat ini hanya disimpan di perangkat ini.',
         footer_back: '← kembali ke semua alat'
       }
     };

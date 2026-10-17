@@ -8,17 +8,8 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231e40af'/%3E%3Ctext x='16' y='23' font-family='ui-monospace,monospace' font-size='18' font-weight='700' fill='%23ffffff' text-anchor='middle'%3E%25%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="../assets/style.css">
   <script src="../assets/theme.js"></script>
+  <script src="../assets/motion.js"></script>
   <style>
-    .top-nav {
-      padding: 1.25rem 0 2.25rem; font-size: 0.9rem;
-      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
-    }
-    .top-nav a { color: var(--text-muted); text-decoration: none; }
-    .top-nav a:hover { color: var(--accent-strong); }
-    .lede { color: var(--text-muted); max-width: 44rem; margin-bottom: 0; }
-    .tool-card { margin: 1.75rem 0 2rem; }
-    .how-card { margin-bottom: 1rem; }
-
     .seg {
       display: inline-flex; gap: 0.25rem; padding: 0.25rem; margin-bottom: 1.25rem;
       background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm);
@@ -51,7 +42,7 @@
 <body>
   <header class="container">
     <nav class="top-nav" aria-label="Site" data-i18n-attr="aria-label:nav_site">
-      <a href="../">&#8592; samba nugraha</a>
+      <a class="home-link" href="../"><span class="brand-mark" aria-hidden="true">SN</span><span class="home-name">samba nugraha</span></a>
       <div class="nav-actions">
       <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
         <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
@@ -68,7 +59,7 @@
       </div>
     </nav>
     <h1 data-i18n="h1">URL Encoder &amp; Decoder</h1>
-    <p class="lede" data-i18n="lede">Percent-encode text so it can travel safely inside a URL, and decode it back. Everything runs in your browser.</p>
+    <p class="lede" data-i18n="lede">Percent-encode text for URLs, and decode it back.</p>
   </header>
 
   <main class="container">
@@ -76,7 +67,7 @@
       <div class="card" style="border-left:3px solid var(--negative)">This tool needs JavaScript to run. Please enable it and reload. / Alat ini membutuhkan JavaScript. Aktifkan lalu muat ulang.</div>
     </noscript>
 
-    <div class="card tool-card">
+    <div class="card tool-card" data-reveal>
       <div class="seg" role="group" aria-label="Mode" data-i18n-attr="aria-label:mode_aria">
         <button type="button" id="mode-encode" aria-pressed="true" data-i18n="mode_encode">Encode</button>
         <button type="button" id="mode-decode" aria-pressed="false" data-i18n="mode_decode">Decode</button>
@@ -108,10 +99,10 @@
       <p class="msg" id="ue-msg" aria-live="polite"></p>
     </div>
 
-    <section class="card how-card" aria-labelledby="how-heading">
+    <section class="card how-card" data-reveal aria-labelledby="how-heading">
       <h2 id="how-heading" data-i18n="how_title">Component vs. full URL</h2>
-      <p data-i18n="how_1">Component mode (encodeURIComponent) encodes every reserved character, including / ? &amp; = and # — use it for a single value like a query parameter. With it off (encodeURI), URL structure characters are kept, so you can encode a whole URL without breaking it. "Treat + as space" matches how HTML forms encode spaces.</p>
-      <p class="muted small" data-i18n="privacy">Everything runs in your browser — nothing is uploaded and nothing is tracked. Your last input is remembered only in this browser.</p>
+      <p data-i18n="how_1">Component mode (encodeURIComponent) also encodes / ? &amp; = # — use it for one value, like a query parameter. Turn it off (encodeURI) to encode a whole URL without breaking it. “Treat + as space” matches how HTML forms send spaces.</p>
+      <p class="muted small" data-i18n="privacy">Nothing is uploaded or tracked. Your last input is saved in this browser only.</p>
     </section>
   </main>
 
@@ -132,7 +123,7 @@
         _meta: 'Free URL encoder and decoder. Percent-encode text for URLs and decode it back, with component and form-data (+) modes — everything runs in your browser.',
         nav_site: 'Site',
         h1: 'URL Encoder & Decoder',
-        lede: 'Percent-encode text so it can travel safely inside a URL, and decode it back. Everything runs in your browser.',
+        lede: 'Percent-encode text for URLs, and decode it back.',
         mode_aria: 'Mode',
         mode_encode: 'Encode',
         mode_decode: 'Decode',
@@ -149,15 +140,15 @@
         btn_copy: 'Copy result',
         btn_swap: 'Use result as input',
         btn_clear: 'Clear',
-        err_decode: 'That is not valid percent-encoding — check for stray or incomplete % sequences.',
+        err_decode: 'That isn\'t valid percent-encoding. Check for stray or incomplete % sequences.',
         err_encode: 'This text cannot be encoded (it contains an unpaired surrogate character).',
         msg_copied: 'Copied to clipboard.',
         msg_copy_empty: 'Nothing to copy yet.',
-        msg_copy_fail: 'Could not copy automatically — select the text and copy it manually.',
+        msg_copy_fail: 'Couldn\'t copy. Select the text and copy it manually.',
         msg_cleared: 'Cleared.',
         how_title: 'Component vs. full URL',
-        how_1: 'Component mode (encodeURIComponent) encodes every reserved character, including / ? & = and # — use it for a single value like a query parameter. With it off (encodeURI), URL structure characters are kept, so you can encode a whole URL without breaking it. "Treat + as space" matches how HTML forms encode spaces.',
-        privacy: 'Everything runs in your browser — nothing is uploaded and nothing is tracked. Your last input is remembered only in this browser.',
+        how_1: 'Component mode (encodeURIComponent) also encodes / ? & = # — use it for one value, like a query parameter. Turn it off (encodeURI) to encode a whole URL without breaking it. “Treat + as space” matches how HTML forms send spaces.',
+        privacy: 'Nothing is uploaded or tracked. Your last input is saved in this browser only.',
         footer_back: '← back to all tools'
       },
       id: {
@@ -165,7 +156,7 @@
         _meta: 'Encoder dan decoder URL gratis. Encode teks untuk URL (percent-encoding) dan decode kembali, dengan mode komponen dan form-data (+) — semuanya berjalan di browser Anda.',
         nav_site: 'Situs',
         h1: 'Encoder & Decoder URL',
-        lede: 'Encode teks dengan percent-encoding agar aman berada di dalam URL, dan decode kembali. Semuanya berjalan di browser Anda.',
+        lede: 'Encode teks untuk URL (percent-encoding), dan decode kembali.',
         mode_aria: 'Mode',
         mode_encode: 'Encode',
         mode_decode: 'Decode',
@@ -182,15 +173,15 @@
         btn_copy: 'Salin hasil',
         btn_swap: 'Jadikan hasil sebagai input',
         btn_clear: 'Bersihkan',
-        err_decode: 'Ini bukan percent-encoding yang valid — periksa urutan % yang salah atau tidak lengkap.',
+        err_decode: 'Ini bukan percent-encoding yang valid. Periksa urutan % yang salah atau tidak lengkap.',
         err_encode: 'Teks ini tidak bisa di-encode (mengandung karakter surrogate yang tidak berpasangan).',
         msg_copied: 'Disalin ke clipboard.',
         msg_copy_empty: 'Belum ada yang bisa disalin.',
-        msg_copy_fail: 'Tidak bisa menyalin otomatis — pilih teksnya lalu salin manual.',
+        msg_copy_fail: 'Gagal menyalin. Pilih teksnya lalu salin manual.',
         msg_cleared: 'Dibersihkan.',
         how_title: 'Komponen vs. URL utuh',
-        how_1: 'Mode komponen (encodeURIComponent) meng-encode semua karakter khusus, termasuk / ? & = dan # — pakai untuk satu nilai seperti parameter query. Jika dimatikan (encodeURI), karakter struktur URL dibiarkan, jadi Anda bisa meng-encode URL utuh tanpa merusaknya. "Anggap + sebagai spasi" mengikuti cara form HTML meng-encode spasi.',
-        privacy: 'Semuanya berjalan di browser Anda — tidak ada yang diunggah dan tidak ada pelacakan. Input terakhir Anda hanya diingat di browser ini.',
+        how_1: 'Mode komponen (encodeURIComponent) ikut meng-encode / ? & = # — pakai untuk satu nilai, seperti parameter query. Matikan (encodeURI) untuk meng-encode URL utuh tanpa merusaknya. “Anggap + sebagai spasi” mengikuti cara form HTML mengirim spasi.',
+        privacy: 'Tidak ada yang diunggah atau dilacak. Input terakhir hanya disimpan di browser ini.',
         footer_back: '← kembali ke semua alat'
       }
     };

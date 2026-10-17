@@ -8,16 +8,8 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231e40af'/%3E%3Cg stroke='%23ffffff' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M25 16a9 9 0 1 1-2.6-6.3'/%3E%3Cpath d='M25 4v6h-6'/%3E%3Cpath d='M16 11v5l3.5 2'/%3E%3C/g%3E%3C/svg%3E">
   <link rel="stylesheet" href="../assets/style.css">
   <script src="../assets/theme.js"></script>
+  <script src="../assets/motion.js"></script>
   <style>
-    .top-nav {
-      padding: 1.25rem 0 2.25rem; font-size: 0.9rem;
-      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
-    }
-    .top-nav a { color: var(--text-muted); text-decoration: none; }
-    .top-nav a:hover { color: var(--accent-strong); }
-    .lede { color: var(--text-muted); max-width: 44rem; margin-bottom: 0; }
-    .tool-card { margin: 1.75rem 0 1.25rem; }
-    .how-card { margin-bottom: 1rem; }
     h2.sub { font-size: 1.05rem; margin: 0 0 1rem; }
 
     /* Tabs (same pattern as the stock calculator) */
@@ -87,7 +79,7 @@
 <body>
   <header class="container">
     <nav class="top-nav" aria-label="Site" data-i18n-attr="aria-label:nav_site">
-      <a href="../">&#8592; samba nugraha</a>
+      <a class="home-link" href="../"><span class="brand-mark" aria-hidden="true">SN</span><span class="home-name">samba nugraha</span></a>
       <div class="nav-actions">
       <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
         <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
@@ -104,7 +96,7 @@
       </div>
     </nav>
     <h1 data-i18n="h1">Cron Expression Builder</h1>
-    <p class="lede" data-i18n="lede">Build a schedule visually and get the matching cron expression — both standard (crontab, GitHub Actions) and Quartz formats — plus the next run times in your timezone.</p>
+    <p class="lede" data-i18n="lede">Build a schedule visually and get the cron expression — standard and Quartz — with the next run times.</p>
   </header>
 
   <main class="container">
@@ -112,7 +104,7 @@
       <div class="card" style="border-left:3px solid var(--negative)">This tool needs JavaScript to run. Please enable it and reload. / Alat ini membutuhkan JavaScript. Aktifkan lalu muat ulang.</div>
     </noscript>
 
-    <div class="card tool-card">
+    <div class="card tool-card" data-reveal>
       <div class="tabs" role="tablist" aria-label="Schedule type" data-i18n-attr="aria-label:tabs_aria">
         <button type="button" role="tab" id="tab-minutes" aria-controls="panel-minutes" aria-selected="true" data-i18n="tab_minutes">Minutes</button>
         <button type="button" role="tab" id="tab-hourly" aria-controls="panel-hourly" aria-selected="false" tabindex="-1" data-i18n="tab_hourly">Hourly</button>
@@ -226,7 +218,7 @@
           <code id="out-quartz">—</code>
           <button type="button" class="btn btn-sm" id="copy-quartz" data-i18n="btn_copy">Copy</button>
         </div>
-        <p class="note" id="unix-note" hidden data-i18n="note_no_unix">Standard 5-field cron cannot express "nth weekday" schedules — use the Quartz form, or a day-of-month approximation.</p>
+        <p class="note" id="unix-note" hidden data-i18n="note_no_unix">Standard 5-field cron can't express "nth weekday" schedules. Use the Quartz form, or a day-of-month approximation.</p>
         <p class="desc" id="out-desc"></p>
         <p class="runs-title" data-i18n="runs_title">Next 5 runs (your timezone)</p>
         <ul class="runs" id="out-runs"></ul>
@@ -234,7 +226,7 @@
       </div>
     </div>
 
-    <div class="card tool-card">
+    <div class="card tool-card" data-reveal>
       <h2 class="sub" data-i18n="ck_title">Check an existing expression</h2>
       <label for="ck-in" data-i18n="ck_label">Standard cron expression (5 fields: minute hour day-of-month month day-of-week)</label>
       <input type="text" id="ck-in" autocomplete="off" spellcheck="false" placeholder="*/15 9-17 * * 1-5">
@@ -242,11 +234,11 @@
       <ul class="runs" id="ck-runs"></ul>
     </div>
 
-    <section class="card how-card" aria-labelledby="how-heading">
+    <section class="card how-card" data-reveal aria-labelledby="how-heading">
       <h2 id="how-heading" data-i18n="how_title">Cron in 30 seconds</h2>
-      <p data-i18n="how_1">A standard cron expression has five fields: minute (0–59), hour (0–23), day of month (1–31), month (1–12), and day of week (0–6, Sunday = 0). Each field takes a number, a list (1,3,5), a range (9–17), a step (*/15), or * for "any". This format works in crontab, GitHub Actions, Kubernetes, and most schedulers.</p>
-      <p data-i18n="how_2">Quartz (used by many Java systems and CronMaker) adds a seconds field at the front and an optional year at the end, uses ? for the unused day field, and supports extras like MON#2 (second Monday) and 6L (last Friday). The two formats are not interchangeable — copy the one your system expects.</p>
-      <p class="muted small" data-i18n="privacy">Everything runs in your browser — nothing is uploaded and nothing is tracked. Next-run times are computed for this device's timezone.</p>
+      <p data-i18n="how_1">Five fields: minute (0–59), hour (0–23), day of month (1–31), month (1–12) and day of week (0–6, Sunday = 0). Each takes a number, a list (1,3,5), a range (9-17), a step (*/15) or * for any. Works in crontab, GitHub Actions, Kubernetes and most schedulers.</p>
+      <p data-i18n="how_2">Quartz (Java systems, CronMaker) adds seconds at the front and an optional year at the end, uses ? for the unused day field, and supports MON#2 (second Monday) and 6L (last Friday). The formats aren't interchangeable — copy the one your system expects.</p>
+      <p class="muted small" data-i18n="privacy">Runs in your browser; nothing is uploaded. Next runs use this device's timezone.</p>
     </section>
   </main>
 
@@ -267,7 +259,7 @@
         _meta: 'Free cron expression builder. Create schedules visually and get both standard cron and Quartz expressions, with the next run times shown in your timezone — all in your browser.',
         nav_site: 'Site',
         h1: 'Cron Expression Builder',
-        lede: 'Build a schedule visually and get the matching cron expression — both standard (crontab, GitHub Actions) and Quartz formats — plus the next run times in your timezone.',
+        lede: 'Build a schedule visually and get the cron expression — standard and Quartz — with the next run times.',
         tabs_aria: 'Schedule type',
         tab_minutes: 'Minutes', tab_hourly: 'Hourly', tab_daily: 'Daily',
         tab_weekly: 'Weekly', tab_monthly: 'Monthly', tab_yearly: 'Yearly',
@@ -279,12 +271,12 @@
         ord_1: 'first', ord_2: 'second', ord_3: 'third', ord_4: 'fourth', ord_last: 'last',
         lbl_unix: 'Standard cron',
         btn_copy: 'Copy',
-        note_no_unix: 'Standard 5-field cron cannot express "nth weekday" schedules — use the Quartz form, or a day-of-month approximation.',
+        note_no_unix: 'Standard 5-field cron can\'t express "nth weekday" schedules. Use the Quartz form, or a day-of-month approximation.',
         runs_title: 'Next 5 runs (your timezone)',
         err_no_days: 'Select at least one day of the week.',
-        err_no_runs: 'No runs found in the next 5 years — check the values (e.g. 31 February never happens).',
+        err_no_runs: 'No runs in the next 5 years. Check the values (31 February never happens).',
         msg_copied: 'Copied to clipboard.',
-        msg_copy_fail: 'Could not copy automatically — select the expression and copy it manually.',
+        msg_copy_fail: 'Couldn\'t copy. Select the expression and copy it manually.',
         desc_minutes: 'Runs every {n} minute(s).',
         desc_hourly: 'Runs at minute {m} past every {n} hour(s).',
         desc_daily: 'Runs at {time}, every {n} day(s).',
@@ -298,9 +290,9 @@
         ck_label: 'Standard cron expression (5 fields: minute hour day-of-month month day-of-week)',
         ck_err: 'Not a valid 5-field cron expression.',
         how_title: 'Cron in 30 seconds',
-        how_1: 'A standard cron expression has five fields: minute (0–59), hour (0–23), day of month (1–31), month (1–12), and day of week (0–6, Sunday = 0). Each field takes a number, a list (1,3,5), a range (9–17), a step (*/15), or * for "any". This format works in crontab, GitHub Actions, Kubernetes, and most schedulers.',
-        how_2: 'Quartz (used by many Java systems and CronMaker) adds a seconds field at the front and an optional year at the end, uses ? for the unused day field, and supports extras like MON#2 (second Monday) and 6L (last Friday). The two formats are not interchangeable — copy the one your system expects.',
-        privacy: "Everything runs in your browser — nothing is uploaded and nothing is tracked. Next-run times are computed for this device's timezone.",
+        how_1: 'Five fields: minute (0–59), hour (0–23), day of month (1–31), month (1–12) and day of week (0–6, Sunday = 0). Each takes a number, a list (1,3,5), a range (9-17), a step (*/15) or * for any. Works in crontab, GitHub Actions, Kubernetes and most schedulers.',
+        how_2: 'Quartz (Java systems, CronMaker) adds seconds at the front and an optional year at the end, uses ? for the unused day field, and supports MON#2 (second Monday) and 6L (last Friday). The formats aren\'t interchangeable — copy the one your system expects.',
+        privacy: 'Runs in your browser; nothing is uploaded. Next runs use this device\'s timezone.',
         footer_back: '← back to all tools'
       },
       id: {
@@ -308,7 +300,7 @@
         _meta: 'Pembuat ekspresi cron gratis. Susun jadwal secara visual dan dapatkan ekspresi cron standar maupun Quartz, dengan waktu eksekusi berikutnya di zona waktu Anda — semuanya di browser.',
         nav_site: 'Situs',
         h1: 'Pembuat Ekspresi Cron',
-        lede: 'Susun jadwal secara visual dan dapatkan ekspresi cron-nya — format standar (crontab, GitHub Actions) maupun Quartz — plus waktu eksekusi berikutnya di zona waktu Anda.',
+        lede: 'Susun jadwal secara visual dan dapatkan ekspresi cron-nya — standar dan Quartz — lengkap dengan waktu eksekusi berikutnya.',
         tabs_aria: 'Jenis jadwal',
         tab_minutes: 'Menit', tab_hourly: 'Per jam', tab_daily: 'Harian',
         tab_weekly: 'Mingguan', tab_monthly: 'Bulanan', tab_yearly: 'Tahunan',
@@ -320,12 +312,12 @@
         ord_1: 'pertama', ord_2: 'kedua', ord_3: 'ketiga', ord_4: 'keempat', ord_last: 'terakhir',
         lbl_unix: 'Cron standar',
         btn_copy: 'Salin',
-        note_no_unix: 'Cron standar 5-kolom tidak bisa menyatakan jadwal "hari-ke-N dalam bulan" — gunakan bentuk Quartz, atau perkiraan tanggal.',
+        note_no_unix: 'Cron standar 5-kolom tidak bisa menyatakan jadwal "hari-ke-N". Gunakan bentuk Quartz, atau perkiraan tanggal.',
         runs_title: '5 eksekusi berikutnya (zona waktu Anda)',
         err_no_days: 'Pilih minimal satu hari dalam seminggu.',
-        err_no_runs: 'Tidak ada eksekusi dalam 5 tahun ke depan — periksa nilainya (mis. 31 Februari tidak pernah ada).',
+        err_no_runs: 'Tidak ada eksekusi dalam 5 tahun ke depan. Periksa nilainya (31 Februari tidak pernah ada).',
         msg_copied: 'Disalin ke clipboard.',
-        msg_copy_fail: 'Tidak bisa menyalin otomatis — pilih ekspresinya lalu salin manual.',
+        msg_copy_fail: 'Gagal menyalin. Pilih ekspresinya lalu salin manual.',
         desc_minutes: 'Berjalan setiap {n} menit.',
         desc_hourly: 'Berjalan pada menit {m} setiap {n} jam.',
         desc_daily: 'Berjalan pukul {time}, setiap {n} hari.',
@@ -339,9 +331,9 @@
         ck_label: 'Ekspresi cron standar (5 kolom: menit jam tanggal bulan hari-dalam-minggu)',
         ck_err: 'Bukan ekspresi cron 5-kolom yang valid.',
         how_title: 'Cron dalam 30 detik',
-        how_1: 'Ekspresi cron standar punya lima kolom: menit (0–59), jam (0–23), tanggal (1–31), bulan (1–12), dan hari dalam minggu (0–6, Minggu = 0). Tiap kolom bisa berisi angka, daftar (1,3,5), rentang (9–17), langkah (*/15), atau * untuk "apa saja". Format ini dipakai crontab, GitHub Actions, Kubernetes, dan sebagian besar penjadwal.',
-        how_2: 'Quartz (dipakai banyak sistem Java dan CronMaker) menambah kolom detik di depan dan tahun opsional di belakang, memakai ? untuk kolom hari yang tidak digunakan, dan mendukung tambahan seperti MON#2 (Senin kedua) dan 6L (Jumat terakhir). Kedua format tidak bisa saling dipertukarkan — salin yang sesuai dengan sistem Anda.',
-        privacy: 'Semuanya berjalan di browser Anda — tidak ada yang diunggah dan tidak ada pelacakan. Waktu eksekusi dihitung untuk zona waktu perangkat ini.',
+        how_1: 'Lima kolom: menit (0–59), jam (0–23), tanggal (1–31), bulan (1–12), dan hari dalam minggu (0–6, Minggu = 0). Tiap kolom berisi angka, daftar (1,3,5), rentang (9-17), langkah (*/15), atau * untuk apa saja. Dipakai di crontab, GitHub Actions, Kubernetes, dan sebagian besar penjadwal.',
+        how_2: 'Quartz (sistem Java, CronMaker) menambah detik di depan dan tahun opsional di belakang, memakai ? untuk kolom hari yang tidak dipakai, dan mendukung MON#2 (Senin kedua) dan 6L (Jumat terakhir). Kedua format tidak bisa dipertukarkan — salin yang sesuai dengan sistem Anda.',
+        privacy: 'Berjalan di browser Anda; tidak ada yang diunggah. Waktu eksekusi memakai zona waktu perangkat ini.',
         footer_back: '← kembali ke semua alat'
       }
     };

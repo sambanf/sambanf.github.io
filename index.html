@@ -4,123 +4,224 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Samba Nugraha — Software Engineer</title>
-  <meta name="description" content="Portfolio of Samba Nugraha, software engineer. Practical software and small, useful web tools.">
+  <meta name="description" content="Samba Nugraha, software engineer. Free web tools that run in your browser, and offline apps for Android and Windows.">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231e40af'/%3E%3Ctext x='16' y='22' font-family='system-ui,sans-serif' font-size='16' font-weight='700' fill='%23ffffff' text-anchor='middle'%3ESN%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="assets/style.css">
   <script src="assets/theme.js"></script>
-  <script>document.documentElement.className += ' js';</script>
+  <script src="assets/motion.js"></script>
   <style>
     /* ---------- Page-specific styles (landing page) ---------- */
 
-    :root { --pop: #6366f1; }
-    @media (prefers-color-scheme: dark) {
-      :root:not([data-theme="light"]) { --pop: #818cf8; }
-    }
-    :root[data-theme="dark"] { --pop: #818cf8; }
+    /* The homepage gets a wider column than the tool pages. */
+    .container { max-width: 1120px; }
 
-    .visually-hidden {
+    /* Side-sliding reveals must never widen the page. */
+    main { overflow-x: clip; }
+
+    .skip-link {
       position: absolute;
-      width: 1px; height: 1px;
-      margin: -1px; padding: 0;
-      overflow: hidden;
-      clip-path: inset(50%);
-      white-space: nowrap;
-      border: 0;
+      left: 1rem;
+      top: -4rem;
+      z-index: 200;
+      padding: 0.55rem 1rem;
+      border-radius: 999px;
+      background: var(--accent);
+      color: var(--accent-contrast);
+      font-weight: 600;
+      text-decoration: none;
+      transition: top 0.2s ease;
+    }
+    .skip-link:focus { top: 0.75rem; color: var(--accent-contrast); }
+
+    /* ---------- Sticky nav ---------- */
+
+    .site-nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      border-bottom: 1px solid transparent;
+      transition: background 0.3s ease, border-color 0.3s ease;
     }
 
-    /* ---------- Hero with animated background ---------- */
+    html.is-scrolled .site-nav {
+      background: color-mix(in srgb, var(--bg) 76%, transparent);
+      -webkit-backdrop-filter: blur(14px) saturate(1.5);
+      backdrop-filter: blur(14px) saturate(1.5);
+      border-bottom-color: var(--border);
+    }
 
-    .site-header {
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      height: 4rem;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-right: auto;
+      color: var(--text);
+      font-family: var(--font-display);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      text-decoration: none;
+    }
+    .brand:hover { color: var(--text); }
+    .brand .brand-mark { width: 2rem; height: 2rem; border-radius: 10px; font-size: 0.78rem; transition: transform 0.4s var(--ease-spring); }
+    .brand:hover .brand-mark { transform: rotate(-8deg) scale(1.06); }
+
+    .nav-links { display: flex; gap: 0.15rem; }
+
+    .nav-links a {
+      position: relative;
+      padding: 0.45rem 0.85rem;
+      border-radius: 999px;
+      color: var(--text-muted);
+      font-size: 0.92rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: color 0.15s ease, background 0.15s ease;
+    }
+    .nav-links a:hover { color: var(--text); background: var(--surface-2); }
+    .nav-links a[aria-current] { color: var(--text); }
+
+    .nav-links a::after {
+      content: "";
+      position: absolute;
+      left: 0.85rem;
+      right: 0.85rem;
+      bottom: 0.2rem;
+      height: 2px;
+      border-radius: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--pop));
+      transform: scaleX(0);
+      transition: transform 0.35s var(--ease-out);
+    }
+    .nav-links a[aria-current]::after { transform: scaleX(1); }
+
+    @media (max-width: 760px) {
+      .nav-links { display: none; }
+    }
+
+    @media (max-width: 420px) {
+      .brand .brand-name {
+        position: absolute;
+        width: 1px; height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+      }
+    }
+
+    /* ---------- Hero ---------- */
+
+    .hero {
       position: relative;
       overflow: hidden;
-      border-bottom: 1px solid var(--border);
-      background: var(--surface);
+      margin-top: -4rem;          /* run the backdrop up behind the nav */
+      padding-block: 8rem 4.5rem;
+    }
+
+    @media (min-width: 1000px) {
+      .hero {
+        display: flex;
+        align-items: center;
+        min-height: min(100svh, 880px);
+        padding-block: 7.5rem 5rem;
+      }
     }
 
     .hero-bg {
       position: absolute;
       inset: 0;
       pointer-events: none;
+      /* fade out at the bottom so the glow never ends in a hard edge */
+      -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent);
+      mask-image: linear-gradient(to bottom, black 60%, transparent);
     }
 
     .hero-grid {
       position: absolute;
-      inset: 0;
+      inset: -6rem 0 0;
       background-image:
         linear-gradient(to right, var(--border) 1px, transparent 1px),
         linear-gradient(to bottom, var(--border) 1px, transparent 1px);
-      background-size: 44px 44px;
-      opacity: 0.4;
-      -webkit-mask-image: radial-gradient(ellipse 90% 100% at 50% 0%, black 25%, transparent 78%);
-      mask-image: radial-gradient(ellipse 90% 100% at 50% 0%, black 25%, transparent 78%);
+      background-size: 48px 48px;
+      opacity: 0.5;
+      -webkit-mask-image: radial-gradient(ellipse 85% 75% at 50% 25%, black 20%, transparent 75%);
+      mask-image: radial-gradient(ellipse 85% 75% at 50% 25%, black 20%, transparent 75%);
     }
 
     .blob {
       position: absolute;
       border-radius: 50%;
-      opacity: 0.55;
     }
 
     .blob-1 {
-      width: 34rem; height: 34rem;
-      top: -14rem; right: -8rem;
-      background: radial-gradient(circle, color-mix(in srgb, var(--accent) 30%, transparent), transparent 65%);
+      width: 42rem; height: 42rem;
+      top: -18rem; right: -12rem;
+      background: radial-gradient(circle, color-mix(in srgb, var(--accent) 34%, transparent), transparent 65%);
     }
 
     .blob-2 {
-      width: 30rem; height: 30rem;
-      bottom: -18rem; left: -12rem;
-      background: radial-gradient(circle, color-mix(in srgb, var(--pop) 24%, transparent), transparent 65%);
+      width: 36rem; height: 36rem;
+      bottom: -22rem; left: -14rem;
+      background: radial-gradient(circle, color-mix(in srgb, var(--pop) 26%, transparent), transparent 65%);
     }
 
-    .topbar {
+    .hero-inner {
       position: relative;
-      z-index: 1;
-      display: flex;
+      display: grid;
+      gap: 3rem;
       align-items: center;
-      justify-content: flex-end;
-      gap: 0.5rem;
-      padding-top: 1.25rem;
+      width: 100%;
     }
 
-    /* The homepage gets a wider column than the tool pages so the card
-       grid can run three across on desktop. */
-    .container { max-width: 1100px; }
-
-    .hero {
-      position: relative;
-      padding-block: 3.25rem 4rem;
-    }
-
-    @media (min-width: 768px) {
-      .hero { padding-block: 4.5rem 5.5rem; }
-      .hero h1 { font-size: clamp(2.5rem, 5vw, 3.4rem); }
-      .hero-tagline { font-size: 1.2rem; }
+    @media (min-width: 1000px) {
+      .hero-inner { grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); }
     }
 
     .hero-eyebrow {
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
-      font-size: 0.8rem;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--accent-strong);
-      background: var(--accent-soft);
+      gap: 0.6rem;
+      margin: 0 0 1.5rem;
+      padding: 0.35rem 0.95rem 0.35rem 0.55rem;
+      border: 1px solid var(--border);
       border-radius: 999px;
-      padding: 0.3rem 0.85rem;
-      margin: 0 0 1.1rem;
+      background: color-mix(in srgb, var(--surface) 72%, transparent);
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      font-weight: 600;
+      -webkit-backdrop-filter: blur(6px);
+      backdrop-filter: blur(6px);
+    }
+
+    .hero-eyebrow .dot {
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent);
     }
 
     .hero h1 {
-      margin-bottom: 0.35rem;
+      font-size: clamp(2.75rem, 9vw, 5rem);
+      line-height: 1.02;
+      letter-spacing: -0.045em;
+      margin: 0 0 1.1rem;
+      padding-bottom: 0.1em;   /* gradient text is clipped to the box: keep descenders inside */
     }
 
     @supports (background-clip: text) or (-webkit-background-clip: text) {
       .hero h1 {
-        background: linear-gradient(90deg, var(--text) 0%, var(--accent-strong) 40%, var(--text) 70%);
-        background-size: 200% auto;
+        /* A light band that sweeps across the name every few seconds;
+           at both ends of the sweep only the plain text colour shows. */
+        background: linear-gradient(100deg, var(--text) 0%, var(--text) 40%, var(--accent-strong) 47%, var(--pop) 53%, var(--text) 60%, var(--text) 100%);
+        background-size: 250% auto;
+        background-position: 100% center;
         -webkit-background-clip: text;
         background-clip: text;
         color: transparent;
@@ -128,18 +229,19 @@
     }
 
     .hero-tagline {
-      max-width: 34em;
-      font-size: 1.075rem;
+      max-width: 28rem;
+      margin: 0 0 1rem;
       color: var(--text-muted);
-      margin-bottom: 0.9rem;
+      font-size: clamp(1.1rem, 2.2vw, 1.3rem);
+      line-height: 1.5;
     }
 
     .hero-typed {
+      min-height: 1.6em;
+      margin: 0 0 2.25rem;
+      color: var(--text-muted);
       font-family: var(--mono);
       font-size: 0.95rem;
-      color: var(--text-muted);
-      min-height: 1.6em;
-      margin-bottom: 1.75rem;
     }
 
     .hero-typed .prompt {
@@ -147,6 +249,8 @@
       font-weight: 700;
       margin-right: 0.5ch;
     }
+
+    .hero-typed #typed { color: var(--text); }
 
     .caret {
       display: inline-block;
@@ -161,53 +265,361 @@
       display: flex;
       flex-wrap: wrap;
       gap: 0.75rem;
+      margin-bottom: 2.75rem;
+    }
+
+    .hero-actions .btn { padding: 0.8rem 1.45rem; }
+    .hero-actions .btn svg { transition: transform 0.3s var(--ease-out); }
+    .hero-actions .btn-primary:hover svg { transform: translateY(3px); }
+
+    .hero-stats {
+      display: flex;
+      gap: 2.5rem;
+      max-width: 30rem;
+      margin: 0;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .hero-stats div {
+      display: flex;
+      flex-direction: column-reverse;
+    }
+
+    .hero-stats dd {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .hero-stats dt {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    /* Decorative stack of tool tiles (desktop only) */
+    .hero-art {
+      display: none;
+      position: relative;
+      height: 470px;
+      perspective: 1300px;
+    }
+
+    @media (min-width: 1000px) {
+      .hero-art { display: block; }
+    }
+
+    .art-stage {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      justify-content: center;
+      gap: 1.1rem;
+      transform: rotateX(var(--tilt-x, 14deg)) rotateY(var(--tilt-y, -20deg)) rotateZ(6deg);
+      transform-style: preserve-3d;
+      transition: transform 0.9s var(--ease-out);
+    }
+
+    .art-col {
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+    }
+    .art-col:nth-child(1) { padding-top: 3.25rem; }
+    .art-col:nth-child(3) { padding-top: 5.5rem; }
+
+    .art-tile {
+      display: grid;
+      place-items: center;
+      width: 6.4rem;
+      height: 6.4rem;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 1.6rem;
+      background: var(--surface);
+      color: var(--accent-strong);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .art-tile svg { width: 2.5rem; height: 2.5rem; }
+
+    .art-tile.is-accent {
+      border-color: transparent;
+      background: linear-gradient(135deg, var(--accent), var(--pop));
+      color: #fff;
+    }
+
+    .art-tile.is-app { border: 0; }
+    .art-tile.is-app img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+    .scroll-cue {
+      position: absolute;
+      left: 50%;
+      bottom: 1.75rem;
+      display: none;
+      width: 1.6rem;
+      height: 2.5rem;
+      margin-left: -0.8rem;
+      border: 2px solid var(--border-strong);
+      border-radius: 999px;
+      transition: opacity 0.4s ease, border-color 0.2s ease;
+    }
+
+    .scroll-cue::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 0.45rem;
+      width: 4px;
+      height: 0.5rem;
+      margin-left: -2px;
+      border-radius: 2px;
+      background: var(--accent);
+    }
+
+    .scroll-cue:hover { border-color: var(--accent); }
+    html.is-scrolled .scroll-cue { opacity: 0; pointer-events: none; }
+
+    @media (min-width: 1000px) and (min-height: 760px) {
+      .scroll-cue { display: block; }
     }
 
     /* ---------- Sections ---------- */
 
     .section {
-      padding: 3.25rem 0;
-      scroll-margin-top: 1rem;
+      position: relative;
+      padding-block: 5rem;
+      scroll-margin-top: 3rem;
     }
 
-    .section + .section {
-      border-top: 1px solid var(--border);
-    }
-
-    .section-heading {
-      display: flex;
-      align-items: baseline;
-      gap: 0.75rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .section-heading::before {
+    .section + .section::before {
       content: "";
-      flex: none;
-      width: 1.6rem;
-      height: 3px;
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: min(1120px, 92%);
+      height: 1px;
+      translate: -50% 0;
+      background: linear-gradient(90deg, transparent, var(--border) 20%, var(--border) 80%, transparent);
+    }
+
+    @media (min-width: 768px) {
+      .section { padding-block: 6rem; }
+    }
+
+    .section-head {
+      max-width: 40rem;
+      margin-bottom: 2.75rem;
+    }
+
+    .section-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+      margin: 0 0 1rem;
+      color: var(--accent-strong);
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .section-kicker::before {
+      content: "";
+      width: 1.75rem;
+      height: 2px;
       border-radius: 2px;
-      background: var(--accent);
-      align-self: center;
+      background: linear-gradient(90deg, var(--accent), var(--pop));
+      transform-origin: left center;
+      transition: transform 0.8s 0.35s var(--ease-out);
+    }
+
+    html.motion [data-reveal]:not(.is-in) .section-kicker::before { transform: scaleX(0); }
+
+    .section-title {
+      font-size: clamp(1.8rem, 4.4vw, 2.7rem);
+      letter-spacing: -0.035em;
+      line-height: 1.1;
+      margin: 0 0 0.75rem;
     }
 
     .section-intro {
+      margin: 0;
       color: var(--text-muted);
-      max-width: 40em;
-      margin-bottom: 2rem;
+      font-size: 1.075rem;
     }
 
-    /* ---------- Tools: search + groups ---------- */
+    /* ---------- Apps ---------- */
+
+    .app-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(290px, 100%), 1fr));
+      gap: 1.25rem;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .app-card {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      padding: 1.6rem;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      transition: transform 0.4s var(--ease-out), box-shadow 0.4s ease, border-color 0.3s ease;
+    }
+
+    /* Each app's own colour glows in the corner */
+    .app-card::before {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      top: -9rem;
+      right: -7rem;
+      width: 18rem;
+      height: 18rem;
+      border-radius: 50%;
+      background: radial-gradient(circle, color-mix(in srgb, var(--brand) 30%, transparent), transparent 68%);
+      opacity: 0.85;
+      transition: transform 0.6s var(--ease-out), opacity 0.4s ease;
+    }
+
+    .app-card:hover,
+    .app-card:focus-within {
+      transform: translateY(-5px);
+      border-color: color-mix(in srgb, var(--brand) 50%, var(--border));
+      box-shadow: var(--shadow-lg);
+    }
+
+    .app-card:hover::before,
+    .app-card:focus-within::before { transform: scale(1.3); opacity: 1; }
+
+    .app-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .app-icon {
+      display: block;
+      width: 3.75rem;
+      height: 3.75rem;
+      border-radius: 16px;
+      box-shadow: 0 0 0 1px var(--border), 0 12px 24px -12px rgb(0 0 0 / 0.5);
+      transition: transform 0.5s var(--ease-spring);
+    }
+
+    .app-card:hover .app-icon { transform: rotate(-6deg) scale(1.06); }
+
+    .platform {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.25rem 0.7rem 0.25rem 0.5rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--surface) 70%, transparent);
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    /* Platform logos keep their own brand colours */
+    .platform-logo { flex: none; width: 15px; height: 15px; }
+    .logo-android { color: #3ddc84; }
+    .logo-windows { color: #0078d4; }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .logo-windows { color: #4cc2ff; }
+    }
+    :root[data-theme="dark"] .logo-windows { color: #4cc2ff; }
+
+    .app-card h3 {
+      margin: 0.35rem 0 0;
+      font-size: 1.3rem;
+      letter-spacing: -0.02em;
+    }
+
+    .app-card p {
+      margin: 0;
+      color: var(--text-muted);
+    }
+
+    .card-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: auto;
+      padding-top: 0.4rem;
+      color: var(--accent-strong);
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .card-cta svg { transition: transform 0.3s var(--ease-out); }
+    .app-card:hover .card-cta svg { transform: translateX(4px); }
+
+    /* Whole card is clickable via its title link */
+    .app-card h3 a,
+    .tile h3 a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .app-card h3 a::after,
+    .tile h3 a::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      border-radius: inherit;
+    }
+
+    /* Focus ring around the whole card, where :has() is supported */
+    @supports selector(:has(*)) {
+      .app-card h3 a:focus-visible,
+      .tile h3 a:focus-visible { outline: none; }
+
+      .app-card:has(h3 a:focus-visible),
+      .tile:has(h3 a:focus-visible) {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+      }
+    }
+
+    /* ---------- Tools: search, filters, groups ---------- */
+
+    .tools-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.85rem 1.25rem;
+      margin-bottom: 2.5rem;
+    }
 
     .tools-search {
       position: relative;
-      max-width: 26rem;
-      margin-bottom: 2.25rem;
+      flex: 1 1 16rem;
+      max-width: 24rem;
     }
 
     .tools-search svg {
       position: absolute;
-      left: 0.85rem;
+      left: 1rem;
       top: 50%;
       transform: translateY(-50%);
       color: var(--text-muted);
@@ -215,376 +627,537 @@
     }
 
     .tools-search input {
-      padding-left: 2.6rem;
+      height: 2.85rem;
+      padding-left: 2.7rem;
+      border-radius: 999px;
     }
 
-    .tool-group + .tool-group {
-      margin-top: 2.25rem;
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
     }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      min-height: 2.5rem;
+      padding: 0.4rem 0.9rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--text-muted);
+      font: inherit;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: color 0.15s ease, background 0.2s ease, border-color 0.2s ease, transform 0.2s var(--ease-out);
+    }
+
+    .chip:hover { color: var(--text); border-color: var(--border-strong); }
+    .chip:active { transform: scale(0.96); }
+
+    .chip[aria-pressed="true"] {
+      background: var(--text);
+      border-color: var(--text);
+      color: var(--bg);
+    }
+
+    .chip-count {
+      min-width: 1.4rem;
+      padding: 0 0.4rem;
+      border-radius: 999px;
+      background: var(--surface-2);
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .chip[aria-pressed="true"] .chip-count {
+      background: color-mix(in srgb, var(--bg) 22%, transparent);
+      color: inherit;
+    }
+
+    .tool-group + .tool-group { margin-top: 2.75rem; }
 
     .tool-group-title {
-      font-size: 0.8rem;
-      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      margin: 0 0 1rem;
+      color: var(--text-muted);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 600;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: var(--text-muted);
-      margin: 0 0 0.9rem;
     }
 
-    #no-results {
-      margin-top: 1.5rem;
+    .tool-group-title::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--border);
     }
 
-    /* ---------- Tools grid ---------- */
+    #no-results { margin-top: 1.5rem; }
 
-    .tool-grid {
+    .tile-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
-      gap: 1.25rem;
+      grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
+      gap: 1rem;
       list-style: none;
       margin: 0;
       padding: 0;
     }
 
-    .tool-card {
+    .tile {
       position: relative;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      transition: border-color 0.2s ease, transform 0.25s ease, box-shadow 0.25s ease;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      grid-template-areas:
+        "icon title arrow"
+        "icon desc  arrow";
+      align-items: start;
+      column-gap: 1rem;
+      row-gap: 0.15rem;
+      padding: 1.1rem 1.15rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      transition: transform 0.35s var(--ease-out), box-shadow 0.35s ease, border-color 0.25s ease;
     }
 
-    .tool-card:hover,
-    .tool-card:focus-within {
-      border-color: var(--accent);
-      transform: translateY(-4px);
-      box-shadow: 0 12px 32px color-mix(in srgb, var(--accent) 16%, transparent);
-    }
-
-    /* Shine sweep across the card on hover */
-    .tool-card::before {
+    /* Soft spotlight that follows the pointer */
+    .tile::before,
+    .contact-card::after {
       content: "";
       position: absolute;
       inset: 0;
-      background: linear-gradient(115deg, transparent 35%, color-mix(in srgb, var(--accent) 9%, transparent) 50%, transparent 65%);
-      transform: translateX(-110%);
+      border-radius: inherit;
+      background: radial-gradient(240px circle at var(--mx, 50%) var(--my, 50%), color-mix(in srgb, var(--accent) 11%, transparent), transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
       pointer-events: none;
     }
 
-    .tool-icon {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
+    .tile:hover::before,
+    .contact-card:hover::after { opacity: 1; }
+
+    .tile:hover {
+      transform: translateY(-3px);
+      border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+      box-shadow: var(--shadow-lg);
+    }
+
+    .tile-icon {
+      grid-area: icon;
+      display: grid;
+      place-items: center;
       width: 2.75rem;
       height: 2.75rem;
-      border-radius: var(--radius-sm);
+      border-radius: 12px;
       background: var(--accent-soft);
       color: var(--accent-strong);
-      transition: transform 0.25s ease;
+      transition: background 0.25s ease, color 0.25s ease, transform 0.45s var(--ease-spring);
     }
 
-    .tool-card:hover .tool-icon,
-    .tool-card:focus-within .tool-icon {
-      transform: scale(1.08) rotate(-4deg);
+    .tile:hover .tile-icon {
+      background: linear-gradient(135deg, var(--accent), var(--pop));
+      color: #fff;
+      transform: rotate(-6deg) scale(1.06);
     }
 
-    /* Android app cards carry the real launcher icon instead of a line glyph,
-       and give it a little more room — it is artwork, not a 2px stroke. */
-    .tool-icon.app-logo {
-      width: 3.25rem;
-      height: 3.25rem;
-      background: none;
-      overflow: hidden;
-      box-shadow: 0 0 0 1px var(--border);
+    .tile h3 {
+      grid-area: title;
+      margin: 0.1rem 0 0;
+      font-size: 1rem;
     }
 
-    .tool-icon.app-logo img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .tool-card h3 {
-      margin: 0;
-    }
-
-    /* Make the whole card clickable via the title link */
-    .tool-card h3 a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    .tool-card h3 a::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: var(--radius);
-    }
-
-    .tool-card h3 a:hover {
-      color: var(--accent-strong);
-    }
-
-    .tool-card p {
+    .tile p {
+      grid-area: desc;
       margin: 0;
       color: var(--text-muted);
-      font-size: 0.95rem;
+      font-size: 0.9rem;
+      line-height: 1.5;
     }
 
-    .tool-cta {
-      margin-top: auto;
-      font-size: 0.875rem;
-      font-weight: 600;
+    .tile-arrow {
+      grid-area: arrow;
+      align-self: center;
+      color: var(--text-muted);
+      opacity: 0.45;
+      transition: transform 0.3s var(--ease-out), opacity 0.2s ease, color 0.2s ease;
+    }
+
+    .tile:hover .tile-arrow {
+      opacity: 1;
       color: var(--accent-strong);
+      transform: translate(3px, -3px);
     }
 
-    .tool-cta::after {
-      content: "\2192";
-      display: inline-block;
-      margin-left: 0.35rem;
-      transition: transform 0.25s ease;
+    /* Quick settle-in when a filter brings a tile back */
+    @keyframes pop-in {
+      from { opacity: 0; scale: 0.96; }
+    }
+    html.motion .tile.pop { animation: pop-in 0.4s var(--ease-out); }
+
+    /* ---------- About + contact ---------- */
+
+    .about-grid {
+      display: grid;
+      gap: 2.5rem;
+      align-items: center;
     }
 
-    .tool-card:hover .tool-cta::after,
-    .tool-card:focus-within .tool-cta::after {
-      transform: translateX(5px);
+    @media (min-width: 900px) {
+      .about-grid { grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr); gap: 4.5rem; }
     }
 
-    /* ---------- About / Contact ---------- */
-
-    .about-text {
-      max-width: 44em;
+    .about-copy p {
+      max-width: 34rem;
+      color: var(--text-muted);
+      font-size: 1.075rem;
     }
 
-    .contact-links {
+    .principles {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.75rem;
+      gap: 0.5rem;
       list-style: none;
-      margin: 0;
+      margin: 1.75rem 0 0;
       padding: 0;
     }
 
-    .btn {
-      transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease, box-shadow 0.2s ease;
+    .principles li {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.4rem 0.9rem 0.4rem 0.7rem;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+      font-size: 0.875rem;
+      font-weight: 600;
     }
 
-    .btn:hover {
-      transform: translateY(-1px);
+    .contact-card {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      padding: 2rem;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      background: var(--surface);
+      box-shadow: var(--shadow-lg);
     }
 
-    .btn-primary:hover {
-      box-shadow: 0 6px 20px color-mix(in srgb, var(--accent) 35%, transparent);
+    .contact-card::before {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      top: -8rem;
+      left: -6rem;
+      width: 16rem;
+      height: 16rem;
+      border-radius: 50%;
+      background: radial-gradient(circle, color-mix(in srgb, var(--pop) 26%, transparent), transparent 68%);
     }
 
-    /* ============================================================
-       Motion. Everything below runs ONLY when the user has not
-       asked for reduced motion; the page is fully usable without it.
-       ============================================================ */
+    .contact-card h3 { font-size: 1.35rem; letter-spacing: -0.02em; }
+    .contact-card > p { color: var(--text-muted); }
 
-    @media (prefers-reduced-motion: no-preference) {
-
-      html {
-        scroll-behavior: smooth;
-      }
-
-      @keyframes fade-up {
-        from { opacity: 0; transform: translateY(18px); }
-        to   { opacity: 1; transform: none; }
-      }
-
-      @keyframes shimmer {
-        to { background-position: 200% center; }
-      }
-
-      @keyframes drift-a {
-        from { transform: translate3d(0, 0, 0) scale(1); }
-        to   { transform: translate3d(-4rem, 3rem, 0) scale(1.15); }
-      }
-
-      @keyframes drift-b {
-        from { transform: translate3d(0, 0, 0) scale(1.1); }
-        to   { transform: translate3d(3rem, -2.5rem, 0) scale(0.95); }
-      }
-
-      @keyframes caret-blink {
-        50% { opacity: 0; }
-      }
-
-      @keyframes icon-draw {
-        from { stroke-dashoffset: 1; }
-        to   { stroke-dashoffset: 0; }
-      }
-
-      @keyframes shine {
-        to { transform: translateX(110%); }
-      }
-
-      .blob-1 { animation: drift-a 26s ease-in-out infinite alternate; }
-      .blob-2 { animation: drift-b 32s ease-in-out infinite alternate; }
-
-      .hero h1 { animation: shimmer 9s linear infinite; }
-
-      .caret { animation: caret-blink 1.1s steps(1) infinite; }
-
-      /* Staggered hero entrance */
-      .hero > * { animation: fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; }
-      .hero > *:nth-child(2) { animation-delay: 0.1s; }
-      .hero > *:nth-child(3) { animation-delay: 0.2s; }
-      .hero > *:nth-child(4) { animation-delay: 0.3s; }
-      .hero > *:nth-child(5) { animation-delay: 0.4s; }
-
-      .tool-card:hover::before,
-      .tool-card:focus-within::before {
-        animation: shine 0.7s ease;
-      }
-
-      .tool-card:hover .tool-icon path {
-        stroke-dasharray: 1;
-        animation: icon-draw 0.9s ease;
-      }
-
-      /* Scroll reveal — hidden state only applies when JS is on
-         (html.js), so content is never stuck invisible without JS. */
-      html.js .reveal {
-        opacity: 0;
-        transform: translateY(22px);
-        transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-      }
-
-      html.js .reveal.in {
-        opacity: 1;
-        transform: none;
-      }
-
-      /* Accent bar grows in as its heading reveals */
-      html.js .section-heading.reveal::before {
-        transform: scaleX(0);
-        transform-origin: left center;
-        transition: transform 0.8s 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-      }
-
-      html.js .section-heading.reveal.in::before {
-        transform: scaleX(1);
-      }
-
-      /* Stagger cards inside the grid */
-      .tool-grid .reveal:nth-child(2) { transition-delay: 0.08s; }
-      .tool-grid .reveal:nth-child(3) { transition-delay: 0.16s; }
-      .tool-grid .reveal:nth-child(4) { transition-delay: 0.24s; }
+    .contact-links {
+      display: grid;
+      gap: 0.6rem;
+      list-style: none;
+      margin: 1.5rem 0 0;
+      padding: 0;
     }
 
-    @media (min-width: 768px) {
-      .section { padding: 4.5rem 0; }
-      .tool-grid { gap: 1.5rem; }
+    .contact-links .btn {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      justify-content: flex-start;
+      overflow-wrap: anywhere;
     }
+
+    /* ---------- Footer + back to top ---------- */
+
+    .site-footer {
+      border-top: 1px solid var(--border);
+      padding-block: 1.75rem;
+      text-align: left;
+    }
+
+    .footer-inner {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem 1.5rem;
+    }
+
+    .footer-inner p { margin: 0; }
+
+    .footer-credit {
+      flex-basis: 100%;
+      font-size: 0.75rem;
+      opacity: 0.8;
+    }
+
+    .footer-credit a { font-weight: 500; text-decoration: underline; }
+
+    .to-top {
+      position: fixed;
+      right: 1.25rem;
+      bottom: 1.25rem;
+      z-index: 40;
+      display: grid;
+      place-items: center;
+      width: 2.85rem;
+      height: 2.85rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: var(--shadow-lg);
+      opacity: 0;
+      translate: 0 14px;
+      visibility: hidden;
+      transition: opacity 0.3s ease, translate 0.4s var(--ease-out), border-color 0.2s ease, visibility 0s 0.4s;
+    }
+
+    .to-top:hover { color: var(--accent-strong); border-color: var(--accent); }
+
+    html.is-deep .to-top {
+      opacity: 1;
+      translate: none;
+      visibility: visible;
+      transition: opacity 0.3s ease, translate 0.4s var(--ease-out), border-color 0.2s ease, visibility 0s;
+    }
+
+    /* ---------- Motion (html.motion = JS on, reduced motion off) ---------- */
+
+    @keyframes hero-in {
+      from { opacity: 0; translate: 0 26px; }
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 100% center; }
+      40%, 100% { background-position: 0% center; }
+    }
+
+    @keyframes tile-in {
+      from { opacity: 0; translate: 0 40px; scale: 0.7; }
+    }
+
+    @keyframes bob {
+      50% { transform: translateY(-12px); }
+    }
+
+    @keyframes drift-a {
+      to { transform: translate3d(-4rem, 3rem, 0) scale(1.15); }
+    }
+
+    @keyframes drift-b {
+      to { transform: translate3d(3rem, -2.5rem, 0) scale(0.92); }
+    }
+
+    @keyframes caret-blink {
+      50% { opacity: 0; }
+    }
+
+    @keyframes wheel {
+      0% { opacity: 0; translate: 0 0; }
+      30% { opacity: 1; }
+      100% { opacity: 0; translate: 0 0.7rem; }
+    }
+
+    @keyframes ping {
+      from { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 45%, transparent); }
+      to { box-shadow: 0 0 0 9px transparent; }
+    }
+
+    html.motion .hero-copy > * { animation: hero-in 0.9s var(--ease-out) both; }
+    html.motion .hero-copy > :nth-child(2) { animation: hero-in 0.9s var(--ease-out) 0.08s both, shimmer 8s ease-in-out 1.2s infinite; }
+    html.motion .hero-copy > :nth-child(3) { animation-delay: 0.16s; }
+    html.motion .hero-copy > :nth-child(4) { animation-delay: 0.24s; }
+    html.motion .hero-copy > :nth-child(5) { animation-delay: 0.32s; }
+    html.motion .hero-copy > :nth-child(6) { animation-delay: 0.4s; }
+
+    html.motion .hero-eyebrow .dot { animation: ping 2.2s ease-out infinite; }
+
+    html.motion .art-tile {
+      animation:
+        tile-in 1s var(--ease-spring) calc(0.35s + var(--i) * 0.07s) both,
+        bob 6s ease-in-out calc(var(--i) * -0.7s) infinite;
+    }
+
+    html.motion .blob-1 { animation: drift-a 26s ease-in-out infinite alternate; }
+    html.motion .blob-2 { animation: drift-b 32s ease-in-out infinite alternate; }
+    html.motion .caret { animation: caret-blink 1.1s steps(1) infinite; }
+    html.motion .scroll-cue::before { animation: wheel 1.8s ease-in-out infinite; }
+
+    /* Don't spend battery on the hero's loops once it's scrolled away */
+    html.hero-away .hero *,
+    html.hero-away .hero *::before { animation-play-state: paused !important; }
 
     @media (max-width: 480px) {
-      .hero { padding-block: 2.25rem 2.75rem; }
-      .section { padding: 2.75rem 0; }
-      .section-intro { margin-bottom: 1.5rem; }
-      .tool-grid { gap: 1rem; }
+      .hero { padding-block: 6.75rem 3.5rem; }
+      .hero-actions .btn { flex: 1 1 auto; }
+      .hero-stats { gap: 1.75rem; }
+      .hero-stats dd { font-size: 1.7rem; }
+      .section { padding-block: 4rem; }
       .tools-search { max-width: none; }
-      .hero-actions .btn { flex: 1 1 auto; justify-content: center; }
+      .contact-card { padding: 1.5rem; }
     }
   </style>
 </head>
-<body>
+<body data-scroll-progress>
 
-  <header class="site-header">
-    <div class="hero-bg" aria-hidden="true">
-      <div class="hero-grid"></div>
-      <div class="blob blob-1"></div>
-      <div class="blob blob-2"></div>
-    </div>
-    <div class="container topbar">
-      <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
-        <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
-          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0l60 30M60 0L0 30" stroke="#fff" stroke-width="6"/><path d="M0 0l60 30M60 0L0 30" stroke="#C8102E" stroke-width="2.5"/><path d="M30 0v30M0 15h60" stroke="#fff" stroke-width="10"/><path d="M30 0v30M0 15h60" stroke="#C8102E" stroke-width="6"/></svg>EN
+  <a class="skip-link" href="#main" data-i18n="skip">Skip to content</a>
+
+  <!-- No element has id="top": "#top" links then scroll to the very top
+       of the document, which a sticky element can't reliably do. -->
+  <header class="site-nav">
+    <div class="container nav-inner">
+      <a class="brand" href="#top">
+        <span class="brand-mark" aria-hidden="true">SN</span>
+        <span class="brand-name">Samba Nugraha</span>
+      </a>
+      <nav class="nav-links" aria-label="Sections" data-i18n-attr="aria-label:navAria">
+        <a href="#apps" data-i18n="navApps">Apps</a>
+        <a href="#tools" data-i18n="navTools">Tools</a>
+        <a href="#about" data-i18n="navAbout">About</a>
+      </nav>
+      <div class="nav-actions">
+        <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
+          <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
+            <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="30" fill="#012169"/><path d="M0 0l60 30M60 0L0 30" stroke="#fff" stroke-width="6"/><path d="M0 0l60 30M60 0L0 30" stroke="#C8102E" stroke-width="2.5"/><path d="M30 0v30M0 15h60" stroke="#fff" stroke-width="10"/><path d="M30 0v30M0 15h60" stroke="#C8102E" stroke-width="6"/></svg>EN
+          </button>
+          <button type="button" data-lang="id" aria-pressed="false" aria-label="Bahasa Indonesia">
+            <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="15" fill="#E70011"/><rect y="15" width="60" height="15" fill="#F7F7F7"/></svg>ID
+          </button>
+        </div>
+        <button type="button" class="theme-toggle" aria-label="Dark mode / Mode gelap" aria-pressed="false">
+          <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
         </button>
-        <button type="button" data-lang="id" aria-pressed="false" aria-label="Bahasa Indonesia">
-          <svg class="flag" viewBox="0 0 60 30" aria-hidden="true" focusable="false"><rect width="60" height="15" fill="#E70011"/><rect y="15" width="60" height="15" fill="#F7F7F7"/></svg>ID
-        </button>
-      </div>
-      <button type="button" class="theme-toggle" aria-label="Dark mode / Mode gelap" aria-pressed="false">
-        <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
-        <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
-      </button>
-    </div>
-    <div class="container hero">
-      <p class="hero-eyebrow">Software Engineer</p>
-      <!-- EDITABLE: Name below was derived from git config — change it here if needed. -->
-      <h1>Samba Nugraha</h1>
-      <!-- PLACEHOLDER TAGLINE: personalize this line to describe your own focus. -->
-      <p class="hero-tagline" data-i18n="tagline">I build practical software and small, useful tools — simple things that solve everyday problems.</p>
-      <p class="hero-typed">
-        <span class="prompt" aria-hidden="true">&#10095;</span>
-        <span class="visually-hidden" data-i18n="typedSr">building simple web tools</span>
-        <span aria-hidden="true"><span data-i18n="typedPrefix">building</span> <span id="typed">simple web tools</span><span class="caret"></span></span>
-      </p>
-      <div class="hero-actions">
-        <a class="btn btn-primary" href="#tools" data-i18n="browseTools">Browse the tools</a>
-        <a class="btn" href="https://github.com/sambanf" rel="me">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.42 7.42 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
-          GitHub
-        </a>
       </div>
     </div>
   </header>
 
-  <main>
+  <main id="main">
 
     <!-- ============================================================
-         Apps — the published Android apps. Deliberately its own
-         section above Tools, and outside it: these are not browser
-         tools, and the tool search must never filter them away.
+         Hero
+         ============================================================ -->
+    <section class="hero" aria-labelledby="hero-name">
+      <div class="hero-bg" aria-hidden="true">
+        <div class="hero-grid" data-parallax="0.3"></div>
+        <div class="blob blob-1" data-parallax="0.18"></div>
+        <div class="blob blob-2" data-parallax="0.4"></div>
+      </div>
+
+      <div class="container hero-inner">
+        <div class="hero-copy">
+          <p class="hero-eyebrow"><span class="dot" aria-hidden="true"></span><span data-i18n="eyebrow">Software engineer</span></p>
+          <h1 id="hero-name">Samba Nugraha</h1>
+          <p class="hero-tagline" data-i18n="tagline">I build simple software for everyday problems.</p>
+          <p class="hero-typed">
+            <span class="prompt" aria-hidden="true">&#10095;</span>
+            <span class="visually-hidden" data-i18n="typedSr">building web tools and offline apps</span>
+            <span aria-hidden="true"><span data-i18n="typedPrefix">building</span> <span id="typed">web tools</span><span class="caret"></span></span>
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#tools">
+              <span data-i18n="browseTools">Browse tools</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
+            </a>
+            <a class="btn" href="https://github.com/sambanf" rel="me">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.42 7.42 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+              GitHub
+            </a>
+          </div>
+          <dl class="hero-stats">
+            <div><dt data-i18n="statTools">web tools</dt><dd id="stat-tools">21</dd></div>
+            <div><dt data-i18n="statApps">apps</dt><dd id="stat-apps">3</dd></div>
+            <div><dt data-i18n="statTrackers">trackers</dt><dd>0</dd></div>
+          </dl>
+        </div>
+
+        <div class="hero-art" aria-hidden="true">
+          <div class="art-stage">
+            <div class="art-col" data-parallax="-0.08">
+              <span class="art-tile" style="--i:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M7 14l4-4 3 3 5-6"/><path d="M19 12V7h-5"/></svg></span>
+              <span class="art-tile is-app" style="--i:3"><img src="kaskucing/assets/icon-192.png" alt="" width="102" height="102" decoding="async"></span>
+              <span class="art-tile" style="--i:6"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1z"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span>
+            </div>
+            <div class="art-col" data-parallax="0.06">
+              <span class="art-tile is-accent" style="--i:1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4c-2 0-3 1-3 3v2c0 1.2-.8 2.2-2 2.5v1c1.2.3 2 1.3 2 2.5v2c0 2 1 3 3 3"/><path d="M16 4c2 0 3 1 3 3v2c0 1.2.8 2.2 2 2.5v1c-1.2.3-2 1.3-2 2.5v2c0 2-1 3-3 3"/></svg></span>
+              <span class="art-tile" style="--i:4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h7v7H4z"/><path d="M13 4h7v7h-7z"/><path d="M4 13h7v7H4z"/><path d="M13 13h7v7h-7z"/></svg></span>
+              <span class="art-tile is-app" style="--i:7"><img src="stokancil/assets/icon-192.png" alt="" width="102" height="102" decoding="async"></span>
+            </div>
+            <div class="art-col" data-parallax="-0.03">
+              <span class="art-tile is-app" style="--i:2"><img src="koaladeck/assets/icon-192.png" alt="" width="102" height="102" decoding="async"></span>
+              <span class="art-tile" style="--i:5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 1 0 0-18"/><path d="M12 8v4l3 2"/></svg></span>
+              <span class="art-tile" style="--i:8"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l5.5 5.5a7.5 7.5 0 1 1-11 0z"/></svg></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <a class="scroll-cue" href="#apps" aria-label="Scroll to apps" data-i18n-attr="aria-label:scrollCue"></a>
+    </section>
+
+    <!-- ============================================================
+         Apps — the published Android and Windows apps. Deliberately
+         outside the Tools section, so the tool search never filters
+         them away. Each card's --brand is the app's own colour.
          ============================================================ -->
     <section class="section" id="apps" aria-labelledby="apps-heading">
       <div class="container">
-        <h2 class="section-heading reveal" id="apps-heading" data-i18n="appsHeading">Android apps</h2>
-        <p class="section-intro reveal" data-i18n="appsIntro">Apps I publish on Google Play. Both are fully offline — no account, no internet permission, and nothing that leaves your phone.</p>
+        <header class="section-head" data-reveal="stagger">
+          <p class="section-kicker" data-i18n="appsKicker">01 — Apps</p>
+          <h2 class="section-title" id="apps-heading" data-i18n="appsHeading">Offline apps for Android and Windows</h2>
+          <p class="section-intro" data-i18n="appsIntro">No account. Your data stays on your device.</p>
+        </header>
 
-        <ul class="tool-grid">
+        <ul class="app-grid">
 
-          <li class="card tool-card reveal">
-            <span class="tool-icon app-logo" aria-hidden="true">
-              <img src="stokancil/assets/icon-192.png" alt="" width="52" height="52" decoding="async">
-            </span>
-            <h3><a href="stokancil/" data-i18n="toolStokancilTitle">Stokancil</a></h3>
-            <p data-i18n="toolStokancilDesc">Offline point-of-sale and stock book for small shops — sales, barcode scanning and thermal receipts, with no internet permission at all.</p>
-            <span class="tool-cta" aria-hidden="true" data-i18n="openApp">View app</span>
+          <li class="app-card" data-reveal="load" style="--brand: #2fb486">
+            <div class="app-top">
+              <img class="app-icon" src="stokancil/assets/icon-192.png" alt="" width="60" height="60" decoding="async">
+              <span class="platform"><svg class="platform-logo logo-android" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path fill-rule="evenodd" d="M2 18a10 10 0 0 1 20 0zM8.2 12.65a1.15 1.15 0 1 0 0 2.3 1.15 1.15 0 1 0 0-2.3zM15.8 12.65a1.15 1.15 0 1 0 0 2.3 1.15 1.15 0 1 0 0-2.3z"/><path d="M7 10.2 5.2 6.9M17 10.2l1.8-3.3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Android</span>
+            </div>
+            <h3><a href="stokancil/">Stokancil</a></h3>
+            <p data-i18n="appStokancilDesc">Offline till and stock book for small shops.</p>
+            <span class="card-cta" aria-hidden="true"><span data-i18n="openApp">View app</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
           </li>
 
-          <li class="card tool-card reveal">
-            <span class="tool-icon app-logo" aria-hidden="true">
-              <img src="kaskucing/assets/icon-192.png" alt="" width="52" height="52" decoding="async">
-            </span>
-            <h3><a href="kaskucing/" data-i18n="toolKaskucingTitle">Kaskucing</a></h3>
-            <p data-i18n="toolKaskucingDesc">Offline daily cash book for Android — record what you spend in seconds, then see where the month actually went. No account, no signal needed.</p>
-            <span class="tool-cta" aria-hidden="true" data-i18n="openApp">View app</span>
+          <li class="app-card" data-reveal="load" style="--brand: #f2b51f">
+            <div class="app-top">
+              <img class="app-icon" src="kaskucing/assets/icon-192.png" alt="" width="60" height="60" decoding="async">
+              <span class="platform"><svg class="platform-logo logo-android" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path fill-rule="evenodd" d="M2 18a10 10 0 0 1 20 0zM8.2 12.65a1.15 1.15 0 1 0 0 2.3 1.15 1.15 0 1 0 0-2.3zM15.8 12.65a1.15 1.15 0 1 0 0 2.3 1.15 1.15 0 1 0 0-2.3z"/><path d="M7 10.2 5.2 6.9M17 10.2l1.8-3.3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Android</span>
+            </div>
+            <h3><a href="kaskucing/">Kaskucing</a></h3>
+            <p data-i18n="appKaskucingDesc">Offline cash book. See where your money goes.</p>
+            <span class="card-cta" aria-hidden="true"><span data-i18n="openApp">View app</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
           </li>
 
-        </ul>
-      </div>
-    </section>
-
-    <!-- Applications — desktop apps (not Android, not browser tools). -->
-    <section class="section" id="applications" aria-labelledby="applications-heading">
-      <div class="container">
-        <h2 class="section-heading reveal" id="applications-heading" data-i18n="applicationsHeading">Applications</h2>
-        <p class="section-intro reveal" data-i18n="applicationsIntro">Desktop software I build. Source on GitHub, free to download.</p>
-
-        <ul class="tool-grid">
-
-          <li class="card tool-card reveal">
-            <span class="tool-icon app-logo" aria-hidden="true">
-              <img src="koaladeck/assets/icon-192.png" alt="" width="52" height="52" decoding="async">
-            </span>
-            <h3><a href="koaladeck/" data-i18n="appKoalaDeckTitle">Koala Deck</a></h3>
-            <p data-i18n="appKoalaDeckDesc">Windows companion app for an ESP32 USB audio controller — set Master, per-app and microphone volume with physical knobs and buttons, from the system tray.</p>
-            <span class="tool-cta" aria-hidden="true" data-i18n="openApp">View app</span>
+          <li class="app-card" data-reveal="load" style="--brand: #38b6f5">
+            <div class="app-top">
+              <img class="app-icon" src="koaladeck/assets/icon-192.png" alt="" width="60" height="60" decoding="async">
+              <span class="platform"><svg class="platform-logo logo-windows" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M2 4.6 10 3.5v7.7H2zM11 3.4 22 2v9.2H11zM2 12.2h8v7.7l-8-1.1zM11 12.2h11V22l-11-1.5z"/></svg>Windows</span>
+            </div>
+            <h3><a href="koaladeck/">Koala Deck</a></h3>
+            <p data-i18n="appKoalaDeckDesc">Real volume knobs for Windows, powered by an ESP32.</p>
+            <span class="card-cta" aria-hidden="true"><span data-i18n="openApp">View app</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
           </li>
 
         </ul>
@@ -592,571 +1165,708 @@
     </section>
 
     <!-- ============================================================
-         Tools — the heart of the page. To add a new tool, copy a
-         <li class="card tool-card reveal"> block (template in the
-         comment below) and adjust the link, icon, title, description.
+         Tools — to add one, copy a <li class="tile"> block (template
+         in the comment at the end of this section) into the right
+         .tool-group. Counts in the hero and the filter chips update
+         themselves.
          ============================================================ -->
     <section class="section" id="tools" aria-labelledby="tools-heading">
       <div class="container">
-        <h2 class="section-heading reveal" id="tools-heading" data-i18n="toolsHeading">Tools</h2>
-        <p class="section-intro reveal" data-i18n="toolsIntro">Small, self-contained web tools. Free to use, no sign-up, everything runs in your browser.</p>
+        <header class="section-head" data-reveal="stagger">
+          <p class="section-kicker" data-i18n="toolsKicker">02 — Tools</p>
+          <h2 class="section-title" id="tools-heading" data-i18n="toolsHeading">Small tools that run in your browser</h2>
+          <p class="section-intro" data-i18n="toolsIntro">Free, no sign-up, nothing uploaded.</p>
+        </header>
 
-        <div class="tools-search reveal">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
-          <input type="search" id="tool-search" autocomplete="off" placeholder="Search tools&hellip;" data-i18n-attr="placeholder:searchPh;aria-label:searchPh">
+        <div class="tools-bar" id="tools-bar" data-reveal hidden>
+          <div class="tools-search">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="search" id="tool-search" autocomplete="off" placeholder="Search tools&hellip;" aria-label="Search tools" data-i18n-attr="placeholder:searchPh;aria-label:searchPh">
+          </div>
+          <div class="filters" role="group" aria-label="Filter by category" data-i18n-attr="aria-label:filterAria">
+            <button type="button" class="chip" data-filter="all" aria-pressed="true"><span data-i18n="filterAll">All</span><span class="chip-count"></span></button>
+            <button type="button" class="chip" data-filter="finance" aria-pressed="false"><span data-i18n="catFinance">Finance</span><span class="chip-count"></span></button>
+            <button type="button" class="chip" data-filter="games" aria-pressed="false"><span data-i18n="catGames">Games</span><span class="chip-count"></span></button>
+            <button type="button" class="chip" data-filter="everyday" aria-pressed="false"><span data-i18n="catEveryday">Everyday</span><span class="chip-count"></span></button>
+            <button type="button" class="chip" data-filter="dev" aria-pressed="false"><span data-i18n="catDev">Developer</span><span class="chip-count"></span></button>
+          </div>
         </div>
 
-        <div class="tool-group">
-          <h3 class="tool-group-title reveal" data-i18n="catFinance">Finance</h3>
-          <ul class="tool-grid">
+        <div class="tool-group" data-group="finance">
+          <h3 class="tool-group-title" data-reveal="fade" data-i18n="catFinance">Finance</h3>
+          <ul class="tile-grid">
 
-          <li class="card tool-card reveal" data-tags="stock saham average down calculator kalkulator invest investasi portfolio portofolio break-even finance keuangan lot">
-            <span class="tool-icon" aria-hidden="true">
+          <li class="tile" data-reveal="load" data-tags="stock saham average down calculator kalkulator invest investasi portfolio portofolio break-even finance keuangan lot">
+            <span class="tile-icon" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
-                <path pathLength="1" d="M3 3v16a2 2 0 0 0 2 2h16"/>
-                <path pathLength="1" d="M7 14l4-4 3 3 5-6"/>
-                <path pathLength="1" d="M19 12V7h-5"/>
+                <path d="M3 3v16a2 2 0 0 0 2 2h16"/>
+                <path d="M7 14l4-4 3 3 5-6"/>
+                <path d="M19 12V7h-5"/>
               </svg>
             </span>
             <h3><a href="stockavgdown/" data-i18n="toolStockTitle">Stock Average Calculator</a></h3>
-            <p data-i18n="toolStockDesc">Work out your new average cost when buying more shares at a lower price, and see how far your break-even moves.</p>
-            <span class="tool-cta" aria-hidden="true" data-i18n="openTool">Open tool</span>
+            <p data-i18n="toolStockDesc">Your new average price after averaging down.</p>
+            <svg class="tile-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M8 7h9v9"/></svg>
           </li>
 
           </ul>
         </div>
 
-        <div class="tool-group">
-          <h3 class="tool-group-title reveal" data-i18n="catGames">Games</h3>
-          <ul class="tool-grid">
+        <div class="tool-group" data-group="games">
+          <h3 class="tool-group-title" data-reveal="fade" data-i18n="catGames">Games</h3>
+          <ul class="tile-grid">
 
-          <li class="card tool-card reveal" data-tags="tic tac toe tictactoe game permainan xo minimax ai komputer">
-            <span class="tool-icon" aria-hidden="true">
+          <li class="tile" data-reveal="load" data-tags="tic tac toe tictactoe game permainan xo minimax ai komputer">
+            <span class="tile-icon" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
-                <path pathLength="1" d="M9 3v18"/>
-                <path pathLength="1" d="M15 3v18"/>
-                <path pathLength="1" d="M3 9h18"/>
-                <path pathLength="1" d="M3 15h18"/>
+                <path d="M9 3v18"/>
+                <path d="M15 3v18"/>
+                <path d="M3 9h18"/>
+                <path d="M3 15h18"/>
               </svg>
             </span>
             <h3><a href="tictactoe/" data-i18n="toolTttTitle">Tic-Tac-Toe</a></h3>
-            <p data-i18n="toolTttDesc">Play a friend on one device, or challenge the computer on easy or hard.</p>
-            <span class="tool-cta" aria-hidden="true" data-i18n="openTool">Open tool</span>
+            <p data-i18n="toolTttDesc">Play a friend or the computer.</p>
+            <svg class="tile-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M8 7h9v9"/></svg>
           </li>
 
-          <li class="card tool-card reveal" data-tags="snake ular game permainan arcade klasik nokia">
-            <span class="tool-icon" aria-hidden="true">
+          <li class="tile" data-reveal="load" data-tags="snake ular game permainan arcade klasik nokia">
+            <span class="tile-icon" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
-                <path pathLength="1" d="M4 8h10a3 3 0 0 1 0 6H9a3 3 0 0 0 0 6h11"/>
-                <path pathLength="1" d="M20 4v.01"/>
+                <path d="M4 8h10a3 3 0 0 1 0 6H9a3 3 0 0 0 0 6h11"/>
+                <path d="M20 4v.01"/>
               </svg>
             </span>
             <h3><a href="snake/" data-i18n="toolSnakeTitle">Snake</a></h3>
-            <p data-i18n="toolSnakeDesc">The classic — eat, grow, speed up. Arrow keys or swipe, best score saved.</p>
-            <span class="tool-cta" aria-hidden="true" data-i18n="openTool">Open tool</span>
+            <p data-i18n="toolSnakeDesc">Eat, grow, speed up. The classic.</p>
+            <svg class="tile-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M8 7h9v9"/></svg>
           </li>
 
-          <li class="card tool-card reveal" data-tags="2048 game permainan puzzle angka tile ubin merge geser">
-            <span class="tool-icon" aria-hidden="true">
+          <li class="tile" data-reveal="load" data-tags="2048 game permainan puzzle angka tile ubin merge geser">
+            <span class="tile-icon" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
-                <path pathLength="1" d="M4 4h7v7H4z"/>
-                <path pathLength="1" d="M13 4h7v7h-7z"/>
-                <path pathLength="1" d="M4 13h7v7H4z"/>
-                <path pathLength="1" d="M13 13h7v7h-7z"/>
+                <path d="M4 4h7v7H4z"/>
+                <path d="M13 4h7v7h-7z"/>
+                <path d="M4 13h7v7H4z"/>
+                <path d="M13 13h7v7h-7z"/>
               </svg>
             </span>
             <h3><a href="2048/" data-i18n="tool2048Title">2048</a></h3>
-            <p data-i18n="tool2048Desc">Slide and merge tiles to reach 2048. Your game saves automatically.</p>
-            <span class="tool-cta" aria-hidden="true" data-i18n="openTool">Open tool</span>
+            <p data-i18n="tool2048Desc">Slide and merge tiles to reach 2048.</p>
+            <svg class="tile-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M8 7h9v9"/></svg>
           </li>
 
-          <li class="card tool-card reveal" data-tags="memory match game permainan kartu cari pasangan pairs anak kids emoji">
-            <span class="tool-icon" aria-hidden="true">
+          <li class="tile" data-reveal="load" data-tags="memory match game permainan kartu cari pasangan pairs anak kids emoji">
+            <span class="tile-icon" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
-                <path pathLength="1" d="M4 8h9a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/>
-                <path pathLength="1" d="M9 4h10a1 1 0 0 1 1 1v12"/>
+                <path d="M4 8h9a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/>
+                <path d="M9 4h10a1 1 0 0 1 1 1v12"/>
               </svg>
             </span>
             <h3><a href="memory/" data-i18n="toolMemTitle">Memory Match</a></h3>
-            <p data-i18n="toolMemDesc">Flip cards to find all the emoji pairs in as few moves as you can.</p>
-            <span class="tool-cta" aria-hidden="true" data-i18n="openTool">Open tool</span>
+            <p data-i18n="toolMemDesc">Flip cards and find every pair.</p>
+            <svg class="tile-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M8 7h9v9"/></svg>
           </li>
 
-          <li class="card tool-card reveal" data-tags="kings raja puzzle teka-teki logic logika queens ratu chess catur non-attacking one per row column board">
-            <span class="tool-icon" aria-hidden="true">
+          <li class="tile" data-reveal="load" data-tags="kings raja puzzle teka-teki logic logika queens ratu chess catur non-attacking one per row column board">
+            <span class="tile-icon" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
-                <path pathLength="1" d="M4 18l-1.6-9.2 4.5 3.4L12 5l5.1 7.2 4.5-3.4L20 18z"/>
-                <path pathLength="1" d="M4 21h16"/>
+                <path d="M4 18l-1.6-9.2 4.5 3.4L12 5l5.1 7.2 4.5-3.4L20 18z"/>
+                <path d="M4 21h16"/>
               </svg>
             </span>
             <h3><a href="kings/" data-i18n="toolKingsTitle">Lone Kings</a></h3>
-            <p data-i18n="toolKingsDesc">A logic puzzle: one king per row and column, no two touching. Uniquely solvable.</p>
-            <span class="tool-cta" aria-hidden="true" data-i18n="openTool">Open tool</span>
+            <p data-i18n="toolKingsDesc">One king per row and column, none touching.</p>
+            <svg class="tile-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M8 7h9v9"/></svg>
           </li>
 
-          <li class="card tool-card reveal" data-tags="sudoku puzzle teka-teki logic logika number angka grid 9x9 su doku game permainan">
-            <span class="tool-icon" aria-hidden="true">
+          <li class="tile" data-reveal="load" data-tags="sudoku puzzle teka-teki logic logika number angka grid 9x9 su doku game permainan">
+            <span class="tile-icon" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
-                <path pathLength="1" d="M4 4h16v16H4z"/>
-                <path pathLength="1" d="M9.3 4v16M14.7 4v16M4 9.3h16M4 14.7h16"/>
+                <path d="M4 4h16v16H4z"/>
+                <path d="M9.3 4v16M14.7 4v16M4 9.3h16M4 14.7h16"/>
               </svg>
             </span>
             <h3><a href="sudoku/" data-i18n="toolSudokuTitle">Sudoku</a></h3>
-            <p data-i18n="toolSudokuDesc">Classic 9×9 number puzzle in four difficulties, with notes, hints, and conflict checking.</p>
-            <span class="tool-cta" aria-hidden="true" data-i18n="openTool">Open tool</span>
+            <p data-i18n="toolSudokuDesc">Classic 9×9, with notes and hints.</p>
+            <svg class="tile-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M8 7h9v9"/></svg>
           </li>
 
-          <li class="card tool-card reveal" data-tags="slide puzzle photo foto geser gambar picture 15-puzzle download offline tiles ubin game permainan">
-            <span class="tool-icon" aria-hidden="true">
+          <li class="tile" data-reveal="load" data-tags="slide puzzle photo foto geser gambar picture 15-puzzle download offline tiles ubin game permainan">
+            <span class="tile-icon" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
-                <path pathLength="1" d="M4 4h7v7H4z"/>
-                <path pathLength="1" d="M13 4h7v7h-7z"/>
-                <path pathLength="1" d="M4 13h7v7H4z"/>
-                <path pathLength="1" d="M15 15h5M17.5 12.5v5"/>
+                <path d="M4 4h7v7H4z"/>
+                <path d="M13 4h7v7h-7z"/>
+                <path d="M4 13h7v7H4z"/>
+                <path d="M15 15h5M17.5 12.5v5"/>
               </svg>
             </span>
             <h3><a href="slidepuzzle/" data-i18n="toolSlideTitle">Photo Slide Puzzle</a></h3>
-            <p data-i18n="toolSlideDesc">Turn your own photo into a sliding puzzle, then download it to play offline anywhere.</p>
-            <span class="tool-cta" aria-hidden="true" data-i18n="openTool">Open tool</span>
+            <p data-i18n="toolSlideDesc">Turn any photo into a sliding puzzle.</p>
+            <svg class="tile-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M8 7h9v9"/></svg>
           </li>
 
           </ul>
         </div>
 
+        <div class="tool-group" data-group="everyday">
+          <h3 class="tool-group-title" data-reveal="fade" data-i18n="catEveryday">Everyday</h3>
+          <ul class="tile-grid">
 
-        <div class="tool-group">
-          <h3 class="tool-group-title reveal" data-i18n="catEveryday">Everyday</h3>
-          <ul class="tool-grid">
-
-          <li class="card tool-card reveal" data-tags="character karakter word kata counter penghitung count hitung text teks sentence kalimat paragraph paragraf limit batas twitter">
-            <span class="tool-icon" aria-hidden="true">
+          <li class="tile" data-reveal="load" data-tags="character karakter word kata counter penghitung count hitung text teks sentence kalimat paragraph paragraf limit batas twitter">
+            <span class="tile-icon" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
-                <path pathLength="1" d="M4 7V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2"/>
-                <path pathLength="1" d="M12 4v16"/>
-                <path pathLength="1" d="M9 20h6"/>
+                <path d="M4 7V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2"/>
+                <path d="M12 4v16"/>
+                <path d="M9 20h6"/>
               </svg>
             </span>
             <h3><a href="charcount/" data-i18n="toolCharTitle">Character &amp; Word Counter</a></h3>
-            <p data-i18n="toolCharDesc">Count characters, words, sentences, lines, and reading time as you type, with an optional character limit.</p>
-            <span class="tool-cta" aria-hidden="true" data-i18n="openTool">Open tool</span>
+            <p data-i18n="toolCharDesc">Live counts of characters, words and reading time.</p>
+            <svg class="tile-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M8 7h9v9"/></svg>
           </li>
 
-          <li class="card tool-card reveal" data-tags="password kata sandi generator random acak secure aman kuat strong security keamanan login">
-            <span class="tool-icon" aria-hidden="true">
+          <li class="tile" data-reveal="load" data-tags="password kata sandi generator random acak secure aman kuat strong security keamanan login">
+            <span class="tile-icon" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
-                <path pathLength="1" d="M5 11h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1z"/>
-                <path pathLength="1" d="M8 11V7a4 4 0 0 1 8 0v4"/>
+                <path d="M5 11h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1z"/>
+                <path d="M8 11V7a4 4 0 0 1 8 0v4"/>
               </svg>
             </span>
             <h3><a href="password/" data-i18n="toolPwTitle">Password Generator</a></h3>
-            <p data-i18n="toolPwDesc">Generate strong random passwords locally, with length and character options and a strength meter.</p>
-            <span class="tool-cta" aria-hidden="true" data-i18n="openTool">Open tool</span>
+            <p data-i18n="toolPwDesc">Strong random passwords, made on your device.</p>
+            <svg class="tile-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M8 7h9v9"/></svg>
           </li>
 
-          <li class="card tool-card reveal" data-tags="random acak picker pengundi undian arisan doorprize giveaway winner pemenang lottery undi nama shuffle draw">
-            <span class="tool-icon" aria-hidden="true">
+          <li class="tile" data-reveal="load" data-tags="random acak picker pengundi undian arisan doorprize giveaway winner pemenang lottery undi nama shuffle draw">
+            <span class="tile-icon" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
-                <path pathLength="1" d="M16 3h5v5"/>
-                <path pathLength="1" d="M4 20L21 3"/>
-                <path pathLength="1" d="M21 16v5h-5"/>
-                <path pathLength="1" d="M15 15l6 6"/>
-                <path pathLength="1" d="M4 4l5 5"/>
+                <path d="M16 3h5v5"/>
+                <path d="M4 20L21 3"/>
+                <path d="M21 16v5h-5"/>
+                <path d="M15 15l6 6"/>
+                <path d="M4 4l5 5"/>
               </svg>
             </span>
             <h3><a href="randompick/" data-i18n="toolPickTitle">Random List Picker</a></h3>
-            <p data-i18n="toolPickDesc">Draw fair random winners from any list of names — for arisan, doorprizes, and giveaways.</p>
-            <span class="tool-cta" aria-hidden="true" data-i18n="openTool">Open tool</span>
+            <p data-i18n="toolPickDesc">Fair draws for arisan, doorprizes and giveaways.</p>
+            <svg class="tile-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M8 7h9v9"/></svg>
           </li>
 
-          <li class="card tool-card reveal" data-tags="countdown timer hitung mundur alarm pengingat detik seconds menit minutes stopwatch kitchen egg workout interval waktu">
-            <span class="tool-icon" aria-hidden="true">
+          <li class="tile" data-reveal="load" data-tags="countdown timer hitung mundur alarm pengingat detik seconds menit minutes stopwatch kitchen egg workout interval waktu">
+            <span class="tile-icon" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
-                <path pathLength="1" d="M9 3h6"/>
-                <path pathLength="1" d="M12 3v3"/>
-                <path pathLength="1" d="M4 14a8 8 0 1 0 16 0 8 8 0 1 0-16 0"/>
-                <path pathLength="1" d="M12 9v5l3 2"/>
+                <path d="M9 3h6"/>
+                <path d="M12 3v3"/>
+                <path d="M4 14a8 8 0 1 0 16 0 8 8 0 1 0-16 0"/>
+                <path d="M12 9v5l3 2"/>
               </svg>
             </span>
             <h3><a href="countdown/" data-i18n="toolCountdownTitle">Countdown Timer</a></h3>
-            <p data-i18n="toolCountdownDesc">Enter a duration in seconds and start it — an on-screen alert and sound go off the moment it hits zero.</p>
-            <span class="tool-cta" aria-hidden="true" data-i18n="openTool">Open tool</span>
+            <p data-i18n="toolCountdownDesc">Set the seconds, get an alert at zero.</p>
+            <svg class="tile-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M8 7h9v9"/></svg>
           </li>
 
           </ul>
         </div>
 
-        <div class="tool-group">
-          <h3 class="tool-group-title reveal" data-i18n="catDev">Developer</h3>
-          <ul class="tool-grid">
+        <div class="tool-group" data-group="dev">
+          <h3 class="tool-group-title" data-reveal="fade" data-i18n="catDev">Developer</h3>
+          <ul class="tile-grid">
 
-          <li class="card tool-card reveal" data-tags="base64 encode decode encoder decoder utf-8 data uri url-safe text teks">
-            <span class="tool-icon" aria-hidden="true">
+          <li class="tile" data-reveal="load" data-tags="base64 encode decode encoder decoder utf-8 data uri url-safe text teks">
+            <span class="tile-icon" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
-                <path pathLength="1" d="M9 8l-4 4 4 4"/>
-                <path pathLength="1" d="M15 8l4 4-4 4"/>
+                <path d="M9 8l-4 4 4 4"/>
+                <path d="M15 8l4 4-4 4"/>
               </svg>
             </span>
             <h3><a href="base64/" data-i18n="toolBase64Title">Base64 Encoder &amp; Decoder</a></h3>
-            <p data-i18n="toolBase64Desc">Convert text to Base64 and back, with full Unicode and a URL-safe option. Encoding, not encryption.</p>
-            <span class="tool-cta" aria-hidden="true" data-i18n="openTool">Open tool</span>
+            <p data-i18n="toolBase64Desc">Encode and decode text, Unicode-safe.</p>
+            <svg class="tile-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M8 7h9v9"/></svg>
           </li>
 
-          <li class="card tool-card reveal" data-tags="unix timestamp epoch time waktu date tanggal converter konverter seconds detik milliseconds milidetik utc iso">
-            <span class="tool-icon" aria-hidden="true">
+          <li class="tile" data-reveal="load" data-tags="unix timestamp epoch time waktu date tanggal converter konverter seconds detik milliseconds milidetik utc iso">
+            <span class="tile-icon" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
-                <path pathLength="1" d="M12 3a9 9 0 1 0 0 18 9 9 0 1 0 0-18"/>
-                <path pathLength="1" d="M12 8v4l3 2"/>
+                <path d="M12 3a9 9 0 1 0 0 18 9 9 0 1 0 0-18"/>
+                <path d="M12 8v4l3 2"/>
               </svg>
             </span>
             <h3><a href="timestamp/" data-i18n="toolTsTitle">Unix Timestamp Converter</a></h3>
-            <p data-i18n="toolTsDesc">Turn epoch seconds or milliseconds into readable dates — local or UTC — and dates back into timestamps.</p>
-            <span class="tool-cta" aria-hidden="true" data-i18n="openTool">Open tool</span>
+            <p data-i18n="toolTsDesc">Epoch to readable date, and back.</p>
+            <svg class="tile-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M8 7h9v9"/></svg>
           </li>
 
-          <li class="card tool-card reveal" data-tags="json format formatter validator validate validasi minify pretty print rapikan sort urutkan parse error">
-            <span class="tool-icon" aria-hidden="true">
+          <li class="tile" data-reveal="load" data-tags="json format formatter validator validate validasi minify pretty print rapikan sort urutkan parse error">
+            <span class="tile-icon" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
-                <path pathLength="1" d="M8 4c-2 0-3 1-3 3v2c0 1.2-.8 2.2-2 2.5v1c1.2.3 2 1.3 2 2.5v2c0 2 1 3 3 3"/>
-                <path pathLength="1" d="M16 4c2 0 3 1 3 3v2c0 1.2.8 2.2 2 2.5v1c-1.2.3-2 1.3-2 2.5v2c0 2-1 3-3 3"/>
+                <path d="M8 4c-2 0-3 1-3 3v2c0 1.2-.8 2.2-2 2.5v1c1.2.3 2 1.3 2 2.5v2c0 2 1 3 3 3"/>
+                <path d="M16 4c2 0 3 1 3 3v2c0 1.2.8 2.2 2 2.5v1c-1.2.3-2 1.3-2 2.5v2c0 2-1 3-3 3"/>
               </svg>
             </span>
             <h3><a href="jsonformat/" data-i18n="toolJsonTitle">JSON Formatter &amp; Validator</a></h3>
-            <p data-i18n="toolJsonDesc">Pretty-print, minify, and validate JSON with error messages that point at the exact line and column.</p>
-            <span class="tool-cta" aria-hidden="true" data-i18n="openTool">Open tool</span>
+            <p data-i18n="toolJsonDesc">Format, minify and validate JSON.</p>
+            <svg class="tile-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M8 7h9v9"/></svg>
           </li>
 
-          <li class="card tool-card reveal" data-tags="url encode decode percent encoding uri query parameter form link tautan">
-            <span class="tool-icon" aria-hidden="true">
+          <li class="tile" data-reveal="load" data-tags="url encode decode percent encoding uri query parameter form link tautan">
+            <span class="tile-icon" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
-                <path pathLength="1" d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-                <path pathLength="1" d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
               </svg>
             </span>
             <h3><a href="urlencode/" data-i18n="toolUrlTitle">URL Encoder &amp; Decoder</a></h3>
-            <p data-i18n="toolUrlDesc">Percent-encode text for URLs and decode it back, with component and form-data modes.</p>
-            <span class="tool-cta" aria-hidden="true" data-i18n="openTool">Open tool</span>
+            <p data-i18n="toolUrlDesc">Percent-encode and decode text.</p>
+            <svg class="tile-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M8 7h9v9"/></svg>
           </li>
 
-          <li class="card tool-card reveal" data-tags="jwt json web token decode decoder claim expiry kedaluwarsa auth login bearer session">
-            <span class="tool-icon" aria-hidden="true">
+          <li class="tile" data-reveal="load" data-tags="jwt json web token decode decoder claim expiry kedaluwarsa auth login bearer session">
+            <span class="tile-icon" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
-                <path pathLength="1" d="M14 10.5a4.5 4.5 0 1 1-6.36 6.36 4.5 4.5 0 0 1 6.36-6.36z"/>
-                <path pathLength="1" d="M13.5 10.5L21 3m-3.5 3.5l3 3"/>
+                <path d="M14 10.5a4.5 4.5 0 1 1-6.36 6.36 4.5 4.5 0 0 1 6.36-6.36z"/>
+                <path d="M13.5 10.5L21 3m-3.5 3.5l3 3"/>
               </svg>
             </span>
             <h3><a href="jwtdecode/" data-i18n="toolJwtTitle">JWT Decoder</a></h3>
-            <p data-i18n="toolJwtDesc">Peek inside a JSON Web Token — header, payload, and expiry — without sending it anywhere.</p>
-            <span class="tool-cta" aria-hidden="true" data-i18n="openTool">Open tool</span>
+            <p data-i18n="toolJwtDesc">Read a token's header, payload and expiry.</p>
+            <svg class="tile-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M8 7h9v9"/></svg>
           </li>
 
-          <li class="card tool-card reveal" data-tags="hash sha sha-256 sha-512 checksum uuid guid random acak generator crypto digest">
-            <span class="tool-icon" aria-hidden="true">
+          <li class="tile" data-reveal="load" data-tags="hash sha sha-256 sha-512 checksum uuid guid random acak generator crypto digest">
+            <span class="tile-icon" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
-                <path pathLength="1" d="M4 9h16"/>
-                <path pathLength="1" d="M4 15h16"/>
-                <path pathLength="1" d="M10 3L8 21"/>
-                <path pathLength="1" d="M16 3l-2 18"/>
+                <path d="M4 9h16"/>
+                <path d="M4 15h16"/>
+                <path d="M10 3L8 21"/>
+                <path d="M16 3l-2 18"/>
               </svg>
             </span>
             <h3><a href="hashgen/" data-i18n="toolHashTitle">Hash &amp; UUID Generator</a></h3>
-            <p data-i18n="toolHashDesc">SHA-1/256/384/512 hashes of any text plus random UUIDs, generated locally by your browser.</p>
-            <span class="tool-cta" aria-hidden="true" data-i18n="openTool">Open tool</span>
+            <p data-i18n="toolHashDesc">SHA hashes and random UUIDs.</p>
+            <svg class="tile-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M8 7h9v9"/></svg>
           </li>
 
-          <li class="card tool-card reveal" data-tags="cron crontab schedule jadwal quartz scheduler expression builder job timer cronmaker penjadwal otomatis github actions">
-            <span class="tool-icon" aria-hidden="true">
+          <li class="tile" data-reveal="load" data-tags="cron crontab schedule jadwal quartz scheduler expression builder job timer cronmaker penjadwal otomatis github actions">
+            <span class="tile-icon" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
-                <path pathLength="1" d="M21 12a9 9 0 1 1-2.6-6.3"/>
-                <path pathLength="1" d="M21 3v6h-6"/>
-                <path pathLength="1" d="M12 8v4l3 2"/>
+                <path d="M21 12a9 9 0 1 1-2.6-6.3"/>
+                <path d="M21 3v6h-6"/>
+                <path d="M12 8v4l3 2"/>
               </svg>
             </span>
             <h3><a href="cron/" data-i18n="toolCronTitle">Cron Expression Builder</a></h3>
-            <p data-i18n="toolCronDesc">Build cron schedules visually — standard and Quartz formats, with the next run times in your timezone.</p>
-            <span class="tool-cta" aria-hidden="true" data-i18n="openTool">Open tool</span>
+            <p data-i18n="toolCronDesc">Build cron schedules visually.</p>
+            <svg class="tile-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M8 7h9v9"/></svg>
           </li>
 
-          <li class="card tool-card reveal" data-tags="diff compare bandingkan perbedaan teks text difference checker version banding merge">
-            <span class="tool-icon" aria-hidden="true">
+          <li class="tile" data-reveal="load" data-tags="diff compare bandingkan perbedaan teks text difference checker version banding merge">
+            <span class="tile-icon" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
-                <path pathLength="1" d="M7 4v6"/>
-                <path pathLength="1" d="M4 7h6"/>
-                <path pathLength="1" d="M14 17h6"/>
-                <path pathLength="1" d="M4 20L20 4"/>
+                <path d="M7 4v6"/>
+                <path d="M4 7h6"/>
+                <path d="M14 17h6"/>
+                <path d="M4 20L20 4"/>
               </svg>
             </span>
             <h3><a href="diff/" data-i18n="toolDiffTitle">Text Diff Checker</a></h3>
-            <p data-i18n="toolDiffDesc">Compare two texts line by line with highlighted additions, removals, and in-line changes.</p>
-            <span class="tool-cta" aria-hidden="true" data-i18n="openTool">Open tool</span>
+            <p data-i18n="toolDiffDesc">Compare two texts line by line.</p>
+            <svg class="tile-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M8 7h9v9"/></svg>
           </li>
 
-          <li class="card tool-card reveal" data-tags="color warna converter konverter hex rgb hsl contrast kontras wcag accessibility aksesibilitas picker palette">
-            <span class="tool-icon" aria-hidden="true">
+          <li class="tile" data-reveal="load" data-tags="color warna converter konverter hex rgb hsl contrast kontras wcag accessibility aksesibilitas picker palette">
+            <span class="tile-icon" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
-                <path pathLength="1" d="M12 3l5.5 5.5a7.5 7.5 0 1 1-11 0z"/>
+                <path d="M12 3l5.5 5.5a7.5 7.5 0 1 1-11 0z"/>
               </svg>
             </span>
             <h3><a href="color/" data-i18n="toolColorTitle">Color Converter &amp; Contrast</a></h3>
-            <p data-i18n="toolColorDesc">Convert between HEX, RGB, and HSL, and check WCAG text contrast for accessibility.</p>
-            <span class="tool-cta" aria-hidden="true" data-i18n="openTool">Open tool</span>
+            <p data-i18n="toolColorDesc">Convert colors and check WCAG contrast.</p>
+            <svg class="tile-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M8 7h9v9"/></svg>
           </li>
 
           </ul>
         </div>
 
-        <p class="muted" id="no-results" hidden data-i18n="noResults">No tools match your search.</p>
+        <p class="muted" id="no-results" hidden data-i18n="noResults">No tools match that.</p>
 
-        <!-- TEMPLATE: copy this block to add a new tool card inside one
-             of the .tool-group <ul>s above. Give it a data-tags attribute
-             with search keywords in both English and Indonesian.
-          <li class="card tool-card reveal">
-            <span class="tool-icon" aria-hidden="true">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
-                [inline SVG icon paths here — add pathLength="1" to each <path> so the hover draw animation works]
-              </svg>
+        <!-- TEMPLATE: copy this block into one of the .tool-group <ul>s
+             above. data-tags holds extra search keywords in English and
+             Indonesian; add the title/description keys to I18N below.
+          <li class="tile" data-reveal="load" data-tags="keywords kata kunci">
+            <span class="tile-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">[icon paths]</svg>
             </span>
-            <h3><a href="your-tool-folder/">Tool Name</a></h3>
-            <p>One or two lines describing what the tool does.</p>
-            <span class="tool-cta" aria-hidden="true">Open tool</span>
+            <h3><a href="your-tool-folder/" data-i18n="toolXTitle">Tool Name</a></h3>
+            <p data-i18n="toolXDesc">One short line on what it does.</p>
+            <svg class="tile-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M8 7h9v9"/></svg>
           </li>
           -->
 
       </div>
     </section>
 
+    <!-- ============================================================
+         About + contact
+         ============================================================ -->
     <section class="section" id="about" aria-labelledby="about-heading">
-      <div class="container">
-        <h2 class="section-heading reveal" id="about-heading" data-i18n="aboutHeading">About</h2>
-        <!-- PLACEHOLDER ABOUT TEXT: rewrite these sentences in your own words (both languages live in the I18N dictionary at the bottom of this file). -->
-        <div class="about-text reveal">
-          <p data-i18n="about1">I'm a software engineer who enjoys turning small, recurring annoyances into simple tools that just work.</p>
-          <p data-i18n="about2">This site is where I publish those tools — each one is a plain, fast web page with no accounts and no tracking.</p>
+      <div class="container about-grid">
+        <div class="about-copy" data-reveal="stagger">
+          <p class="section-kicker" data-i18n="aboutKicker">03 — About</p>
+          <h2 class="section-title" id="about-heading" data-i18n="aboutHeading">Hi, I'm Samba.</h2>
+          <p data-i18n="about1">I'm a software engineer who turns small, everyday annoyances into tools that just work.</p>
+          <p data-i18n="about2">Every tool here is one fast page. No account, no tracking.</p>
+          <ul class="principles">
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 6 9 17l-5-5"/></svg><span data-i18n="pr1">No account</span></li>
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 6 9 17l-5-5"/></svg><span data-i18n="pr2">No tracking</span></li>
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 6 9 17l-5-5"/></svg><span data-i18n="pr3">Runs on your device</span></li>
+          </ul>
         </div>
-      </div>
-    </section>
 
-    <section class="section" id="contact" aria-labelledby="contact-heading">
-      <div class="container">
-        <h2 class="section-heading reveal" id="contact-heading" data-i18n="contactHeading">Contact</h2>
-        <p class="section-intro reveal" data-i18n="contactIntro">Found a bug in one of the tools, or have an idea for a new one? Get in touch.</p>
-        <ul class="contact-links reveal">
-          <li>
-            <a class="btn" href="https://github.com/sambanf" rel="me">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.42 7.42 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
-              github.com/sambanf
-            </a>
-          </li>
-          <li>
-            <!-- EDITABLE: contact email — swap to samba@getz.co if you prefer that address publicly. -->
-            <a class="btn" href="mailto:sambanugraha@gmail.com">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7L22 7"/></svg>
-              sambanugraha@gmail.com
-            </a>
-          </li>
-        </ul>
+        <aside class="contact-card" id="contact" data-reveal="stagger right" aria-labelledby="contact-heading">
+          <h3 id="contact-heading" data-i18n="contactHeading">Say hello</h3>
+          <p data-i18n="contactIntro">Found a bug, or have an idea for a tool? Get in touch.</p>
+          <ul class="contact-links">
+            <li>
+              <a class="btn" href="https://github.com/sambanf" rel="me">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.42 7.42 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+                github.com/sambanf
+              </a>
+            </li>
+            <li>
+              <!-- EDITABLE: contact email — swap to samba@getz.co if you prefer that address publicly. -->
+              <a class="btn" href="mailto:sambanugraha@gmail.com">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7L22 7"/></svg>
+                sambanugraha@gmail.com
+              </a>
+            </li>
+          </ul>
+        </aside>
       </div>
     </section>
 
   </main>
 
   <footer class="site-footer">
-    <div class="container">
-      <p>&copy; 2026 Samba Nugraha</p>
+    <div class="container footer-inner">
+      <p>&copy; 2026 Samba Nugraha &middot; <span data-i18n="footNote">Plain HTML, CSS and JavaScript. No trackers.</span></p>
+      <a href="#top" data-i18n="backTop">Back to top &#8593;</a>
+      <p class="footer-credit"><span data-i18n="footCredit">Android robot by Google, used under</span> <a href="https://creativecommons.org/licenses/by/3.0/" rel="license">CC BY 3.0</a>.</p>
     </div>
   </footer>
+
+  <a class="to-top" href="#top" aria-label="Back to top" data-i18n-attr="aria-label:backTopAria">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
+  </a>
 
   <script src="assets/lang.js"></script>
   <script>
     (function () {
-      var reduced = window.matchMedia &&
-        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-      /* ----- Scroll reveal ----- */
-      var revealEls = Array.prototype.slice.call(document.querySelectorAll('.reveal'));
-      if (!reduced && 'IntersectionObserver' in window) {
-        var io = new IntersectionObserver(function (entries) {
-          entries.forEach(function (entry) {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('in');
-              io.unobserve(entry.target);
-            }
-          });
-        }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
-        revealEls.forEach(function (el) { io.observe(el); });
-      } else {
-        revealEls.forEach(function (el) { el.classList.add('in'); });
-      }
+      var root = document.documentElement;
+      var motionOn = !!(window.SiteMotion && window.SiteMotion.enabled);
 
       /* ----- Translations ----- */
       var I18N = {
         en: {
           _title: 'Samba Nugraha — Software Engineer',
-          _meta: 'Portfolio of Samba Nugraha, software engineer. Practical software and small, useful web tools.',
-          tagline: 'I build practical software and small, useful tools — simple things that solve everyday problems.',
+          _meta: 'Samba Nugraha, software engineer. Free web tools that run in your browser, and offline apps for Android and Windows.',
+          skip: 'Skip to content',
+          navAria: 'Sections',
+          navApps: 'Apps',
+          navTools: 'Tools',
+          navAbout: 'About',
+          eyebrow: 'Software engineer',
+          tagline: 'I build simple software for everyday problems.',
           typedPrefix: 'building',
-          typedSr: 'building simple web tools',
-          browseTools: 'Browse the tools',
-          applicationsHeading: 'Applications',
-          applicationsIntro: 'Desktop software I build. Source on GitHub, free to download.',
-          appKoalaDeckTitle: 'Koala Deck',
-          appKoalaDeckDesc: 'Windows companion app for an ESP32 USB audio controller — set Master, per-app and microphone volume with physical knobs and buttons, from the system tray.',
-          appsHeading: 'Android apps',
-          appsIntro: 'Apps I publish on Google Play. Both are fully offline — no account, no internet permission, and nothing that leaves your phone.',
-          toolsHeading: 'Tools',
-          toolsIntro: 'Small, self-contained web tools. Free to use, no sign-up, everything runs in your browser.',
-          toolStokancilTitle: 'Stokancil',
-          toolStokancilDesc: 'Offline point-of-sale and stock book for small shops — sales, barcode scanning and thermal receipts, with no internet permission at all.',
-          toolKaskucingTitle: 'Kaskucing',
-          toolKaskucingDesc: 'Offline daily cash book for Android — record what you spend in seconds, then see where the month actually went. No account, no signal needed.',
-          toolStockTitle: 'Stock Average Calculator',
-          toolStockDesc: 'Work out your new average cost when buying more shares at a lower price, and see how far your break-even moves.',
-          toolCharTitle: 'Character & Word Counter',
-          toolCharDesc: 'Count characters, words, sentences, lines, and reading time as you type, with an optional character limit.',
-          toolBase64Title: 'Base64 Encoder & Decoder',
-          toolBase64Desc: 'Convert text to Base64 and back, with full Unicode and a URL-safe option. Encoding, not encryption.',
-          toolTsTitle: 'Unix Timestamp Converter',
-          toolTsDesc: 'Turn epoch seconds or milliseconds into readable dates — local or UTC — and dates back into timestamps.',
-          toolJsonTitle: 'JSON Formatter & Validator',
-          toolJsonDesc: 'Pretty-print, minify, and validate JSON with error messages that point at the exact line and column.',
-          toolUrlTitle: 'URL Encoder & Decoder',
-          toolUrlDesc: 'Percent-encode text for URLs and decode it back, with component and form-data modes.',
-          toolJwtTitle: 'JWT Decoder',
-          toolJwtDesc: 'Peek inside a JSON Web Token — header, payload, and expiry — without sending it anywhere.',
-          toolHashTitle: 'Hash & UUID Generator',
-          toolHashDesc: 'SHA-1/256/384/512 hashes of any text plus random UUIDs, generated locally by your browser.',
-          toolCronTitle: 'Cron Expression Builder',
-          toolCronDesc: 'Build cron schedules visually — standard and Quartz formats, with the next run times in your timezone.',
-          toolDiffTitle: 'Text Diff Checker',
-          toolDiffDesc: 'Compare two texts line by line with highlighted additions, removals, and in-line changes.',
-          toolColorTitle: 'Color Converter & Contrast',
-          toolColorDesc: 'Convert between HEX, RGB, and HSL, and check WCAG text contrast for accessibility.',
-          toolPwTitle: 'Password Generator',
-          toolPwDesc: 'Generate strong random passwords locally, with length and character options and a strength meter.',
-          toolPickTitle: 'Random List Picker',
-          toolPickDesc: 'Draw fair random winners from any list of names — for arisan, doorprizes, and giveaways.',
-          toolCountdownTitle: 'Countdown Timer',
-          toolCountdownDesc: 'Enter a duration in seconds and start it — an on-screen alert and sound go off the moment it hits zero.',
-          toolTttTitle: 'Tic-Tac-Toe',
-          toolTttDesc: 'Play a friend on one device, or challenge the computer on easy or hard.',
-          toolSnakeTitle: 'Snake',
-          toolSnakeDesc: 'The classic — eat, grow, speed up. Arrow keys or swipe, best score saved.',
-          tool2048Title: '2048',
-          tool2048Desc: 'Slide and merge tiles to reach 2048. Your game saves automatically.',
-          toolMemTitle: 'Memory Match',
-          toolMemDesc: 'Flip cards to find all the emoji pairs in as few moves as you can.',
-          toolKingsTitle: 'Lone Kings',
-          toolKingsDesc: 'A logic puzzle: one king per row and column, no two touching. Uniquely solvable.',
-          toolSudokuTitle: 'Sudoku',
-          toolSudokuDesc: 'Classic 9×9 number puzzle in four difficulties, with notes, hints, and conflict checking.',
-          toolSlideTitle: 'Photo Slide Puzzle',
-          toolSlideDesc: 'Turn your own photo into a sliding puzzle, then download it to play offline anywhere.',
+          typedSr: 'building web tools and offline apps',
+          browseTools: 'Browse tools',
+          statTools: 'web tools',
+          statApps: 'apps',
+          statTrackers: 'trackers',
+          scrollCue: 'Scroll to apps',
+
+          appsKicker: '01 — Apps',
+          appsHeading: 'Offline apps for Android and Windows',
+          appsIntro: 'No account. Your data stays on your device.',
+          appStokancilDesc: 'Offline till and stock book for small shops.',
+          appKaskucingDesc: 'Offline cash book. See where your money goes.',
+          appKoalaDeckDesc: 'Real volume knobs for Windows, powered by an ESP32.',
+          openApp: 'View app',
+
+          toolsKicker: '02 — Tools',
+          toolsHeading: 'Small tools that run in your browser',
+          toolsIntro: 'Free, no sign-up, nothing uploaded.',
           searchPh: 'Search tools…',
+          filterAria: 'Filter by category',
+          filterAll: 'All',
           catFinance: 'Finance',
+          catGames: 'Games',
           catEveryday: 'Everyday',
           catDev: 'Developer',
-          catGames: 'Games',
-          noResults: 'No tools match your search.',
-          openTool: 'Open tool',
-          openApp: 'View app',
-          aboutHeading: 'About',
-          about1: "I'm a software engineer who enjoys turning small, recurring annoyances into simple tools that just work.",
-          about2: 'This site is where I publish those tools — each one is a plain, fast web page with no accounts and no tracking.',
-          contactHeading: 'Contact',
-          contactIntro: 'Found a bug in one of the tools, or have an idea for a new one? Get in touch.'
+          noResults: 'No tools match that.',
+          toolStockTitle: 'Stock Average Calculator',
+          toolStockDesc: 'Your new average price after averaging down.',
+          toolTttTitle: 'Tic-Tac-Toe',
+          toolTttDesc: 'Play a friend or the computer.',
+          toolSnakeTitle: 'Snake',
+          toolSnakeDesc: 'Eat, grow, speed up. The classic.',
+          tool2048Title: '2048',
+          tool2048Desc: 'Slide and merge tiles to reach 2048.',
+          toolMemTitle: 'Memory Match',
+          toolMemDesc: 'Flip cards and find every pair.',
+          toolKingsTitle: 'Lone Kings',
+          toolKingsDesc: 'One king per row and column, none touching.',
+          toolSudokuTitle: 'Sudoku',
+          toolSudokuDesc: 'Classic 9×9, with notes and hints.',
+          toolSlideTitle: 'Photo Slide Puzzle',
+          toolSlideDesc: 'Turn any photo into a sliding puzzle.',
+          toolCharTitle: 'Character & Word Counter',
+          toolCharDesc: 'Live counts of characters, words and reading time.',
+          toolPwTitle: 'Password Generator',
+          toolPwDesc: 'Strong random passwords, made on your device.',
+          toolPickTitle: 'Random List Picker',
+          toolPickDesc: 'Fair draws for arisan, doorprizes and giveaways.',
+          toolCountdownTitle: 'Countdown Timer',
+          toolCountdownDesc: 'Set the seconds, get an alert at zero.',
+          toolBase64Title: 'Base64 Encoder & Decoder',
+          toolBase64Desc: 'Encode and decode text, Unicode-safe.',
+          toolTsTitle: 'Unix Timestamp Converter',
+          toolTsDesc: 'Epoch to readable date, and back.',
+          toolJsonTitle: 'JSON Formatter & Validator',
+          toolJsonDesc: 'Format, minify and validate JSON.',
+          toolUrlTitle: 'URL Encoder & Decoder',
+          toolUrlDesc: 'Percent-encode and decode text.',
+          toolJwtTitle: 'JWT Decoder',
+          toolJwtDesc: "Read a token's header, payload and expiry.",
+          toolHashTitle: 'Hash & UUID Generator',
+          toolHashDesc: 'SHA hashes and random UUIDs.',
+          toolCronTitle: 'Cron Expression Builder',
+          toolCronDesc: 'Build cron schedules visually.',
+          toolDiffTitle: 'Text Diff Checker',
+          toolDiffDesc: 'Compare two texts line by line.',
+          toolColorTitle: 'Color Converter & Contrast',
+          toolColorDesc: 'Convert colors and check WCAG contrast.',
+
+          aboutKicker: '03 — About',
+          aboutHeading: "Hi, I'm Samba.",
+          about1: 'I\'m a software engineer who turns small, everyday annoyances into tools that just work.',
+          about2: 'Every tool here is one fast page. No account, no tracking.',
+          pr1: 'No account',
+          pr2: 'No tracking',
+          pr3: 'Runs on your device',
+          contactHeading: 'Say hello',
+          contactIntro: 'Found a bug, or have an idea for a tool? Get in touch.',
+          footNote: 'Plain HTML, CSS and JavaScript. No trackers.',
+          footCredit: 'Android robot by Google, used under',
+          backTop: 'Back to top ↑',
+          backTopAria: 'Back to top'
         },
         id: {
           _title: 'Samba Nugraha — Software Engineer',
-          _meta: 'Portofolio Samba Nugraha, software engineer. Perangkat lunak praktis dan alat web kecil yang berguna.',
-          tagline: 'Saya membuat perangkat lunak praktis dan alat kecil yang berguna — hal sederhana yang menyelesaikan masalah sehari-hari.',
+          _meta: 'Samba Nugraha, software engineer. Alat web gratis yang berjalan di browser, dan aplikasi offline untuk Android dan Windows.',
+          skip: 'Langsung ke konten',
+          navAria: 'Bagian',
+          navApps: 'Aplikasi',
+          navTools: 'Alat',
+          navAbout: 'Tentang',
+          eyebrow: 'Software engineer',
+          tagline: 'Saya membuat software sederhana untuk masalah sehari-hari.',
           typedPrefix: 'membuat',
-          typedSr: 'membuat alat web sederhana',
-          browseTools: 'Lihat semua alat',
-          applicationsHeading: 'Aplikasi',
-          applicationsIntro: 'Perangkat lunak desktop buatan saya. Kode sumber di GitHub, gratis diunduh.',
-          appKoalaDeckTitle: 'Koala Deck',
-          appKoalaDeckDesc: 'Aplikasi pendamping Windows untuk kontroler audio USB berbasis ESP32 — atur volume Master, per aplikasi, dan mikrofon dengan knob dan tombol fisik, dari system tray.',
-          appsHeading: 'Aplikasi Android',
-          appsIntro: 'Aplikasi yang saya terbitkan di Google Play. Keduanya sepenuhnya offline — tanpa akun, tanpa izin internet, dan tidak ada apa pun yang keluar dari HP Anda.',
-          toolsHeading: 'Alat',
-          toolsIntro: 'Alat web kecil yang mandiri. Gratis, tanpa daftar, semuanya berjalan di browser Anda.',
-          toolStokancilTitle: 'Stokancil',
-          toolStokancilDesc: 'Aplikasi kasir dan stok offline untuk toko kecil — penjualan, pindai barcode, dan struk termal, sama sekali tanpa izin internet.',
-          toolKaskucingTitle: 'Kaskucing',
-          toolKaskucingDesc: 'Catatan keuangan harian offline untuk Android — catat pengeluaran dalam hitungan detik, lalu lihat ke mana sebenarnya uang bulan ini pergi. Tanpa akun, tanpa sinyal.',
-          toolStockTitle: 'Kalkulator Average Saham',
-          toolStockDesc: 'Hitung harga rata-rata baru saat membeli saham tambahan di harga yang lebih rendah, dan lihat seberapa jauh titik break-even Anda bergeser.',
-          toolCharTitle: 'Penghitung Karakter & Kata',
-          toolCharDesc: 'Hitung karakter, kata, kalimat, baris, dan waktu baca saat Anda mengetik, dengan batas karakter opsional.',
-          toolBase64Title: 'Encoder & Decoder Base64',
-          toolBase64Desc: 'Ubah teks ke Base64 dan sebaliknya, dengan dukungan penuh Unicode dan opsi URL-safe. Encoding, bukan enkripsi.',
-          toolTsTitle: 'Konverter Unix Timestamp',
-          toolTsDesc: 'Ubah epoch detik atau milidetik menjadi tanggal yang mudah dibaca — lokal atau UTC — dan sebaliknya.',
-          toolJsonTitle: 'Formatter & Validator JSON',
-          toolJsonDesc: 'Rapikan, minify, dan validasi JSON dengan pesan error yang menunjuk baris dan kolom persisnya.',
-          toolUrlTitle: 'Encoder & Decoder URL',
-          toolUrlDesc: 'Encode teks untuk URL (percent-encoding) dan decode kembali, dengan mode komponen dan form-data.',
-          toolJwtTitle: 'Decoder JWT',
-          toolJwtDesc: 'Lihat isi JSON Web Token — header, payload, dan masa berlaku — tanpa mengirimnya ke mana pun.',
-          toolHashTitle: 'Generator Hash & UUID',
-          toolHashDesc: 'Hash SHA-1/256/384/512 dari teks apa pun plus UUID acak, dibuat secara lokal oleh browser Anda.',
-          toolCronTitle: 'Pembuat Ekspresi Cron',
-          toolCronDesc: 'Susun jadwal cron secara visual — format standar dan Quartz, dengan waktu eksekusi berikutnya di zona waktu Anda.',
-          toolDiffTitle: 'Pembanding Teks (Diff)',
-          toolDiffDesc: 'Bandingkan dua teks baris per baris dengan sorotan penambahan, penghapusan, dan perubahan di dalam baris.',
-          toolColorTitle: 'Konverter Warna & Kontras',
-          toolColorDesc: 'Konversi antara HEX, RGB, dan HSL, dan periksa kontras teks WCAG untuk aksesibilitas.',
-          toolPwTitle: 'Generator Password',
-          toolPwDesc: 'Buat password acak yang kuat secara lokal, dengan opsi panjang dan karakter serta pengukur kekuatan.',
-          toolPickTitle: 'Pengundi Acak',
-          toolPickDesc: 'Undi pemenang secara adil dari daftar nama apa pun — untuk arisan, doorprize, dan giveaway.',
-          toolCountdownTitle: 'Timer Hitung Mundur',
-          toolCountdownDesc: 'Masukkan durasi dalam detik lalu mulai — peringatan di layar dan suara akan muncul begitu waktu habis.',
-          toolTttTitle: 'Tic-Tac-Toe',
-          toolTttDesc: 'Main melawan teman di satu perangkat, atau tantang komputer di tingkat mudah atau sulit.',
-          toolSnakeTitle: 'Ular (Snake)',
-          toolSnakeDesc: 'Yang klasik — makan, tumbuh, makin cepat. Tombol panah atau usapan, skor terbaik tersimpan.',
-          tool2048Title: '2048',
-          tool2048Desc: 'Geser dan gabungkan ubin hingga mencapai 2048. Permainan tersimpan otomatis.',
-          toolMemTitle: 'Cari Pasangan (Memory)',
-          toolMemDesc: 'Balik kartu untuk menemukan semua pasangan emoji dengan langkah sesedikit mungkin.',
-          toolKingsTitle: 'Raja Penyendiri',
-          toolKingsDesc: 'Teka-teki logika: satu raja per baris dan kolom, tak ada yang bersentuhan. Solusi unik.',
-          toolSudokuTitle: 'Sudoku',
-          toolSudokuDesc: 'Teka-teki angka 9×9 klasik dalam empat tingkat kesulitan, dengan catatan, petunjuk, dan cek konflik.',
-          toolSlideTitle: 'Puzzle Geser Foto',
-          toolSlideDesc: 'Ubah foto Anda menjadi puzzle geser, lalu unduh untuk dimainkan offline di mana saja.',
+          typedSr: 'membuat alat web dan aplikasi offline',
+          browseTools: 'Lihat alat',
+          statTools: 'alat web',
+          statApps: 'aplikasi',
+          statTrackers: 'pelacak',
+          scrollCue: 'Gulir ke aplikasi',
+
+          appsKicker: '01 — Aplikasi',
+          appsHeading: 'Aplikasi offline untuk Android dan Windows',
+          appsIntro: 'Tanpa akun. Data tetap di perangkat Anda.',
+          appStokancilDesc: 'Kasir dan buku stok offline untuk toko kecil.',
+          appKaskucingDesc: 'Buku kas offline. Lihat ke mana uang Anda pergi.',
+          appKoalaDeckDesc: 'Knob volume sungguhan untuk Windows, dengan ESP32.',
+          openApp: 'Lihat aplikasi',
+
+          toolsKicker: '02 — Alat',
+          toolsHeading: 'Alat kecil yang berjalan di browser',
+          toolsIntro: 'Gratis, tanpa daftar, tidak ada yang diunggah.',
           searchPh: 'Cari alat…',
+          filterAria: 'Saring menurut kategori',
+          filterAll: 'Semua',
           catFinance: 'Keuangan',
+          catGames: 'Permainan',
           catEveryday: 'Sehari-hari',
           catDev: 'Developer',
-          catGames: 'Permainan',
-          noResults: 'Tidak ada alat yang cocok dengan pencarian Anda.',
-          openTool: 'Buka alat',
-          openApp: 'Lihat aplikasi',
-          aboutHeading: 'Tentang',
-          about1: 'Saya software engineer yang senang mengubah gangguan kecil sehari-hari menjadi alat sederhana yang benar-benar berfungsi.',
-          about2: 'Situs ini tempat saya memublikasikan alat-alat itu — masing-masing berupa halaman web sederhana dan cepat, tanpa akun dan tanpa pelacakan.',
-          contactHeading: 'Kontak',
-          contactIntro: 'Menemukan bug di salah satu alat, atau punya ide alat baru? Hubungi saya.'
+          noResults: 'Tidak ada alat yang cocok.',
+          toolStockTitle: 'Kalkulator Average Saham',
+          toolStockDesc: 'Harga rata-rata baru setelah average down.',
+          toolTttTitle: 'Tic-Tac-Toe',
+          toolTttDesc: 'Lawan teman atau komputer.',
+          toolSnakeTitle: 'Ular (Snake)',
+          toolSnakeDesc: 'Makan, tumbuh, makin cepat. Yang klasik.',
+          tool2048Title: '2048',
+          tool2048Desc: 'Geser dan gabungkan ubin sampai 2048.',
+          toolMemTitle: 'Cari Pasangan (Memory)',
+          toolMemDesc: 'Balik kartu, temukan semua pasangan.',
+          toolKingsTitle: 'Raja Penyendiri',
+          toolKingsDesc: 'Satu raja per baris dan kolom, tak bersentuhan.',
+          toolSudokuTitle: 'Sudoku',
+          toolSudokuDesc: 'Sudoku 9×9 klasik, dengan catatan dan petunjuk.',
+          toolSlideTitle: 'Puzzle Geser Foto',
+          toolSlideDesc: 'Ubah foto apa pun jadi puzzle geser.',
+          toolCharTitle: 'Penghitung Karakter & Kata',
+          toolCharDesc: 'Hitung karakter, kata, dan waktu baca secara langsung.',
+          toolPwTitle: 'Generator Password',
+          toolPwDesc: 'Password acak yang kuat, dibuat di perangkat Anda.',
+          toolPickTitle: 'Pengundi Acak',
+          toolPickDesc: 'Undian adil untuk arisan, doorprize, dan giveaway.',
+          toolCountdownTitle: 'Timer Hitung Mundur',
+          toolCountdownDesc: 'Atur detik, dapat peringatan saat habis.',
+          toolBase64Title: 'Encoder & Decoder Base64',
+          toolBase64Desc: 'Encode dan decode teks, aman untuk Unicode.',
+          toolTsTitle: 'Konverter Unix Timestamp',
+          toolTsDesc: 'Epoch ke tanggal, dan sebaliknya.',
+          toolJsonTitle: 'Formatter & Validator JSON',
+          toolJsonDesc: 'Rapikan, minify, dan validasi JSON.',
+          toolUrlTitle: 'Encoder & Decoder URL',
+          toolUrlDesc: 'Percent-encode dan decode teks.',
+          toolJwtTitle: 'Decoder JWT',
+          toolJwtDesc: 'Baca header, payload, dan masa berlaku token.',
+          toolHashTitle: 'Generator Hash & UUID',
+          toolHashDesc: 'Hash SHA dan UUID acak.',
+          toolCronTitle: 'Pembuat Ekspresi Cron',
+          toolCronDesc: 'Susun jadwal cron secara visual.',
+          toolDiffTitle: 'Pembanding Teks (Diff)',
+          toolDiffDesc: 'Bandingkan dua teks baris per baris.',
+          toolColorTitle: 'Konverter Warna & Kontras',
+          toolColorDesc: 'Konversi warna dan cek kontras WCAG.',
+
+          aboutKicker: '03 — Tentang',
+          aboutHeading: 'Halo, saya Samba.',
+          about1: 'Saya software engineer yang mengubah gangguan kecil sehari-hari menjadi alat yang langsung berfungsi.',
+          about2: 'Setiap alat di sini cukup satu halaman cepat. Tanpa akun, tanpa pelacakan.',
+          pr1: 'Tanpa akun',
+          pr2: 'Tanpa pelacakan',
+          pr3: 'Berjalan di perangkat Anda',
+          contactHeading: 'Sapa saya',
+          contactIntro: 'Menemukan bug, atau punya ide alat baru? Hubungi saya.',
+          footNote: 'HTML, CSS, dan JavaScript murni. Tanpa pelacak.',
+          footCredit: 'Robot Android oleh Google, digunakan dengan lisensi',
+          backTop: 'Kembali ke atas ↑',
+          backTopAria: 'Kembali ke atas'
         }
       };
+
+      /* ----- Scroll state: nav backdrop, back-to-top button ----- */
+      var scrollTick = false;
+      function syncScroll() {
+        scrollTick = false;
+        var y = window.pageYOffset || root.scrollTop;
+        var atFooter = y + window.innerHeight > root.scrollHeight - 120;  // the footer has its own link
+        root.classList.toggle('is-scrolled', y > 8);
+        root.classList.toggle('is-deep', y > 900 && !atFooter);
+      }
+      window.addEventListener('scroll', function () {
+        if (!scrollTick) { scrollTick = true; window.requestAnimationFrame(syncScroll); }
+      }, { passive: true });
+      syncScroll();
+
+      /* ----- Highlight the nav link of the section in view ----- */
+      var navLinks = document.querySelectorAll('.nav-links a');
+      if ('IntersectionObserver' in window) {
+        var spy = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            var link = document.querySelector('.nav-links a[href="#' + entry.target.id + '"]');
+            if (!link) return;
+            if (entry.isIntersecting) {
+              navLinks.forEach(function (a) { a.removeAttribute('aria-current'); });
+              link.setAttribute('aria-current', 'location');
+            } else {
+              link.removeAttribute('aria-current');
+            }
+          });
+        }, { rootMargin: '-45% 0px -50% 0px' });
+        navLinks.forEach(function (a) {
+          var section = document.querySelector(a.getAttribute('href'));
+          if (section) spy.observe(section);
+        });
+      }
+
+      /* ----- Pause the hero's looping animations while it's off screen ----- */
+      var heroEl = document.querySelector('.hero');
+      if (motionOn && heroEl && 'IntersectionObserver' in window) {
+        new IntersectionObserver(function (entries) {
+          root.classList.toggle('hero-away', !entries[0].isIntersecting);
+        }).observe(heroEl);
+      }
+
+      /* ----- Hero stats count up from zero ----- */
+      function countUp(el, target) {
+        if (!el) return;
+        el.textContent = target;
+        if (!motionOn || target < 2) return;
+        el.textContent = '0';
+        var start = null;
+        function step(t) {
+          if (start === null) start = t;
+          var p = Math.min(1, (t - start) / 1400);
+          el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3)));
+          if (p < 1) window.requestAnimationFrame(step);
+        }
+        setTimeout(function () { window.requestAnimationFrame(step); }, 450);
+      }
+      countUp(document.getElementById('stat-tools'), document.querySelectorAll('#tools .tile').length);
+      countUp(document.getElementById('stat-apps'), document.querySelectorAll('#apps .app-card').length);
+
+      /* ----- Tilt the hero tile stack toward the pointer ----- */
+      var stage = document.querySelector('.art-stage');
+      if (motionOn && heroEl && stage && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+        var tiltFrame = 0, px = 0, py = 0;
+        heroEl.addEventListener('pointermove', function (e) {
+          var r = heroEl.getBoundingClientRect();
+          px = (e.clientX - r.left) / r.width - 0.5;
+          py = (e.clientY - r.top) / r.height - 0.5;
+          if (tiltFrame) return;
+          tiltFrame = window.requestAnimationFrame(function () {
+            tiltFrame = 0;
+            stage.style.setProperty('--tilt-x', (14 - py * 12).toFixed(2) + 'deg');
+            stage.style.setProperty('--tilt-y', (-20 + px * 16).toFixed(2) + 'deg');
+          });
+        });
+        heroEl.addEventListener('pointerleave', function () {
+          stage.style.removeProperty('--tilt-x');
+          stage.style.removeProperty('--tilt-y');
+        });
+      }
+
+      /* ----- Card spotlight follows the pointer ----- */
+      if (window.matchMedia('(hover: hover)').matches) {
+        document.addEventListener('pointermove', function (e) {
+          var card = e.target.closest && e.target.closest('.tile, .contact-card');
+          if (!card) return;
+          var r = card.getBoundingClientRect();
+          card.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+          card.style.setProperty('--my', (e.clientY - r.top) + 'px');
+        }, { passive: true });
+      }
 
       /* ----- Typewriter line in the hero (restarts on language switch) ----- */
       var typed = document.getElementById('typed');
       var TYPED_WORDS = {
-        en: ['simple web tools', 'a stock average calculator', 'things that just work'],
-        id: ['alat web sederhana', 'kalkulator average saham', 'hal yang langsung berfungsi']
+        en: ['web tools', 'offline apps', 'things that just work'],
+        id: ['alat web', 'aplikasi offline', 'hal yang langsung jalan']
       };
       var twTimer = null;
 
       function startTypewriter(lang) {
         if (!typed) return;
         var words = TYPED_WORDS[lang] || TYPED_WORDS.en;
-        if (reduced) {
+        clearTimeout(twTimer);
+        if (!motionOn) {
           typed.textContent = words[0];
           return;
         }
-        clearTimeout(twTimer);
         var wordIdx = 0, charIdx = 0, deleting = false;
         typed.textContent = '';
 
@@ -1177,32 +1887,61 @@
           typed.textContent = word.slice(0, charIdx);
           twTimer = setTimeout(tick, deleting ? 35 : 70);
         }
-        twTimer = setTimeout(tick, 600);
+        twTimer = setTimeout(tick, 900);
       }
 
-      /* ----- Tool search (matches visible text + bilingual data-tags) ----- */
+      /* ----- Tools: category chips + search (text + bilingual data-tags) ----- */
+      var groups = document.querySelectorAll('.tool-group');
+      var chips = document.querySelectorAll('.chip');
       var searchEl = document.getElementById('tool-search');
-      if (searchEl) {
-        var filterTools = function () {
-          var terms = searchEl.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
-          var total = 0;
-          document.querySelectorAll('.tool-group').forEach(function (group) {
-            var visible = 0;
-            group.querySelectorAll('.tool-card').forEach(function (card) {
-              var hay = (card.textContent + ' ' + (card.getAttribute('data-tags') || '')).toLowerCase();
-              var show = terms.every(function (term) { return hay.indexOf(term) !== -1; });
-              card.hidden = !show;
-              if (show) visible++;
-            });
-            group.hidden = visible === 0;
-            total += visible;
+      var noResults = document.getElementById('no-results');
+      var filter = 'all';
+
+      document.getElementById('tools-bar').hidden = false;  // both need JS
+
+      chips.forEach(function (chip) {
+        var key = chip.getAttribute('data-filter');
+        var scope = key === 'all' ? '#tools' : '.tool-group[data-group="' + key + '"]';
+        chip.querySelector('.chip-count').textContent = document.querySelectorAll(scope + ' .tile').length;
+        chip.addEventListener('click', function () {
+          filter = key;
+          chips.forEach(function (c) { c.setAttribute('aria-pressed', c === chip ? 'true' : 'false'); });
+          applyFilters();
+        });
+      });
+
+      function applyFilters() {
+        var terms = searchEl.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+        var total = 0;
+        groups.forEach(function (group) {
+          var inCategory = filter === 'all' || group.getAttribute('data-group') === filter;
+          var visible = 0;
+          group.querySelectorAll('.tile').forEach(function (tile) {
+            var hay = (tile.textContent + ' ' + (tile.getAttribute('data-tags') || '')).toLowerCase();
+            var show = inCategory && terms.every(function (term) { return hay.indexOf(term) !== -1; });
+            if (show && tile.hidden && tile.classList.contains('is-done')) {
+              tile.classList.remove('pop');
+              void tile.offsetWidth;        // restart the settle-in animation
+              tile.classList.add('pop');
+            }
+            tile.hidden = !show;
+            if (show) visible++;
           });
-          document.getElementById('no-results').hidden = total > 0;
-        };
-        searchEl.addEventListener('input', filterTools);
+          group.hidden = visible === 0;
+          total += visible;
+        });
+        noResults.hidden = total > 0;
       }
 
-      SiteLang.init(I18N, startTypewriter);
+      searchEl.addEventListener('input', applyFilters);
+      document.addEventListener('animationend', function (e) {
+        if (e.animationName === 'pop-in') e.target.classList.remove('pop');
+      });
+
+      SiteLang.init(I18N, function (lang) {
+        startTypewriter(lang);
+        applyFilters();   // matches depend on the visible language
+      });
     })();
   </script>
 

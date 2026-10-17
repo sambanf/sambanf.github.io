@@ -26,29 +26,62 @@ Personal site and simple tools, served by [GitHub Pages](https://pages.github.co
 - **`/slidepuzzle/`** — photo slide puzzle with offline download ([slidepuzzle/index.html](slidepuzzle/index.html))
 - **`/stokancil/`** — Stokancil app site: homepage ([stokancil/index.html](stokancil/index.html)) and privacy policy ([stokancil/privacy/index.html](stokancil/privacy/index.html))
 - **`/kaskucing/`** — Kaskucing app site: homepage ([kaskucing/index.html](kaskucing/index.html)) and privacy policy ([kaskucing/privacy/index.html](kaskucing/privacy/index.html))
-- **`/assets/style.css`** — shared design tokens and base styles used by every page
+- **`/koaladeck/`** — Koala Deck, a Windows app for an ESP32 volume controller ([koaladeck/index.html](koaladeck/index.html))
+- **`/assets/style.css`** — shared design tokens, base styles and the tool-page header, used by every tool page
+- **`/assets/motion.js`** — shared scroll animations (reveal on scroll, parallax, reading-progress bar); see [Motion](#motion)
 - **`/assets/lang.js`** — shared English/Indonesian language switcher
 - **`/assets/theme.js`** — shared dark-mode toggle (system default, manual override in `localStorage['site.theme']`)
 
 ## Adding a new tool
 
-1. Create a folder, e.g. `mytool/`, with an `index.html` inside.
-2. Link the shared stylesheet: `<link rel="stylesheet" href="../assets/style.css">`.
-3. Add a card for it in the Tools section of the root `index.html`.
-4. Commit and push — it appears at `https://sambanf.github.io/mytool/`.
+1. Create a folder, e.g. `mytool/`, with an `index.html` inside. Copying an
+   existing tool page is the quickest start: it already has the top bar
+   (`.top-nav` with the `.home-link` back to the homepage), the language and
+   theme toggles, and the header (`h1` + one-line `.lede`).
+2. In `<head>`, link `../assets/style.css`, then load `../assets/theme.js` and
+   `../assets/motion.js` (in that order, both before the page's own styles run).
+3. Give the main `.card.tool-card` and the `.card.how-card` below it a
+   `data-reveal` attribute so they animate in.
+4. Add a `<li class="tile">` to the right `.tool-group` in the Tools section of
+   the root `index.html` (a template sits in a comment at the end of that
+   section). The hero's tool count and the filter-chip counts update themselves.
+5. Commit and push — it appears at `https://sambanf.github.io/mytool/`.
 
 ## App landing pages
 
-The Android apps each get a folder holding a bilingual landing page, a privacy
-policy at `privacy/`, and an `assets/` folder with `icon-192.png`,
-`icon-512.png` and a 1200×630 `og.png` for link previews. They are listed in
-their own **Android apps** section above the Tools section of the root
-`index.html` — deliberately outside it, so the tool search never filters them
-away. Their cards use `.tool-icon.app-logo`, which swaps the line-glyph tile for
-the app's real launcher icon.
+Each app gets a folder holding a bilingual landing page and an `assets/` folder
+with `icon-192.png` and `icon-512.png` (the Android apps also have a privacy
+policy at `privacy/` and a 1200×630 `og.png` for link previews). They are
+listed in the **Apps** section of the root `index.html`, above Tools and
+deliberately outside it, so the tool search never filters them away. Each
+`.app-card` shows the app's real launcher icon, a platform badge with the
+Android or Windows logo, and sets `--brand` to the app's own colour for the
+glow in its corner. The Android logo is the Android robot, shared by Google
+under CC BY 3.0 — keep the credit line in the homepage footer while it's used.
 
 Unlike the tools, these pages carry their own colour tokens inline rather than
-using `assets/style.css`, so each app keeps its own brand palette.
+using `assets/style.css`, so each app keeps its own brand palette. They still
+load `assets/motion.js` for the scroll animations.
+
+## Motion
+
+`assets/motion.js` adds scroll animations through plain attributes, and injects
+its own CSS so it works on pages that don't use `style.css`:
+
+- `data-reveal` — the element rises and fades in when it scrolls into view.
+  Variants: `left`, `right`, `zoom`, `fade`.
+- `data-reveal="stagger"` — fades in, then its children rise in one by one
+  (headings, text blocks).
+- `data-reveal="load"` — for cards: the card rises in, a sheen sweeps across it,
+  then its contents fade in one by one. Variants combine: `data-reveal="load right"`.
+- `data-parallax="0.2"` — the element drifts at that fraction of the scroll.
+- `<body data-scroll-progress>` — a thin reading-progress bar along the top.
+
+Elements that come into view together are staggered in reading order.
+Visitors who ask for reduced motion (or have JavaScript off) get every
+element in place with no animation. The homepage hero, the tile stack, and
+the tool-page headers animate with CSS keyframes gated on the `html.motion`
+class that `motion.js` sets.
 
 ## Languages (EN / ID)
 

@@ -8,17 +8,8 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231e40af'/%3E%3Cg fill='%23ffffff'%3E%3Crect x='6' y='6' width='9' height='9' rx='2'/%3E%3Crect x='17' y='6' width='9' height='9' rx='2' opacity='0.7'/%3E%3Crect x='6' y='17' width='9' height='9' rx='2' opacity='0.7'/%3E%3Crect x='17' y='17' width='9' height='9' rx='2' opacity='0.4'/%3E%3C/g%3E%3C/svg%3E">
   <link rel="stylesheet" href="../assets/style.css">
   <script src="../assets/theme.js"></script>
+  <script src="../assets/motion.js"></script>
   <style>
-    .top-nav {
-      padding: 1.25rem 0 2.25rem; font-size: 0.9rem;
-      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
-    }
-    .top-nav a { color: var(--text-muted); text-decoration: none; }
-    .top-nav a:hover { color: var(--accent-strong); }
-    .lede { color: var(--text-muted); max-width: 44rem; margin-bottom: 0; }
-    .tool-card { margin: 1.75rem 0 1.25rem; }
-    .how-card { margin-bottom: 1rem; }
-
     .hud { display: flex; justify-content: center; gap: 0.85rem; margin-bottom: 1rem; }
     .hud .box {
       min-width: 7rem; text-align: center; padding: 0.6rem 1rem;
@@ -85,7 +76,7 @@
 <body>
   <header class="container">
     <nav class="top-nav" aria-label="Site" data-i18n-attr="aria-label:nav_site">
-      <a href="../">&#8592; samba nugraha</a>
+      <a class="home-link" href="../"><span class="brand-mark" aria-hidden="true">SN</span><span class="home-name">samba nugraha</span></a>
       <div class="nav-actions">
       <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
         <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
@@ -102,7 +93,7 @@
       </div>
     </nav>
     <h1>2048</h1>
-    <p class="lede" data-i18n="lede">Slide the tiles with arrow keys or a swipe. Equal tiles merge — reach 2048 without filling the board.</p>
+    <p class="lede" data-i18n="lede">Slide with the arrow keys or a swipe. Equal tiles merge — reach 2048 before the board fills up.</p>
   </header>
 
   <main class="container">
@@ -110,7 +101,7 @@
       <div class="card" style="border-left:3px solid var(--negative)">This game needs JavaScript to run. Please enable it and reload. / Permainan ini membutuhkan JavaScript. Aktifkan lalu muat ulang.</div>
     </noscript>
 
-    <div class="card tool-card">
+    <div class="card tool-card" data-reveal>
       <div class="hud">
         <div class="box"><b id="g-score">0</b><span data-i18n="hud_score">Score</span></div>
         <div class="box"><b id="g-best">0</b><span data-i18n="hud_best">Best</span></div>
@@ -139,13 +130,13 @@
       <div class="actions">
         <button type="button" class="btn" id="g-new" data-i18n="btn_new">New game</button>
       </div>
-      <p class="hint" data-i18n="hint">Your game is saved automatically — come back any time.</p>
+      <p class="hint" data-i18n="hint">Your game saves itself. Come back any time.</p>
     </div>
 
-    <section class="card how-card" aria-labelledby="how-heading">
+    <section class="card how-card" data-reveal aria-labelledby="how-heading">
       <h2 id="how-heading" data-i18n="how_title">Rules</h2>
-      <p data-i18n="how_1">Each move slides every tile as far as it can go. Two tiles with the same number merge into one with their sum, and each merge adds to your score. After every move a new 2 (or occasionally a 4) appears. The game ends when the board is full and no merges are possible.</p>
-      <p class="muted small" data-i18n="privacy">Runs entirely in your browser. Your game and best score are remembered only on this device.</p>
+      <p data-i18n="how_1">Each move slides every tile as far as it goes. Matching tiles merge into their sum and add to your score. A new 2 (sometimes a 4) appears after every move. The game ends when the board is full and nothing can merge.</p>
+      <p class="muted small" data-i18n="privacy">Runs in your browser. Your game and best score are saved on this device only.</p>
     </section>
   </main>
 
@@ -165,7 +156,7 @@
         _title: '2048',
         _meta: 'Free 2048 puzzle game. Slide and merge tiles to reach 2048 — arrow keys or swipe, with your best score saved. Runs entirely in your browser.',
         nav_site: 'Site',
-        lede: 'Slide the tiles with arrow keys or a swipe. Equal tiles merge — reach 2048 without filling the board.',
+        lede: 'Slide with the arrow keys or a swipe. Equal tiles merge — reach 2048 before the board fills up.',
         hud_score: 'Score',
         hud_best: 'Best',
         btn_new: 'New game',
@@ -174,17 +165,17 @@
         ov_win_text: 'Stop here with your glory intact, or keep going for 4096.',
         ov_over: 'Game over!',
         ov_over_text: 'No more moves. Final score: {n}',
-        hint: 'Your game is saved automatically — come back any time.',
+        hint: 'Your game saves itself. Come back any time.',
         how_title: 'Rules',
-        how_1: 'Each move slides every tile as far as it can go. Two tiles with the same number merge into one with their sum, and each merge adds to your score. After every move a new 2 (or occasionally a 4) appears. The game ends when the board is full and no merges are possible.',
-        privacy: 'Runs entirely in your browser. Your game and best score are remembered only on this device.',
+        how_1: 'Each move slides every tile as far as it goes. Matching tiles merge into their sum and add to your score. A new 2 (sometimes a 4) appears after every move. The game ends when the board is full and nothing can merge.',
+        privacy: 'Runs in your browser. Your game and best score are saved on this device only.',
         footer_back: '← back to all tools'
       },
       id: {
         _title: '2048',
         _meta: 'Permainan puzzle 2048 gratis. Geser dan gabungkan ubin untuk mencapai 2048 — tombol panah atau usapan, dengan skor terbaik tersimpan. Berjalan sepenuhnya di browser Anda.',
         nav_site: 'Situs',
-        lede: 'Geser ubin dengan tombol panah atau usapan. Ubin yang sama akan bergabung — capai 2048 sebelum papan penuh.',
+        lede: 'Geser dengan tombol panah atau usapan. Ubin yang sama bergabung — capai 2048 sebelum papan penuh.',
         hud_score: 'Skor',
         hud_best: 'Terbaik',
         btn_new: 'Permainan baru',
@@ -193,10 +184,10 @@
         ov_win_text: 'Berhenti di sini dengan kemenangan, atau lanjutkan menuju 4096.',
         ov_over: 'Permainan selesai!',
         ov_over_text: 'Tidak ada langkah tersisa. Skor akhir: {n}',
-        hint: 'Permainan tersimpan otomatis — kembali kapan saja.',
+        hint: 'Permainan tersimpan otomatis. Kembali kapan saja.',
         how_title: 'Aturan',
-        how_1: 'Setiap langkah menggeser semua ubin sejauh mungkin. Dua ubin dengan angka sama bergabung menjadi satu dengan jumlahnya, dan setiap penggabungan menambah skor. Setelah setiap langkah muncul ubin 2 baru (kadang 4). Permainan berakhir saat papan penuh dan tidak ada penggabungan yang mungkin.',
-        privacy: 'Berjalan sepenuhnya di browser Anda. Permainan dan skor terbaik hanya diingat di perangkat ini.',
+        how_1: 'Setiap langkah menggeser semua ubin sejauh mungkin. Ubin yang sama bergabung menjadi jumlahnya dan menambah skor. Ubin 2 baru (kadang 4) muncul setiap langkah. Permainan berakhir saat papan penuh dan tidak ada yang bisa digabung.',
+        privacy: 'Berjalan di browser Anda. Permainan dan skor terbaik hanya disimpan di perangkat ini.',
         footer_back: '← kembali ke semua alat'
       }
     };

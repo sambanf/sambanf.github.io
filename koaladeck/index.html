@@ -17,6 +17,7 @@
 <meta property="og:image:height" content="920">
 <meta name="twitter:card" content="summary_large_image">
 <script src="../assets/theme.js"></script>
+<script src="../assets/motion.js"></script>
 <style>
   :root {
     --bg: #f2f4f8;
@@ -194,6 +195,18 @@
     .btn-dl, .btn-ghost { justify-content: center; }
   }
 
+  /* Entrance: only when motion.js has set html.motion (JS on, reduced motion off) */
+  @keyframes hero-rise { from { opacity: 0; translate: 0 22px; } }
+  @keyframes hero-pop { from { opacity: 0; scale: .88; } }
+  html.motion .hero-icon { animation: hero-pop .9s cubic-bezier(.16,1,.3,1) both; }
+  html.motion .hero-inner > div > * { animation: hero-rise .9s cubic-bezier(.16,1,.3,1) both; }
+  html.motion .hero-inner > div > :nth-child(1) { animation-delay: .06s; }
+  html.motion .hero-inner > div > :nth-child(2) { animation-delay: .14s; }
+  html.motion .hero-inner > div > :nth-child(3) { animation-delay: .22s; }
+  html.motion .hero-inner > div > :nth-child(4) { animation-delay: .3s; }
+  html.motion .hero-inner > div > :nth-child(5) { animation-delay: .38s; }
+  html.motion .hero-inner > div > :nth-child(6) { animation-delay: .46s; }
+
   /* ---------- Sections ---------- */
 
   main { padding-bottom: 20px; }
@@ -332,7 +345,7 @@
   footer.end .spacer { flex: 1 1 auto; }
 </style>
 </head>
-<body>
+<body data-scroll-progress>
 
 <header class="hero">
   <div class="wrap">
@@ -362,9 +375,7 @@
       <div>
         <h1>Koala Deck</h1>
         <p class="tagline" data-i18n="tagline">Real knobs for Windows audio.</p>
-        <p class="lede" data-i18n="lede">The Windows companion app for an ESP32 USB audio controller.
-          Turn a knob to set the Master volume, your voice chat or your music — each on its own —
-          and tap a button to mute the microphone. It lives quietly in the system tray.</p>
+        <p class="lede" data-i18n="lede">The Windows app for an ESP32 USB audio controller. Knobs set Master, Chat and Music volume; a button mutes the mic.</p>
         <ul class="chips">
           <li data-i18n="chip1">Free download</li>
           <li data-i18n="chip2">No account</li>
@@ -395,135 +406,123 @@
   <div class="wrap">
 
     <section id="look">
-      <p class="eyebrow" data-i18n="ebLook">The dashboard</p>
-      <h2 data-i18n="h2Look">Three channels, one microphone, everything live</h2>
-      <p class="sub" data-i18n="subLook">Each channel shows its volume, its output device and the apps
-        inside it, with live audio levels. Close the window and it keeps running in the tray.</p>
+      <p class="eyebrow" data-reveal data-i18n="ebLook">The dashboard</p>
+      <h2 data-reveal data-i18n="h2Look">Three channels, one mic, live levels</h2>
+      <p class="sub" data-reveal data-i18n="subLook">See each channel's volume, output, apps and live levels.</p>
 
-      <figure class="shot">
+      <figure class="shot" data-reveal="zoom">
         <img src="assets/screenshot.png" width="1180" height="920" loading="lazy" decoding="async"
              alt="Koala Deck dashboard with Master, Chat and Music channels, a microphone card and an activity log"
              data-i18n-attr="alt:shot1Alt">
       </figure>
       <div class="shot-pair">
-        <figure class="shot">
+        <figure class="shot" data-reveal="zoom">
           <img src="assets/drag-and-drop.png" loading="lazy" decoding="async"
                alt="Dragging an app from one channel to another" data-i18n-attr="alt:shot2Alt">
-          <figcaption data-i18n="shot2Cap">Drag an app between channels to move it.</figcaption>
+          <figcaption data-i18n="shot2Cap">Drag apps between channels.</figcaption>
         </figure>
-        <figure class="shot">
+        <figure class="shot" data-reveal="zoom">
           <img src="assets/add-app-popup.png" loading="lazy" decoding="async"
                alt="The add-app popup listing running and installed apps with a search box" data-i18n-attr="alt:shot3Alt">
-          <figcaption data-i18n="shot3Cap">Add running or installed apps with a search.</figcaption>
+          <figcaption data-i18n="shot3Cap">Search and add running or installed apps.</figcaption>
         </figure>
       </div>
     </section>
 
     <section id="how">
-      <p class="eyebrow" data-i18n="ebHow">How it works</p>
-      <h2 data-i18n="h2How">A plain text line over USB, both ways</h2>
-      <p class="sub" data-i18n="subHow">The deck sends a short command when you turn a knob. Koala Deck
-        applies it in Windows and answers with the real state, so the deck's display never drifts.</p>
+      <p class="eyebrow" data-reveal data-i18n="ebHow">How it works</p>
+      <h2 data-reveal data-i18n="h2How">Plain text over USB, both ways</h2>
+      <p class="sub" data-reveal data-i18n="subHow">The deck's display never drifts: Koala Deck applies each command and replies with the real Windows state.</p>
 
       <div class="flow">
-        <div class="node"><strong data-i18n="n1t">Your ESP32 deck</strong><span data-i18n="n1b">Rotary encoders and buttons, plugged in over USB.</span></div>
-        <div class="arrow" aria-hidden="true">
+        <div class="node" data-reveal><strong data-i18n="n1t">Your ESP32 deck</strong><span data-i18n="n1b">Rotary encoders and buttons, over USB.</span></div>
+        <div class="arrow" data-reveal="fade" aria-hidden="true">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9h14l-4-4M19 15H5l4 4"/></svg>
           115200
         </div>
-        <div class="node"><strong>Koala Deck</strong><span data-i18n="n2b">Reads commands, sends back SYNC lines. Runs in the tray.</span></div>
-        <div class="arrow" aria-hidden="true">
+        <div class="node" data-reveal><strong>Koala Deck</strong><span data-i18n="n2b">Reads commands, sends back SYNC lines. Runs in the tray.</span></div>
+        <div class="arrow" data-reveal="fade" aria-hidden="true">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9h14l-4-4M19 15H5l4 4"/></svg>
           Core Audio
         </div>
-        <div class="node"><strong data-i18n="n3t">Windows audio</strong><span data-i18n="n3b">Master volume, each app's volume, outputs and the microphone.</span></div>
+        <div class="node" data-reveal><strong data-i18n="n3t">Windows audio</strong><span data-i18n="n3b">Master and per-app volume, outputs and the mic.</span></div>
       </div>
 
-      <div class="protocol">
+      <div class="protocol" data-reveal="load">
         <pre><code>VOL_UP_2            <span data-i18n="pc1">&#8594; Chat volume up one step</span>
 MIC_TOGGLE          <span data-i18n="pc2">&#8594; mute or unmute the microphone</span>
 SYNC:12,50,80,0,0,0,1   <span data-i18n="pc3">&#8592; the real Windows state, back to the deck</span></code></pre>
-        <p data-i18n="protoP">One command per line. A SYNC: line goes back after every command,
-          on request, and whenever the volume changes anywhere else in Windows — so 12% shows as 12%,
-          not the nearest step. The full protocol and an Arduino example are in the README.</p>
+        <p data-i18n="protoP">One command per line. After each command, on request, or when Windows volume changes, a SYNC: line reports exact values. Full protocol in the README.</p>
       </div>
     </section>
 
     <section id="features">
-      <p class="eyebrow" data-i18n="ebFeatures">What it does</p>
-      <h2 data-i18n="h2Features">More than a volume knob</h2>
-      <p class="sub" data-i18n="subFeatures">Group apps into channels, send each channel to its own
-        speakers or headset, and let the deck show what Windows actually did.</p>
+      <p class="eyebrow" data-reveal data-i18n="ebFeatures">What it does</p>
+      <h2 data-reveal data-i18n="h2Features">More than a volume knob</h2>
+      <p class="sub" data-reveal data-i18n="subFeatures">Group apps into channels, route each to its own device, and keep the deck in sync.</p>
 
       <div class="features">
-        <div class="card">
+        <div class="card" data-reveal="load">
           <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4v16M12 4v16M18 4v16M4 14h4M10 8h4M16 15h4"/></svg></span>
           <h3 data-i18n="f1t">Three channels</h3>
-          <p data-i18n="f1b">Master, Chat and Music. One knob each, plus mute. Chat starts with
-            Discord; put any apps you like in Chat or Music.</p>
+          <p data-i18n="f1b">Master, Chat and Music, one knob each plus mute. Chat starts with Discord.</p>
         </div>
-        <div class="card">
+        <div class="card" data-reveal="load">
           <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="6" rx="2"/><rect x="3" y="14" width="18" height="6" rx="2"/><path d="M7 7h.01M7 17h.01"/></svg></span>
-          <h3 data-i18n="f2t">App groups by drag and drop</h3>
-          <p data-i18n="f2b">Drag apps between channels, or add them from a searchable list of running
-            and installed apps. Group members are remembered even while the app is closed.</p>
+          <h3 data-i18n="f2t">Drag-and-drop app groups</h3>
+          <p data-i18n="f2b">Drag apps between channels or pick from a searchable list. Closed apps keep their group.</p>
         </div>
-        <div class="card">
+        <div class="card" data-reveal="load">
           <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 14v-3a9 9 0 0 1 18 0v3"/><path d="M21 15a2 2 0 0 1-2 2h-1v-6h1a2 2 0 0 1 2 2zM3 15a2 2 0 0 0 2 2h1v-6H5a2 2 0 0 0-2 2z"/></svg></span>
           <h3 data-i18n="f3t">An output per channel</h3>
-          <p data-i18n="f3b">Send Chat to your headset and Music to your speakers. Chat can follow the
-            Windows communications device, and apps that start later are routed automatically.</p>
+          <p data-i18n="f3b">Chat to your headset, Music to your speakers, even for apps opened later. Chat can follow Windows' communications device.</p>
         </div>
-        <div class="card">
+        <div class="card" data-reveal="load">
           <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v4M8 21h8"/></svg></span>
           <h3 data-i18n="f4t">Microphone mute that sticks</h3>
-          <p data-i18n="f4b">Mutes the default recording device and the communications device if they
-            differ — which is usually what Discord or Teams is listening to.</p>
+          <p data-i18n="f4b">Mutes both the default mic and the communications mic that Discord or Teams usually uses.</p>
         </div>
-        <div class="card">
+        <div class="card" data-reveal="load">
           <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 1-15.5 6.2M3 12a9 9 0 0 1 15.5-6.2"/><path d="M21 4v5h-5M3 20v-5h5"/></svg></span>
           <h3 data-i18n="f5t">Two-way sync</h3>
-          <p data-i18n="f5b">Change the volume with the mouse, the keyboard or the Volume mixer, and the
-            deck hears about it. Its display always matches Windows.</p>
+          <p data-i18n="f5b">Change volume with the mouse, keyboard or Volume mixer, and the deck's display follows.</p>
         </div>
-        <div class="card">
+        <div class="card" data-reveal="load">
           <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 2v6M15 2v6M7 8h10v4a5 5 0 0 1-10 0zM12 17v5"/></svg></span>
           <h3 data-i18n="f6t">Plug in and forget</h3>
-          <p data-i18n="f6b">ESP32 USB chips are detected and picked automatically. Pull the cable and
-            plug it back — even on a new COM port — and Koala Deck reconnects by itself.</p>
+          <p data-i18n="f6b">Finds your ESP32 automatically. Replug the cable, even on a new COM port, and it reconnects.</p>
         </div>
-        <div class="card">
+        <div class="card" data-reveal="load">
           <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 17l6-6-6-6M12 19h8"/></svg></span>
           <h3 data-i18n="f7t">Simulator built in</h3>
-          <p data-i18n="f7b">No hardware yet? Type commands like VOL_UP_2 in the Activity
-            panel and watch them work — and see the SYNC line the deck would receive.</p>
+          <p data-i18n="f7b">No hardware yet? Type commands like VOL_UP_2 in the Activity panel and see the result and SYNC reply.</p>
         </div>
       </div>
     </section>
 
     <section id="start">
-      <p class="eyebrow" data-i18n="ebStart">Getting started</p>
-      <h2 data-i18n="h2Start">From download to first knob turn</h2>
+      <p class="eyebrow" data-reveal data-i18n="ebStart">Getting started</p>
+      <h2 data-reveal data-i18n="h2Start">From download to first knob turn</h2>
       <ol class="steps">
-        <li><strong data-i18n="s1t">Download from GitHub Releases</strong><span data-i18n="s1b">Pick the installer (recommended) or the portable exe. Both are self-contained — no .NET install needed.</span></li>
-        <li><strong data-i18n="s2t">Get past SmartScreen</strong><span data-i18n="s2b">The files aren't code-signed yet, so Windows may say it protected your PC. Click More info, then Run anyway.</span></li>
-        <li><strong data-i18n="s3t">Plug in your deck</strong><span data-i18n="s3b">Koala Deck finds the ESP32's COM port and connects. The tray koala turns green when it's linked.</span></li>
-        <li><strong data-i18n="s4t">Put apps in channels</strong><span data-i18n="s4b">Drag apps into Chat and Music, pick an output for each, and turn Start with Windows on if you want it always there.</span></li>
+        <li data-reveal><strong data-i18n="s1t">Download from GitHub Releases</strong><span data-i18n="s1b">Pick the installer (recommended) or portable exe. Neither needs .NET installed.</span></li>
+        <li data-reveal><strong data-i18n="s2t">Get past SmartScreen</strong><span data-i18n="s2b">The files aren't code-signed yet, so SmartScreen may warn you. Click More info, then Run anyway.</span></li>
+        <li data-reveal><strong data-i18n="s3t">Plug in your deck</strong><span data-i18n="s3b">Koala Deck finds the ESP32's COM port and connects; the tray koala turns green.</span></li>
+        <li data-reveal><strong data-i18n="s4t">Put apps in channels</strong><span data-i18n="s4b">Drag apps into Chat and Music, pick outputs, and optionally turn on Start with Windows.</span></li>
       </ol>
     </section>
 
     <section id="specs">
-      <p class="eyebrow" data-i18n="ebSpecs">At a glance</p>
-      <h2 data-i18n="h2Specs">The details</h2>
-      <div class="table-scroll">
+      <p class="eyebrow" data-reveal data-i18n="ebSpecs">At a glance</p>
+      <h2 data-reveal data-i18n="h2Specs">The details</h2>
+      <div class="table-scroll" data-reveal>
         <table>
           <tbody>
             <tr><td data-i18n="sp1k">Platform</td><td data-i18n="sp1v">Windows 10 (1809 or later) or Windows 11, 64-bit</td></tr>
             <tr><td data-i18n="sp2k">Downloads</td><td data-i18n="sp2v">Installer (~50 MB, per-user, no admin rights) or portable exe (~67 MB)</td></tr>
-            <tr><td data-i18n="sp3k">Hardware</td><td data-i18n="sp3v">An ESP32 board over USB serial at 115200 baud — Espressif native USB, CP210x, CH340/CH9102 or FTDI</td></tr>
+            <tr><td data-i18n="sp3k">Hardware</td><td data-i18n="sp3v">ESP32 board, USB serial at 115200 baud: Espressif native USB, CP210x, CH340/CH9102 or FTDI</td></tr>
             <tr><td data-i18n="sp4k">Built with</td><td>C# · .NET 10 · WPF · NAudio</td></tr>
-            <tr><td data-i18n="sp5k">Account</td><td data-i18n="sp5v">None. Nothing to sign up for</td></tr>
-            <tr><td data-i18n="sp6k">Your settings</td><td data-i18n="sp6v">A JSON file in your own AppData folder</td></tr>
+            <tr><td data-i18n="sp5k">Account</td><td data-i18n="sp5v">None</td></tr>
+            <tr><td data-i18n="sp6k">Your settings</td><td data-i18n="sp6v">A JSON file in your AppData folder</td></tr>
             <tr><td data-i18n="sp7k">Source</td><td><a href="https://github.com/sambanf/koaladeck">github.com/sambanf/koaladeck</a></td></tr>
           </tbody>
         </table>
@@ -531,49 +530,39 @@ SYNC:12,50,80,0,0,0,1   <span data-i18n="pc3">&#8592; the real Windows state, ba
     </section>
 
     <section id="faq">
-      <p class="eyebrow" data-i18n="ebFaq">Questions</p>
-      <h2 data-i18n="h2Faq">Frequently asked</h2>
+      <p class="eyebrow" data-reveal data-i18n="ebFaq">Questions</p>
+      <h2 data-reveal data-i18n="h2Faq">Frequently asked</h2>
       <div class="faq">
-        <details>
+        <details data-reveal>
           <summary data-i18n="q1">Do I need to build the hardware myself?</summary>
-          <p data-i18n="a1">Yes — Koala Deck is the PC side. Any ESP32 that prints commands like
-            VOL_UP_1 over USB serial will work. The README has the full command list and an Arduino
-            example that reads the SYNC lines back.</p>
+          <p data-i18n="a1">Yes. Koala Deck is the PC side. Any ESP32 printing commands like VOL_UP_1 over USB serial works. See the README for commands and an Arduino example.</p>
         </details>
-        <details>
+        <details data-reveal>
           <summary data-i18n="q2">Can I try it without an ESP32?</summary>
-          <p data-i18n="a2">Yes. Type commands into the Simulator box in the Activity panel and Koala
-            Deck acts on them exactly as if the deck had sent them.</p>
+          <p data-i18n="a2">Yes. Type commands into the Simulator box in the Activity panel; they work exactly like the deck's.</p>
         </details>
-        <details>
-          <summary data-i18n="q3">Why does Windows warn me when I run it?</summary>
-          <p data-i18n="a3">The installer and exe aren't code-signed yet, so SmartScreen doesn't
-            recognise them. Click More info, then Run anyway. The release page lists SHA-256 hashes
-            if you want to check the file.</p>
+        <details data-reveal>
+          <summary data-i18n="q3">Why does Windows warn me?</summary>
+          <p data-i18n="a3">The files aren't code-signed yet. Click More info, then Run anyway. SHA-256 hashes are on the release page.</p>
         </details>
-        <details>
+        <details data-reveal>
           <summary data-i18n="q4">My Chat or Music channel says "No audio".</summary>
-          <p data-i18n="a4">The app in that group hasn't opened an audio session yet — Spotify, for
-            example, doesn't until it plays something. Settings still apply the moment it starts.</p>
+          <p data-i18n="a4">That app hasn't opened an audio session yet (Spotify waits until it plays). Settings apply once it does.</p>
         </details>
-        <details>
+        <details data-reveal>
           <summary data-i18n="q5">Another program is using the COM port.</summary>
-          <p data-i18n="a5">Close the Arduino IDE or PlatformIO serial monitor. Koala Deck connects on
-            its own as soon as the port is free.</p>
+          <p data-i18n="a5">Close the Arduino IDE or PlatformIO serial monitor. Koala Deck connects once the port is free.</p>
         </details>
-        <details>
+        <details data-reveal>
           <summary data-i18n="q6">How do I update or uninstall?</summary>
-          <p data-i18n="a6">Run the newer installer over the old one — it closes Koala Deck for you and
-            keeps your settings. Uninstall from Apps &amp; features; it asks whether to keep your
-            settings and logs.</p>
+          <p data-i18n="a6">Run the newer installer; it closes Koala Deck and keeps your settings. Uninstall via Apps &amp; features; you can keep settings and logs.</p>
         </details>
       </div>
     </section>
 
-    <div class="closing">
+    <div class="closing" data-reveal="zoom">
       <h2 data-i18n="closeH">Give your volume a knob</h2>
-      <p data-i18n="closeP">Free on GitHub. Download the latest release, plug in your deck, and stop
-        hunting for the Volume mixer.</p>
+      <p data-i18n="closeP">Free on GitHub. Download, plug in your deck, and stop hunting for the Volume mixer.</p>
       <div class="cta-row">
         <a class="btn-dl" href="https://github.com/sambanf/koaladeck/releases/latest">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -610,7 +599,7 @@ var I18N = {
     _meta: 'Koala Deck is the Windows companion app for an ESP32 USB audio controller. Turn physical knobs to set Master, per-app and microphone volume, with two-way sync back to the deck. Free download on GitHub.',
     iconAlt: 'Koala Deck app icon',
     tagline: 'Real knobs for Windows audio.',
-    lede: 'The Windows companion app for an ESP32 USB audio controller. Turn a knob to set the Master volume, your voice chat or your music — each on its own — and tap a button to mute the microphone. It lives quietly in the system tray.',
+    lede: 'The Windows app for an ESP32 USB audio controller. Knobs set Master, Chat and Music volume; a button mutes the mic.',
     chip1: 'Free download',
     chip2: 'No account',
     chip3: 'Source on GitHub',
@@ -619,55 +608,55 @@ var I18N = {
     heroNote: 'Windows 10 (1809+) or 11, 64-bit · installer or portable exe · from GitHub Releases',
 
     ebLook: 'The dashboard',
-    h2Look: 'Three channels, one microphone, everything live',
-    subLook: 'Each channel shows its volume, its output device and the apps inside it, with live audio levels. Close the window and it keeps running in the tray.',
+    h2Look: 'Three channels, one mic, live levels',
+    subLook: 'See each channel\'s volume, output, apps and live levels.',
     shot1Alt: 'Koala Deck dashboard with Master, Chat and Music channels, a microphone card and an activity log',
     shot2Alt: 'Dragging an app from one channel to another',
-    shot2Cap: 'Drag an app between channels to move it.',
+    shot2Cap: 'Drag apps between channels.',
     shot3Alt: 'The add-app popup listing running and installed apps with a search box',
-    shot3Cap: 'Add running or installed apps with a search.',
+    shot3Cap: 'Search and add running or installed apps.',
 
     ebHow: 'How it works',
-    h2How: 'A plain text line over USB, both ways',
-    subHow: "The deck sends a short command when you turn a knob. Koala Deck applies it in Windows and answers with the real state, so the deck's display never drifts.",
+    h2How: 'Plain text over USB, both ways',
+    subHow: 'The deck\'s display never drifts: Koala Deck applies each command and replies with the real Windows state.',
     n1t: 'Your ESP32 deck',
-    n1b: 'Rotary encoders and buttons, plugged in over USB.',
+    n1b: 'Rotary encoders and buttons, over USB.',
     n2b: 'Reads commands, sends back SYNC lines. Runs in the tray.',
     n3t: 'Windows audio',
-    n3b: "Master volume, each app's volume, outputs and the microphone.",
+    n3b: 'Master and per-app volume, outputs and the mic.',
     pc1: '→ Chat volume up one step',
     pc2: '→ mute or unmute the microphone',
     pc3: '← the real Windows state, back to the deck',
-    protoP: 'One command per line. A SYNC: line goes back after every command, on request, and whenever the volume changes anywhere else in Windows — so 12% shows as 12%, not the nearest step. The full protocol and an Arduino example are in the README.',
+    protoP: 'One command per line. After each command, on request, or when Windows volume changes, a SYNC: line reports exact values. Full protocol in the README.',
 
     ebFeatures: 'What it does',
     h2Features: 'More than a volume knob',
-    subFeatures: 'Group apps into channels, send each channel to its own speakers or headset, and let the deck show what Windows actually did.',
+    subFeatures: 'Group apps into channels, route each to its own device, and keep the deck in sync.',
     f1t: 'Three channels',
-    f1b: 'Master, Chat and Music. One knob each, plus mute. Chat starts with Discord; put any apps you like in Chat or Music.',
-    f2t: 'App groups by drag and drop',
-    f2b: 'Drag apps between channels, or add them from a searchable list of running and installed apps. Group members are remembered even while the app is closed.',
+    f1b: 'Master, Chat and Music, one knob each plus mute. Chat starts with Discord.',
+    f2t: 'Drag-and-drop app groups',
+    f2b: 'Drag apps between channels or pick from a searchable list. Closed apps keep their group.',
     f3t: 'An output per channel',
-    f3b: 'Send Chat to your headset and Music to your speakers. Chat can follow the Windows communications device, and apps that start later are routed automatically.',
+    f3b: 'Chat to your headset, Music to your speakers, even for apps opened later. Chat can follow Windows\' communications device.',
     f4t: 'Microphone mute that sticks',
-    f4b: 'Mutes the default recording device and the communications device if they differ — which is usually what Discord or Teams is listening to.',
+    f4b: 'Mutes both the default mic and the communications mic that Discord or Teams usually uses.',
     f5t: 'Two-way sync',
-    f5b: 'Change the volume with the mouse, the keyboard or the Volume mixer, and the deck hears about it. Its display always matches Windows.',
+    f5b: 'Change volume with the mouse, keyboard or Volume mixer, and the deck\'s display follows.',
     f6t: 'Plug in and forget',
-    f6b: 'ESP32 USB chips are detected and picked automatically. Pull the cable and plug it back — even on a new COM port — and Koala Deck reconnects by itself.',
+    f6b: 'Finds your ESP32 automatically. Replug the cable, even on a new COM port, and it reconnects.',
     f7t: 'Simulator built in',
-    f7b: 'No hardware yet? Type commands like VOL_UP_2 in the Activity panel and watch them work — and see the SYNC line the deck would receive.',
+    f7b: 'No hardware yet? Type commands like VOL_UP_2 in the Activity panel and see the result and SYNC reply.',
 
     ebStart: 'Getting started',
     h2Start: 'From download to first knob turn',
     s1t: 'Download from GitHub Releases',
-    s1b: 'Pick the installer (recommended) or the portable exe. Both are self-contained — no .NET install needed.',
+    s1b: 'Pick the installer (recommended) or portable exe. Neither needs .NET installed.',
     s2t: 'Get past SmartScreen',
-    s2b: "The files aren't code-signed yet, so Windows may say it protected your PC. Click More info, then Run anyway.",
+    s2b: 'The files aren\'t code-signed yet, so SmartScreen may warn you. Click More info, then Run anyway.',
     s3t: 'Plug in your deck',
-    s3b: "Koala Deck finds the ESP32's COM port and connects. The tray koala turns green when it's linked.",
+    s3b: 'Koala Deck finds the ESP32\'s COM port and connects; the tray koala turns green.',
     s4t: 'Put apps in channels',
-    s4b: 'Drag apps into Chat and Music, pick an output for each, and turn Start with Windows on if you want it always there.',
+    s4b: 'Drag apps into Chat and Music, pick outputs, and optionally turn on Start with Windows.',
 
     ebSpecs: 'At a glance',
     h2Specs: 'The details',
@@ -676,31 +665,31 @@ var I18N = {
     sp2k: 'Downloads',
     sp2v: 'Installer (~50 MB, per-user, no admin rights) or portable exe (~67 MB)',
     sp3k: 'Hardware',
-    sp3v: 'An ESP32 board over USB serial at 115200 baud — Espressif native USB, CP210x, CH340/CH9102 or FTDI',
+    sp3v: 'ESP32 board, USB serial at 115200 baud: Espressif native USB, CP210x, CH340/CH9102 or FTDI',
     sp4k: 'Built with',
     sp5k: 'Account',
-    sp5v: 'None. Nothing to sign up for',
+    sp5v: 'None',
     sp6k: 'Your settings',
-    sp6v: 'A JSON file in your own AppData folder',
+    sp6v: 'A JSON file in your AppData folder',
     sp7k: 'Source',
 
     ebFaq: 'Questions',
     h2Faq: 'Frequently asked',
     q1: 'Do I need to build the hardware myself?',
-    a1: 'Yes — Koala Deck is the PC side. Any ESP32 that prints commands like VOL_UP_1 over USB serial will work. The README has the full command list and an Arduino example that reads the SYNC lines back.',
+    a1: 'Yes. Koala Deck is the PC side. Any ESP32 printing commands like VOL_UP_1 over USB serial works. See the README for commands and an Arduino example.',
     q2: 'Can I try it without an ESP32?',
-    a2: 'Yes. Type commands into the Simulator box in the Activity panel and Koala Deck acts on them exactly as if the deck had sent them.',
-    q3: 'Why does Windows warn me when I run it?',
-    a3: "The installer and exe aren't code-signed yet, so SmartScreen doesn't recognise them. Click More info, then Run anyway. The release page lists SHA-256 hashes if you want to check the file.",
+    a2: 'Yes. Type commands into the Simulator box in the Activity panel; they work exactly like the deck\'s.',
+    q3: 'Why does Windows warn me?',
+    a3: 'The files aren\'t code-signed yet. Click More info, then Run anyway. SHA-256 hashes are on the release page.',
     q4: 'My Chat or Music channel says "No audio".',
-    a4: "The app in that group hasn't opened an audio session yet — Spotify, for example, doesn't until it plays something. Settings still apply the moment it starts.",
+    a4: 'That app hasn\'t opened an audio session yet (Spotify waits until it plays). Settings apply once it does.',
     q5: 'Another program is using the COM port.',
-    a5: 'Close the Arduino IDE or PlatformIO serial monitor. Koala Deck connects on its own as soon as the port is free.',
+    a5: 'Close the Arduino IDE or PlatformIO serial monitor. Koala Deck connects once the port is free.',
     q6: 'How do I update or uninstall?',
-    a6: 'Run the newer installer over the old one — it closes Koala Deck for you and keeps your settings. Uninstall from Apps & features; it asks whether to keep your settings and logs.',
+    a6: 'Run the newer installer; it closes Koala Deck and keeps your settings. Uninstall via Apps & features; you can keep settings and logs.',
 
     closeH: 'Give your volume a knob',
-    closeP: 'Free on GitHub. Download the latest release, plug in your deck, and stop hunting for the Volume mixer.',
+    closeP: 'Free on GitHub. Download, plug in your deck, and stop hunting for the Volume mixer.',
     fReleases: 'Releases',
     fIssues: 'Report an issue',
     fBy: 'Made by Samba Nugraha'
@@ -711,7 +700,7 @@ var I18N = {
     _meta: 'Koala Deck adalah aplikasi pendamping Windows untuk kontroler audio USB berbasis ESP32. Putar knob fisik untuk mengatur volume Master, per aplikasi, dan mikrofon, dengan sinkronisasi dua arah ke deck. Unduh gratis di GitHub.',
     iconAlt: 'Ikon aplikasi Koala Deck',
     tagline: 'Knob sungguhan untuk audio Windows.',
-    lede: 'Aplikasi pendamping Windows untuk kontroler audio USB berbasis ESP32. Putar knob untuk mengatur volume Master, voice chat, atau musik — masing-masing terpisah — dan tekan tombol untuk membisukan mikrofon. Berjalan tenang di system tray.',
+    lede: 'Aplikasi Windows untuk kontroler audio USB berbasis ESP32. Knob mengatur volume Master, Chat, dan Music; satu tombol membisukan mikrofon.',
     chip1: 'Unduh gratis',
     chip2: 'Tanpa akun',
     chip3: 'Kode sumber di GitHub',
@@ -720,55 +709,55 @@ var I18N = {
     heroNote: 'Windows 10 (1809+) atau 11, 64-bit · installer atau exe portabel · dari GitHub Releases',
 
     ebLook: 'Dasbor',
-    h2Look: 'Tiga kanal, satu mikrofon, semuanya langsung',
-    subLook: 'Setiap kanal menampilkan volume, perangkat output, dan aplikasi di dalamnya, lengkap dengan level audio langsung. Tutup jendelanya dan aplikasi tetap berjalan di tray.',
+    h2Look: 'Tiga kanal, satu mikrofon, level real-time',
+    subLook: 'Lihat volume, output, aplikasi, dan level audio langsung di tiap kanal.',
     shot1Alt: 'Dasbor Koala Deck dengan kanal Master, Chat, dan Music, kartu mikrofon, dan log aktivitas',
     shot2Alt: 'Menyeret aplikasi dari satu kanal ke kanal lain',
-    shot2Cap: 'Seret aplikasi antarkanal untuk memindahkannya.',
+    shot2Cap: 'Seret aplikasi antarkanal.',
     shot3Alt: 'Popup tambah aplikasi berisi aplikasi yang berjalan dan terpasang, dengan kotak pencarian',
-    shot3Cap: 'Tambahkan aplikasi yang berjalan atau terpasang lewat pencarian.',
+    shot3Cap: 'Cari dan tambahkan aplikasi yang berjalan atau terpasang.',
 
     ebHow: 'Cara kerja',
-    h2How: 'Satu baris teks lewat USB, dua arah',
-    subHow: 'Deck mengirim perintah singkat saat knob diputar. Koala Deck menerapkannya di Windows dan membalas dengan kondisi sebenarnya, jadi tampilan deck tidak pernah meleset.',
+    h2How: 'Teks biasa lewat USB, dua arah',
+    subHow: 'Tampilan deck tak pernah meleset: Koala Deck menjalankan tiap perintah lalu membalas dengan kondisi Windows yang sebenarnya.',
     n1t: 'Deck ESP32 Anda',
-    n1b: 'Rotary encoder dan tombol, tersambung lewat USB.',
+    n1b: 'Rotary encoder dan tombol, lewat USB.',
     n2b: 'Membaca perintah, mengirim balik baris SYNC. Berjalan di tray.',
     n3t: 'Audio Windows',
-    n3b: 'Volume Master, volume tiap aplikasi, output, dan mikrofon.',
+    n3b: 'Volume Master dan per aplikasi, output, dan mikrofon.',
     pc1: '→ volume Chat naik satu langkah',
     pc2: '→ bisukan atau aktifkan mikrofon',
     pc3: '← kondisi Windows sebenarnya, kembali ke deck',
-    protoP: 'Satu perintah per baris. Baris SYNC: dikirim balik setelah setiap perintah, saat diminta, dan setiap kali volume berubah dari mana pun di Windows — jadi 12% tampil sebagai 12%, bukan dibulatkan ke langkah terdekat. Protokol lengkap dan contoh Arduino ada di README.',
+    protoP: 'Satu perintah per baris. Setelah tiap perintah, saat diminta, atau saat volume Windows berubah, baris SYNC: melaporkan nilai persisnya. Protokol lengkap ada di README.',
 
     ebFeatures: 'Apa yang bisa dilakukan',
     h2Features: 'Lebih dari sekadar knob volume',
-    subFeatures: 'Kelompokkan aplikasi ke dalam kanal, kirim tiap kanal ke speaker atau headset sendiri, dan biarkan deck menampilkan apa yang benar-benar dilakukan Windows.',
+    subFeatures: 'Kelompokkan aplikasi ke kanal, arahkan tiap kanal ke perangkatnya sendiri, dan jaga deck tetap sinkron.',
     f1t: 'Tiga kanal',
-    f1b: 'Master, Chat, dan Music. Satu knob untuk masing-masing, plus mute. Chat berisi Discord sejak awal; masukkan aplikasi apa pun ke Chat atau Music.',
-    f2t: 'Grup aplikasi dengan seret dan lepas',
-    f2b: 'Seret aplikasi antarkanal, atau tambahkan dari daftar aplikasi yang berjalan dan terpasang yang bisa dicari. Anggota grup tetap diingat meski aplikasinya ditutup.',
+    f1b: 'Master, Chat, dan Music, masing-masing satu knob plus mute. Chat sudah berisi Discord.',
+    f2t: 'Grup aplikasi seret-lepas',
+    f2b: 'Seret aplikasi antarkanal atau pilih dari daftar yang bisa dicari. Aplikasi yang ditutup tetap di grupnya.',
     f3t: 'Output untuk tiap kanal',
-    f3b: 'Kirim Chat ke headset dan Music ke speaker. Chat bisa mengikuti perangkat komunikasi Windows, dan aplikasi yang baru mulai nanti diarahkan otomatis.',
+    f3b: 'Chat ke headset, Music ke speaker, termasuk aplikasi yang dibuka belakangan. Chat juga bisa mengikuti perangkat komunikasi Windows.',
     f4t: 'Mute mikrofon yang benar-benar mute',
-    f4b: 'Membisukan perangkat rekam default dan perangkat komunikasi jika keduanya berbeda — biasanya itulah yang didengarkan Discord atau Teams.',
+    f4b: 'Membisukan mikrofon default sekaligus mikrofon komunikasi yang biasanya dipakai Discord atau Teams.',
     f5t: 'Sinkronisasi dua arah',
-    f5b: 'Ubah volume dengan mouse, keyboard, atau Volume mixer, dan deck ikut tahu. Tampilannya selalu sama dengan Windows.',
+    f5b: 'Ubah volume dengan mouse, keyboard, atau Volume mixer, dan tampilan deck ikut berubah.',
     f6t: 'Colok lalu lupakan',
-    f6b: 'Chip USB ESP32 terdeteksi dan dipilih otomatis. Cabut kabelnya lalu colok lagi — bahkan di port COM baru — dan Koala Deck tersambung kembali sendiri.',
+    f6b: 'Menemukan ESP32 Anda secara otomatis. Cabut-colok kabelnya, bahkan di port COM baru, dan Koala Deck tersambung lagi.',
     f7t: 'Simulator bawaan',
-    f7b: 'Belum punya hardware? Ketik perintah seperti VOL_UP_2 di panel Activity dan lihat hasilnya — termasuk baris SYNC yang akan diterima deck.',
+    f7b: 'Belum punya hardware? Ketik perintah seperti VOL_UP_2 di panel Activity dan lihat hasilnya beserta balasan SYNC.',
 
     ebStart: 'Mulai',
     h2Start: 'Dari unduhan sampai putaran knob pertama',
     s1t: 'Unduh dari GitHub Releases',
-    s1b: 'Pilih installer (disarankan) atau exe portabel. Keduanya mandiri — tidak perlu memasang .NET.',
+    s1b: 'Pilih installer (disarankan) atau exe portabel. Keduanya tak perlu .NET terpasang.',
     s2t: 'Lewati SmartScreen',
-    s2b: 'File belum ditandatangani kode, jadi Windows mungkin bilang telah melindungi PC Anda. Klik More info, lalu Run anyway.',
+    s2b: 'File-nya belum ditandatangani kode, jadi SmartScreen mungkin memberi peringatan. Klik More info, lalu Run anyway.',
     s3t: 'Colokkan deck Anda',
-    s3b: 'Koala Deck menemukan port COM milik ESP32 lalu menyambung. Koala di tray berubah hijau saat sudah tersambung.',
+    s3b: 'Koala Deck menemukan port COM ESP32 lalu tersambung; koala di tray berubah hijau.',
     s4t: 'Masukkan aplikasi ke kanal',
-    s4b: 'Seret aplikasi ke Chat dan Music, pilih output untuk masing-masing, dan nyalakan Start with Windows jika ingin selalu aktif.',
+    s4b: 'Seret aplikasi ke Chat dan Music, pilih output, dan bila perlu nyalakan Start with Windows.',
 
     ebSpecs: 'Ringkasan',
     h2Specs: 'Detailnya',
@@ -777,31 +766,31 @@ var I18N = {
     sp2k: 'Unduhan',
     sp2v: 'Installer (~50 MB, per pengguna, tanpa hak admin) atau exe portabel (~67 MB)',
     sp3k: 'Hardware',
-    sp3v: 'Board ESP32 lewat serial USB 115200 baud — USB native Espressif, CP210x, CH340/CH9102, atau FTDI',
+    sp3v: 'Board ESP32, serial USB 115200 baud: USB native Espressif, CP210x, CH340/CH9102, atau FTDI',
     sp4k: 'Dibuat dengan',
     sp5k: 'Akun',
-    sp5v: 'Tidak ada. Tidak perlu mendaftar',
+    sp5v: 'Tidak ada',
     sp6k: 'Pengaturan Anda',
-    sp6v: 'File JSON di folder AppData milik Anda sendiri',
+    sp6v: 'File JSON di folder AppData Anda',
     sp7k: 'Kode sumber',
 
     ebFaq: 'Pertanyaan',
     h2Faq: 'Sering ditanyakan',
     q1: 'Apakah saya harus membuat hardware-nya sendiri?',
-    a1: 'Ya — Koala Deck adalah sisi PC-nya. ESP32 apa pun yang mengirim perintah seperti VOL_UP_1 lewat serial USB akan berfungsi. README berisi daftar perintah lengkap dan contoh Arduino yang membaca balik baris SYNC.',
+    a1: 'Ya. Koala Deck adalah sisi PC-nya. ESP32 apa pun yang mengirim perintah seperti VOL_UP_1 lewat serial USB bisa dipakai. Daftar perintah dan contoh Arduino ada di README.',
     q2: 'Bisakah saya mencobanya tanpa ESP32?',
-    a2: 'Bisa. Ketik perintah di kotak Simulator pada panel Activity dan Koala Deck menjalankannya persis seperti dikirim dari deck.',
-    q3: 'Kenapa Windows memberi peringatan saat saya menjalankannya?',
-    a3: 'Installer dan exe belum ditandatangani kode, jadi SmartScreen belum mengenalinya. Klik More info, lalu Run anyway. Halaman rilis mencantumkan hash SHA-256 jika Anda ingin memeriksa filenya.',
+    a2: 'Bisa. Ketik perintah di kotak Simulator pada panel Activity; hasilnya persis seperti dari deck.',
+    q3: 'Kenapa Windows memberi peringatan?',
+    a3: 'File-nya belum ditandatangani kode. Klik More info, lalu Run anyway. Hash SHA-256 tersedia di halaman rilis.',
     q4: 'Kanal Chat atau Music saya menampilkan "No audio".',
-    a4: 'Aplikasi di grup itu belum membuka sesi audio — Spotify, misalnya, belum membukanya sampai memutar sesuatu. Pengaturan tetap berlaku begitu aplikasinya mulai.',
+    a4: 'Aplikasi itu belum membuka sesi audio (Spotify baru membukanya saat memutar sesuatu). Pengaturan berlaku begitu sesi dibuka.',
     q5: 'Port COM sedang dipakai program lain.',
-    a5: 'Tutup Arduino IDE atau serial monitor PlatformIO. Koala Deck akan menyambung sendiri begitu port bebas.',
+    a5: 'Tutup Arduino IDE atau serial monitor PlatformIO. Koala Deck tersambung begitu port bebas.',
     q6: 'Bagaimana cara memperbarui atau menghapus?',
-    a6: 'Jalankan installer yang lebih baru di atas yang lama — installer menutup Koala Deck untuk Anda dan menyimpan pengaturan. Hapus lewat Apps & features; Anda akan ditanya apakah ingin menyimpan pengaturan dan log.',
+    a6: 'Jalankan installer yang lebih baru; Koala Deck ditutup otomatis dan pengaturan tetap tersimpan. Hapus lewat Apps & features; Anda bisa memilih menyimpan pengaturan dan log.',
 
     closeH: 'Beri volume Anda sebuah knob',
-    closeP: 'Gratis di GitHub. Unduh rilis terbaru, colokkan deck Anda, dan berhenti mencari-cari Volume mixer.',
+    closeP: 'Gratis di GitHub. Unduh, colokkan deck Anda, dan tak perlu lagi mencari-cari Volume mixer.',
     fReleases: 'Rilis',
     fIssues: 'Laporkan masalah',
     fBy: 'Dibuat oleh Samba Nugraha'

@@ -8,17 +8,8 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231e40af'/%3E%3Ctext x='16' y='22' font-family='ui-monospace,monospace' font-size='15' font-weight='700' fill='%23ffffff' text-anchor='middle'%3E%7B%7D%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="../assets/style.css">
   <script src="../assets/theme.js"></script>
+  <script src="../assets/motion.js"></script>
   <style>
-    .top-nav {
-      padding: 1.25rem 0 2.25rem; font-size: 0.9rem;
-      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
-    }
-    .top-nav a { color: var(--text-muted); text-decoration: none; }
-    .top-nav a:hover { color: var(--accent-strong); }
-    .lede { color: var(--text-muted); max-width: 44rem; margin-bottom: 0; }
-    .tool-card { margin: 1.75rem 0 2rem; }
-    .how-card { margin-bottom: 1rem; }
-
     textarea.io {
       width: 100%; min-height: 170px; padding: 0.85rem 1rem;
       font-family: var(--mono); font-size: 0.9rem; line-height: 1.55; color: var(--text);
@@ -44,7 +35,7 @@
 <body>
   <header class="container">
     <nav class="top-nav" aria-label="Site" data-i18n-attr="aria-label:nav_site">
-      <a href="../">&#8592; samba nugraha</a>
+      <a class="home-link" href="../"><span class="brand-mark" aria-hidden="true">SN</span><span class="home-name">samba nugraha</span></a>
       <div class="nav-actions">
       <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
         <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
@@ -61,7 +52,7 @@
       </div>
     </nav>
     <h1 data-i18n="h1">JSON Formatter &amp; Validator</h1>
-    <p class="lede" data-i18n="lede">Pretty-print, minify, and validate JSON with clear error messages that point at the exact line and column. Everything runs in your browser.</p>
+    <p class="lede" data-i18n="lede">Format, minify and validate JSON. Errors point to the exact line and column.</p>
   </header>
 
   <main class="container">
@@ -69,7 +60,7 @@
       <div class="card" style="border-left:3px solid var(--negative)">This tool needs JavaScript to run. Please enable it and reload. / Alat ini membutuhkan JavaScript. Aktifkan lalu muat ulang.</div>
     </noscript>
 
-    <div class="card tool-card">
+    <div class="card tool-card" data-reveal>
       <label for="jf-in" data-i18n="in_label">JSON input</label>
       <textarea class="io" id="jf-in" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder='{"paste": "your JSON here"}' data-i18n-attr="placeholder:in_ph"></textarea>
       <p class="status" id="jf-status" aria-live="polite"></p>
@@ -101,10 +92,10 @@
       <p class="msg" id="jf-msg" aria-live="polite"></p>
     </div>
 
-    <section class="card how-card" aria-labelledby="how-heading">
+    <section class="card how-card" data-reveal aria-labelledby="how-heading">
       <h2 id="how-heading" data-i18n="how_title">Notes</h2>
-      <p data-i18n="how_1">Validation runs as you type using the browser's own JSON parser, so what passes here is exactly what JSON.parse accepts: double-quoted strings, no trailing commas, no comments. "Sort keys" reorders object keys alphabetically at every level — useful for comparing two JSON documents.</p>
-      <p class="muted small" data-i18n="privacy">Your JSON never leaves this page — no server, no upload, no tracking. The input is remembered only in this browser.</p>
+      <p data-i18n="how_1">Validation runs as you type, using the browser's own JSON.parse: double-quoted strings, no trailing commas, no comments. “Sort keys A→Z” orders keys at every level — handy for comparing two documents.</p>
+      <p class="muted small" data-i18n="privacy">Your JSON never leaves this page. Your input is saved in this browser only.</p>
     </section>
   </main>
 
@@ -125,7 +116,7 @@
         _meta: 'Free JSON formatter, minifier, and validator. Pretty-print JSON, sort keys, and get clear error messages with line and column — everything runs in your browser.',
         nav_site: 'Site',
         h1: 'JSON Formatter & Validator',
-        lede: 'Pretty-print, minify, and validate JSON with clear error messages that point at the exact line and column. Everything runs in your browser.',
+        lede: 'Format, minify and validate JSON. Errors point to the exact line and column.',
         in_label: 'JSON input',
         in_ph: '{"paste": "your JSON here"}',
         out_label: 'Result',
@@ -150,12 +141,12 @@
         desc_null: 'null',
         msg_copied: 'Copied to clipboard.',
         msg_copy_empty: 'Nothing to copy yet.',
-        msg_copy_fail: 'Could not copy automatically — select the text and copy it manually.',
+        msg_copy_fail: 'Couldn\'t copy. Select the text and copy it manually.',
         msg_cleared: 'Cleared.',
         msg_fix_first: 'Fix the JSON error first — see the message under the input.',
         how_title: 'Notes',
-        how_1: 'Validation runs as you type using the browser’s own JSON parser, so what passes here is exactly what JSON.parse accepts: double-quoted strings, no trailing commas, no comments. "Sort keys" reorders object keys alphabetically at every level — useful for comparing two JSON documents.',
-        privacy: 'Your JSON never leaves this page — no server, no upload, no tracking. The input is remembered only in this browser.',
+        how_1: 'Validation runs as you type, using the browser\'s own JSON.parse: double-quoted strings, no trailing commas, no comments. “Sort keys A→Z” orders keys at every level — handy for comparing two documents.',
+        privacy: 'Your JSON never leaves this page. Your input is saved in this browser only.',
         footer_back: '← back to all tools'
       },
       id: {
@@ -163,7 +154,7 @@
         _meta: 'Formatter, minifier, dan validator JSON gratis. Rapikan JSON, urutkan key, dan dapatkan pesan error yang jelas dengan baris dan kolom — semuanya berjalan di browser Anda.',
         nav_site: 'Situs',
         h1: 'Formatter & Validator JSON',
-        lede: 'Rapikan, minify, dan validasi JSON dengan pesan error yang jelas menunjuk baris dan kolom persisnya. Semuanya berjalan di browser Anda.',
+        lede: 'Rapikan, minify, dan validasi JSON. Error menunjuk baris dan kolom persisnya.',
         in_label: 'Input JSON',
         in_ph: '{"tempel": "JSON Anda di sini"}',
         out_label: 'Hasil',
@@ -188,12 +179,12 @@
         desc_null: 'null',
         msg_copied: 'Disalin ke clipboard.',
         msg_copy_empty: 'Belum ada yang bisa disalin.',
-        msg_copy_fail: 'Tidak bisa menyalin otomatis — pilih teksnya lalu salin manual.',
+        msg_copy_fail: 'Gagal menyalin. Pilih teksnya lalu salin manual.',
         msg_cleared: 'Dibersihkan.',
         msg_fix_first: 'Perbaiki dulu error JSON-nya — lihat pesan di bawah input.',
         how_title: 'Catatan',
-        how_1: 'Validasi berjalan saat Anda mengetik memakai parser JSON bawaan browser, jadi yang lolos di sini persis yang diterima JSON.parse: string berkutip ganda, tanpa koma di akhir, tanpa komentar. "Urutkan key" menyusun ulang key objek secara alfabetis di setiap tingkat — berguna untuk membandingkan dua dokumen JSON.',
-        privacy: 'JSON Anda tidak pernah keluar dari halaman ini — tanpa server, tanpa unggahan, tanpa pelacakan. Input hanya diingat di browser ini.',
+        how_1: 'Validasi berjalan saat Anda mengetik, memakai JSON.parse bawaan browser: string berkutip ganda, tanpa koma di akhir, tanpa komentar. “Urutkan key A→Z” menyusun key di setiap tingkat — praktis untuk membandingkan dua dokumen.',
+        privacy: 'JSON Anda tidak pernah keluar dari halaman ini. Input hanya disimpan di browser ini.',
         footer_back: '← kembali ke semua alat'
       }
     };

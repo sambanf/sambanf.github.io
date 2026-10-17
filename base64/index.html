@@ -8,18 +8,8 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231e40af'/%3E%3Cg stroke='%23ffffff' stroke-width='2.6' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M13 11l-5 5 5 5'/%3E%3Cpath d='M19 11l5 5-5 5'/%3E%3C/g%3E%3C/svg%3E">
   <link rel="stylesheet" href="../assets/style.css">
   <script src="../assets/theme.js"></script>
+  <script src="../assets/motion.js"></script>
   <style>
-    .top-nav {
-      padding: 1.25rem 0 2.25rem; font-size: 0.9rem;
-      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
-    }
-    .top-nav a { color: var(--text-muted); text-decoration: none; }
-    .top-nav a:hover { color: var(--accent-strong); }
-    .lede { color: var(--text-muted); max-width: 44rem; margin-bottom: 0; }
-    .tool-card { margin: 1.75rem 0 2rem; }
-    .how-card { margin-bottom: 1rem; }
-    .how-card h3 { margin-top: 1.25rem; }
-
     .seg {
       display: inline-flex; gap: 0.25rem; padding: 0.25rem; margin-bottom: 1.25rem;
       background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm);
@@ -53,7 +43,7 @@
 <body>
   <header class="container">
     <nav class="top-nav" aria-label="Site" data-i18n-attr="aria-label:nav_site">
-      <a href="../">&#8592; samba nugraha</a>
+      <a class="home-link" href="../"><span class="brand-mark" aria-hidden="true">SN</span><span class="home-name">samba nugraha</span></a>
       <div class="nav-actions">
       <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
         <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
@@ -70,7 +60,7 @@
       </div>
     </nav>
     <h1 data-i18n="h1">Base64 Encoder &amp; Decoder</h1>
-    <p class="lede" data-i18n="lede">Convert text to Base64 and back. Full Unicode (UTF-8) support, an optional URL-safe mode, and everything runs in your browser.</p>
+    <p class="lede" data-i18n="lede">Convert text to Base64 and back. Unicode-safe, with an optional URL-safe mode.</p>
   </header>
 
   <main class="container">
@@ -78,7 +68,7 @@
       <div class="card" style="border-left:3px solid var(--negative)">This tool needs JavaScript to run. Please enable it and reload. / Alat ini membutuhkan JavaScript. Aktifkan lalu muat ulang.</div>
     </noscript>
 
-    <div class="card tool-card">
+    <div class="card tool-card" data-reveal>
       <div class="seg" role="group" aria-label="Mode" data-i18n-attr="aria-label:mode_aria">
         <button type="button" id="mode-encode" aria-pressed="true" data-i18n="mode_encode">Encode</button>
         <button type="button" id="mode-decode" aria-pressed="false" data-i18n="mode_decode">Decode</button>
@@ -109,11 +99,11 @@
       <p class="msg" id="b64-msg" aria-live="polite"></p>
     </div>
 
-    <section class="card how-card" aria-labelledby="how-heading">
+    <section class="card how-card" data-reveal aria-labelledby="how-heading">
       <h2 id="how-heading" data-i18n="how_title">About Base64</h2>
-      <p data-i18n="how_1">Base64 rewrites any data using 64 safe characters (A–Z, a–z, 0–9, + and /) so it can travel through systems that only expect text — for example inside data URIs, JSON, or email. It is an encoding, not encryption: anyone can decode it, so never use it to hide secrets.</p>
-      <p data-i18n="how_2">Text is handled as UTF-8, so emoji and accented or non-Latin characters round-trip correctly. Turn on URL-safe when the result must sit inside a URL or filename.</p>
-      <p class="muted small" data-i18n="privacy">All conversion happens on this page — nothing is uploaded and nothing is tracked. Your last input is remembered only in this browser.</p>
+      <p data-i18n="how_1">Base64 spells any data with 64 safe characters, so it fits where only text is allowed: data URIs, JSON, email. It's an encoding, not encryption — anyone can decode it.</p>
+      <p data-i18n="how_2">Text is read as UTF-8, so emoji and accents survive the round trip. Use URL-safe when the result goes in a URL or filename.</p>
+      <p class="muted small" data-i18n="privacy">Nothing is uploaded or tracked. Your last input is saved in this browser only.</p>
     </section>
   </main>
 
@@ -134,7 +124,7 @@
         _meta: 'Free online Base64 encoder and decoder. Convert text to Base64 and back with full UTF-8 and URL-safe support — everything runs in your browser.',
         nav_site: 'Site',
         h1: 'Base64 Encoder & Decoder',
-        lede: 'Convert text to Base64 and back. Full Unicode (UTF-8) support, an optional URL-safe mode, and everything runs in your browser.',
+        lede: 'Convert text to Base64 and back. Unicode-safe, with an optional URL-safe mode.',
         mode_aria: 'Mode',
         mode_encode: 'Encode',
         mode_decode: 'Decode',
@@ -149,15 +139,15 @@
         btn_copy: 'Copy result',
         btn_swap: 'Use result as input',
         btn_clear: 'Clear',
-        err_decode: 'That does not look like valid Base64. Check for stray or missing characters.',
+        err_decode: 'That isn\'t valid Base64. Check for stray or missing characters.',
         msg_copied: 'Copied to clipboard.',
         msg_copy_empty: 'Nothing to copy yet.',
-        msg_copy_fail: 'Could not copy automatically — select the text and copy it manually.',
+        msg_copy_fail: 'Couldn\'t copy. Select the text and copy it manually.',
         msg_cleared: 'Cleared.',
         how_title: 'About Base64',
-        how_1: 'Base64 rewrites any data using 64 safe characters (A–Z, a–z, 0–9, + and /) so it can travel through systems that only expect text — for example inside data URIs, JSON, or email. It is an encoding, not encryption: anyone can decode it, so never use it to hide secrets.',
-        how_2: 'Text is handled as UTF-8, so emoji and accented or non-Latin characters round-trip correctly. Turn on URL-safe when the result must sit inside a URL or filename.',
-        privacy: 'All conversion happens on this page — nothing is uploaded and nothing is tracked. Your last input is remembered only in this browser.',
+        how_1: 'Base64 spells any data with 64 safe characters, so it fits where only text is allowed: data URIs, JSON, email. It\'s an encoding, not encryption — anyone can decode it.',
+        how_2: 'Text is read as UTF-8, so emoji and accents survive the round trip. Use URL-safe when the result goes in a URL or filename.',
+        privacy: 'Nothing is uploaded or tracked. Your last input is saved in this browser only.',
         footer_back: '← back to all tools'
       },
       id: {
@@ -165,7 +155,7 @@
         _meta: 'Encoder dan decoder Base64 online gratis. Ubah teks ke Base64 dan sebaliknya dengan dukungan penuh UTF-8 dan mode URL-safe — semuanya berjalan di browser Anda.',
         nav_site: 'Situs',
         h1: 'Encoder & Decoder Base64',
-        lede: 'Ubah teks ke Base64 dan sebaliknya. Dukungan penuh Unicode (UTF-8), mode URL-safe opsional, dan semuanya berjalan di browser Anda.',
+        lede: 'Ubah teks ke Base64 dan sebaliknya. Aman untuk Unicode, dengan mode URL-safe opsional.',
         mode_aria: 'Mode',
         mode_encode: 'Encode',
         mode_decode: 'Decode',
@@ -180,15 +170,15 @@
         btn_copy: 'Salin hasil',
         btn_swap: 'Jadikan hasil sebagai input',
         btn_clear: 'Bersihkan',
-        err_decode: 'Ini tidak tampak seperti Base64 yang valid. Periksa karakter yang salah atau kurang.',
+        err_decode: 'Ini bukan Base64 yang valid. Periksa karakter yang salah atau kurang.',
         msg_copied: 'Disalin ke clipboard.',
         msg_copy_empty: 'Belum ada yang bisa disalin.',
-        msg_copy_fail: 'Tidak bisa menyalin otomatis — pilih teksnya lalu salin manual.',
+        msg_copy_fail: 'Gagal menyalin. Pilih teksnya lalu salin manual.',
         msg_cleared: 'Dibersihkan.',
         how_title: 'Tentang Base64',
-        how_1: 'Base64 menulis ulang data apa pun memakai 64 karakter aman (A–Z, a–z, 0–9, + dan /) agar bisa melewati sistem yang hanya menerima teks — misalnya di dalam data URI, JSON, atau email. Ini adalah encoding, bukan enkripsi: siapa pun bisa men-decode-nya, jadi jangan gunakan untuk menyembunyikan rahasia.',
-        how_2: 'Teks diproses sebagai UTF-8, sehingga emoji dan karakter beraksen atau non-Latin tetap utuh bolak-balik. Aktifkan URL-safe bila hasilnya harus berada di dalam URL atau nama berkas.',
-        privacy: 'Semua konversi terjadi di halaman ini — tidak ada yang diunggah dan tidak ada pelacakan. Input terakhir Anda hanya diingat di browser ini.',
+        how_1: 'Base64 menulis data apa pun dengan 64 karakter aman, sehingga muat di tempat yang hanya menerima teks: data URI, JSON, email. Ini encoding, bukan enkripsi — siapa pun bisa men-decode-nya.',
+        how_2: 'Teks dibaca sebagai UTF-8, jadi emoji dan huruf beraksen tetap utuh. Pakai URL-safe bila hasilnya masuk ke URL atau nama berkas.',
+        privacy: 'Tidak ada yang diunggah atau dilacak. Input terakhir hanya disimpan di browser ini.',
         footer_back: '← kembali ke semua alat'
       }
     };

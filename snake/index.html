@@ -8,17 +8,8 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231e40af'/%3E%3Cpath d='M7 10h12a3.5 3.5 0 0 1 0 7H12a3.5 3.5 0 0 0 0 7h13' stroke='%23ffffff' stroke-width='2.6' fill='none' stroke-linecap='round'/%3E%3Ccircle cx='26' cy='9' r='2' fill='%23ffffff'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="../assets/style.css">
   <script src="../assets/theme.js"></script>
+  <script src="../assets/motion.js"></script>
   <style>
-    .top-nav {
-      padding: 1.25rem 0 2.25rem; font-size: 0.9rem;
-      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
-    }
-    .top-nav a { color: var(--text-muted); text-decoration: none; }
-    .top-nav a:hover { color: var(--accent-strong); }
-    .lede { color: var(--text-muted); max-width: 44rem; margin-bottom: 0; }
-    .tool-card { margin: 1.75rem 0 1.25rem; }
-    .how-card { margin-bottom: 1rem; }
-
     .hud {
       display: flex; justify-content: center; gap: 0.85rem; margin-bottom: 1rem;
     }
@@ -57,7 +48,7 @@
 <body>
   <header class="container">
     <nav class="top-nav" aria-label="Site" data-i18n-attr="aria-label:nav_site">
-      <a href="../">&#8592; samba nugraha</a>
+      <a class="home-link" href="../"><span class="brand-mark" aria-hidden="true">SN</span><span class="home-name">samba nugraha</span></a>
       <div class="nav-actions">
       <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
         <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
@@ -74,7 +65,7 @@
       </div>
     </nav>
     <h1 data-i18n="h1">Snake</h1>
-    <p class="lede" data-i18n="lede">Eat, grow, don't hit the walls — or yourself. Arrow keys or WASD on desktop, swipe on your phone. It gets faster.</p>
+    <p class="lede" data-i18n="lede">Eat, grow, and don't hit the walls — or yourself. Arrow keys, WASD or swipe.</p>
   </header>
 
   <main class="container">
@@ -82,7 +73,7 @@
       <div class="card" style="border-left:3px solid var(--negative)">This game needs JavaScript to run. Please enable it and reload. / Permainan ini membutuhkan JavaScript. Aktifkan lalu muat ulang.</div>
     </noscript>
 
-    <div class="card tool-card">
+    <div class="card tool-card" data-reveal>
       <div class="hud">
         <div class="box"><b id="sn-score">0</b><span data-i18n="hud_score">Score</span></div>
         <div class="box"><b id="sn-best">0</b><span data-i18n="hud_best">Best</span></div>
@@ -103,10 +94,10 @@
       <p class="hint" data-i18n="hint">Tip: you can also pause with Space.</p>
     </div>
 
-    <section class="card how-card" aria-labelledby="how-heading">
+    <section class="card how-card" data-reveal aria-labelledby="how-heading">
       <h2 id="how-heading" data-i18n="how_title">Rules</h2>
-      <p data-i18n="how_1">Every food eaten makes the snake one segment longer and adds a point — and every fifth food speeds the game up a little. The run ends if you hit a wall or your own tail. The game pauses automatically if you switch tabs.</p>
-      <p class="muted small" data-i18n="privacy">Runs entirely in your browser. Your high score is remembered only on this device.</p>
+      <p data-i18n="how_1">Each food adds a segment and a point, and every fifth one speeds things up. Hit a wall or your tail and the run ends. Switching tabs pauses the game.</p>
+      <p class="muted small" data-i18n="privacy">Runs in your browser. Your high score is saved on this device only.</p>
     </section>
   </main>
 
@@ -127,7 +118,7 @@
         _meta: "Free Snake game. Eat, grow, and don't hit the walls — arrow keys or swipe, with your high score saved. Runs entirely in your browser.",
         nav_site: 'Site',
         h1: 'Snake',
-        lede: "Eat, grow, don't hit the walls — or yourself. Arrow keys or WASD on desktop, swipe on your phone. It gets faster.",
+        lede: 'Eat, grow, and don\'t hit the walls — or yourself. Arrow keys, WASD or swipe.',
         hud_score: 'Score',
         hud_best: 'Best',
         ov_ready: 'Ready?',
@@ -143,8 +134,8 @@
         btn_pause: 'Pause',
         hint: 'Tip: you can also pause with Space.',
         how_title: 'Rules',
-        how_1: 'Every food eaten makes the snake one segment longer and adds a point — and every fifth food speeds the game up a little. The run ends if you hit a wall or your own tail. The game pauses automatically if you switch tabs.',
-        privacy: 'Runs entirely in your browser. Your high score is remembered only on this device.',
+        how_1: 'Each food adds a segment and a point, and every fifth one speeds things up. Hit a wall or your tail and the run ends. Switching tabs pauses the game.',
+        privacy: 'Runs in your browser. Your high score is saved on this device only.',
         footer_back: '← back to all tools'
       },
       id: {
@@ -152,7 +143,7 @@
         _meta: 'Permainan Snake gratis. Makan, tumbuh, dan jangan menabrak dinding — tombol panah atau usapan, dengan skor tertinggi tersimpan. Berjalan sepenuhnya di browser Anda.',
         nav_site: 'Situs',
         h1: 'Ular (Snake)',
-        lede: 'Makan, tumbuh, jangan menabrak dinding — atau tubuh sendiri. Tombol panah atau WASD di desktop, usap di ponsel. Makin lama makin cepat.',
+        lede: 'Makan, tumbuh, dan jangan menabrak dinding — atau tubuh sendiri. Tombol panah, WASD, atau usap.',
         hud_score: 'Skor',
         hud_best: 'Terbaik',
         ov_ready: 'Siap?',
@@ -168,8 +159,8 @@
         btn_pause: 'Jeda',
         hint: 'Tips: Anda juga bisa jeda dengan Spasi.',
         how_title: 'Aturan',
-        how_1: 'Setiap makanan membuat ular bertambah satu ruas dan menambah satu poin — dan setiap lima makanan permainan sedikit lebih cepat. Permainan berakhir jika menabrak dinding atau ekor sendiri. Permainan otomatis jeda jika Anda pindah tab.',
-        privacy: 'Berjalan sepenuhnya di browser Anda. Skor tertinggi hanya diingat di perangkat ini.',
+        how_1: 'Setiap makanan menambah satu ruas dan satu poin, dan setiap makanan kelima mempercepat permainan. Menabrak dinding atau ekor sendiri berarti permainan selesai. Pindah tab akan menjeda permainan.',
+        privacy: 'Berjalan di browser Anda. Skor tertinggi hanya disimpan di perangkat ini.',
         footer_back: '← kembali ke semua alat'
       }
     };

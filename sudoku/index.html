@@ -8,18 +8,10 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231e40af'/%3E%3Cg stroke='%23ffffff' stroke-width='1.8' fill='none'%3E%3Crect x='6' y='6' width='20' height='20' rx='1.5'/%3E%3Cpath d='M12.7 6v20M19.3 6v20M6 12.7h20M6 19.3h20'/%3E%3C/g%3E%3C/svg%3E">
   <link rel="stylesheet" href="../assets/style.css">
   <script src="../assets/theme.js"></script>
+  <script src="../assets/motion.js"></script>
   <style>
     :root { --seam: color-mix(in srgb, var(--text) 34%, var(--border)); }
 
-    .top-nav {
-      padding: 1.25rem 0 2.25rem; font-size: 0.9rem;
-      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
-    }
-    .top-nav a { color: var(--text-muted); text-decoration: none; }
-    .top-nav a:hover { color: var(--accent-strong); }
-    .lede { color: var(--text-muted); max-width: 44rem; margin-bottom: 0; }
-    .tool-card { margin: 1.75rem 0 1.25rem; }
-    .how-card { margin-bottom: 1rem; }
 
     .topbar-game { display: flex; flex-wrap: wrap; align-items: end; justify-content: center; gap: 1rem; margin-bottom: 1.1rem; }
     .topbar-game .grp { display: flex; align-items: center; gap: 0.6rem; }
@@ -95,7 +87,7 @@
 <body>
   <header class="container">
     <nav class="top-nav" aria-label="Site" data-i18n-attr="aria-label:nav_site">
-      <a href="../">&#8592; samba nugraha</a>
+      <a class="home-link" href="../"><span class="brand-mark" aria-hidden="true">SN</span><span class="home-name">samba nugraha</span></a>
       <div class="nav-actions">
       <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
         <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
@@ -112,7 +104,7 @@
       </div>
     </nav>
     <h1>Sudoku</h1>
-    <p class="lede" data-i18n="lede">Fill the grid so every row, column, and 3×3 box contains 1 to 9 exactly once. Every puzzle has a single unique solution.</p>
+    <p class="lede" data-i18n="lede">Fill the grid so every row, column and 3×3 box holds 1 to 9 once. One solution per puzzle.</p>
   </header>
 
   <main class="container">
@@ -120,7 +112,7 @@
       <div class="card" style="border-left:3px solid var(--negative)">This game needs JavaScript to run. Please enable it and reload. / Permainan ini membutuhkan JavaScript. Aktifkan lalu muat ulang.</div>
     </noscript>
 
-    <div class="card tool-card">
+    <div class="card tool-card" data-reveal>
       <div class="topbar-game">
         <div class="grp">
           <label for="su-diff" data-i18n="diff_label">Difficulty</label>
@@ -155,11 +147,11 @@
       </div>
     </div>
 
-    <section class="card how-card" aria-labelledby="how-heading">
+    <section class="card how-card" data-reveal aria-labelledby="how-heading">
       <h2 id="how-heading" data-i18n="how_title">How to play</h2>
-      <p data-i18n="how_1">Tap a cell, then tap a number (or use your keyboard's 1–9). Each of the nine rows, nine columns, and nine 3×3 boxes must contain the digits 1 to 9 with no repeats. Duplicates are flagged in red, and every cell sharing the selected number is highlighted to help you scan.</p>
-      <p data-i18n="how_2">Turn on Notes to pencil in candidate digits for a cell; placing a real number automatically clears that candidate from the rest of its row, column, and box. Arrow keys move the selection, Backspace erases, and N toggles Notes.</p>
-      <p class="muted small" data-i18n="privacy">Runs entirely in your browser. Your puzzle, progress, and best times are saved only on this device.</p>
+      <p data-i18n="how_1">Tap a cell, then a number (or type 1–9). No digit may repeat in a row, column or 3×3 box. Duplicates turn red, and cells with the selected number light up.</p>
+      <p data-i18n="how_2">Turn on Notes to pencil in candidates; placing a number clears that candidate from its row, column and box. Arrow keys move, Backspace erases, N toggles Notes.</p>
+      <p class="muted small" data-i18n="privacy">Runs in your browser. Your puzzle, progress and best times are saved on this device only.</p>
     </section>
   </main>
 
@@ -179,7 +171,7 @@
         _title: 'Sudoku',
         _meta: 'Free Sudoku game. Uniquely-solvable puzzles in four difficulties, with pencil notes, conflict highlighting, hints, and a timer — everything runs in your browser.',
         nav_site: 'Site',
-        lede: 'Fill the grid so every row, column, and 3×3 box contains 1 to 9 exactly once. Every puzzle has a single unique solution.',
+        lede: 'Fill the grid so every row, column and 3×3 box holds 1 to 9 once. One solution per puzzle.',
         diff_label: 'Difficulty',
         diff_easy: 'Easy',
         diff_medium: 'Medium',
@@ -203,16 +195,16 @@
         status_win_assisted: 'Solved with help in {t}. 🎉',
         cell_aria: 'Row {r}, column {c}',
         how_title: 'How to play',
-        how_1: "Tap a cell, then tap a number (or use your keyboard's 1–9). Each of the nine rows, nine columns, and nine 3×3 boxes must contain the digits 1 to 9 with no repeats. Duplicates are flagged in red, and every cell sharing the selected number is highlighted to help you scan.",
-        how_2: 'Turn on Notes to pencil in candidate digits for a cell; placing a real number automatically clears that candidate from the rest of its row, column, and box. Arrow keys move the selection, Backspace erases, and N toggles Notes.',
-        privacy: 'Runs entirely in your browser. Your puzzle, progress, and best times are saved only on this device.',
+        how_1: 'Tap a cell, then a number (or type 1–9). No digit may repeat in a row, column or 3×3 box. Duplicates turn red, and cells with the selected number light up.',
+        how_2: 'Turn on Notes to pencil in candidates; placing a number clears that candidate from its row, column and box. Arrow keys move, Backspace erases, N toggles Notes.',
+        privacy: 'Runs in your browser. Your puzzle, progress and best times are saved on this device only.',
         footer_back: '← back to all tools'
       },
       id: {
         _title: 'Sudoku',
         _meta: 'Permainan Sudoku gratis. Teka-teki bersolusi unik dalam empat tingkat kesulitan, dengan catatan pensil, sorotan konflik, petunjuk, dan timer — semuanya berjalan di browser Anda.',
         nav_site: 'Situs',
-        lede: 'Isi kotak agar setiap baris, kolom, dan kotak 3×3 memuat angka 1 sampai 9 tepat satu kali. Setiap teka-teki punya satu solusi unik.',
+        lede: 'Isi kotak agar setiap baris, kolom, dan kotak 3×3 memuat 1 sampai 9 tepat sekali. Satu solusi per teka-teki.',
         diff_label: 'Kesulitan',
         diff_easy: 'Mudah',
         diff_medium: 'Sedang',
@@ -236,9 +228,9 @@
         status_win_assisted: 'Terpecahkan dengan bantuan dalam {t}. 🎉',
         cell_aria: 'Baris {r}, kolom {c}',
         how_title: 'Cara bermain',
-        how_1: 'Ketuk sel, lalu ketuk angka (atau pakai tombol 1–9 di keyboard). Setiap sembilan baris, sembilan kolom, dan sembilan kotak 3×3 harus memuat angka 1 sampai 9 tanpa pengulangan. Angka ganda ditandai merah, dan setiap sel dengan angka yang sama dengan sel terpilih disorot untuk memudahkan.',
-        how_2: 'Aktifkan Catatan untuk menuliskan angka kandidat di sebuah sel; menempatkan angka sungguhan otomatis menghapus kandidat itu dari sisa baris, kolom, dan kotaknya. Tombol panah memindahkan pilihan, Backspace menghapus, dan N mengalihkan Catatan.',
-        privacy: 'Berjalan sepenuhnya di browser Anda. Teka-teki, progres, dan waktu terbaik hanya disimpan di perangkat ini.',
+        how_1: 'Ketuk sel, lalu angka (atau ketik 1–9). Tidak boleh ada angka berulang dalam baris, kolom, atau kotak 3×3. Angka ganda berubah merah, dan sel dengan angka yang dipilih ikut menyala.',
+        how_2: 'Aktifkan Catatan untuk menulis kandidat; menaruh angka otomatis menghapus kandidat itu dari baris, kolom, dan kotaknya. Tombol panah memindah, Backspace menghapus, N mengalihkan Catatan.',
+        privacy: 'Berjalan di browser Anda. Teka-teki, progres, dan waktu terbaik hanya disimpan di perangkat ini.',
         footer_back: '← kembali ke semua alat'
       }
     };
@@ -712,7 +704,8 @@
       newPuzzle(initial);
     }
 
-    window.SiteLang.init(I18N, function () { render(); });
+    // On a first visit the puzzle is still being generated (newPuzzle defers it).
+    window.SiteLang.init(I18N, function () { if (cur) render(); });
   })();
   </script>
 </body>

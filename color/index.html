@@ -8,16 +8,8 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d9488'/%3E%3Cpath d='M16 6l6.5 6.5a9 9 0 1 1-13 0z' stroke='%23ffffff' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="../assets/style.css">
   <script src="../assets/theme.js"></script>
+  <script src="../assets/motion.js"></script>
   <style>
-    .top-nav {
-      padding: 1.25rem 0 2.25rem; font-size: 0.9rem;
-      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
-    }
-    .top-nav a { color: var(--text-muted); text-decoration: none; }
-    .top-nav a:hover { color: var(--accent-strong); }
-    .lede { color: var(--text-muted); max-width: 44rem; margin-bottom: 0; }
-    .tool-card { margin: 1.75rem 0 1.25rem; }
-    .how-card { margin-bottom: 1rem; }
     h2.sub { font-size: 1.05rem; margin: 0 0 1rem; }
 
     .color-in { display: flex; gap: 0.6rem; align-items: stretch; }
@@ -75,7 +67,7 @@
 <body>
   <header class="container">
     <nav class="top-nav" aria-label="Site" data-i18n-attr="aria-label:nav_site">
-      <a href="../">&#8592; samba nugraha</a>
+      <a class="home-link" href="../"><span class="brand-mark" aria-hidden="true">SN</span><span class="home-name">samba nugraha</span></a>
       <div class="nav-actions">
       <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
         <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
@@ -92,7 +84,7 @@
       </div>
     </nav>
     <h1 data-i18n="h1">Color Converter &amp; Contrast Checker</h1>
-    <p class="lede" data-i18n="lede">Convert any CSS color between HEX, RGB, and HSL, and check text/background contrast against the WCAG accessibility guidelines.</p>
+    <p class="lede" data-i18n="lede">Convert colors between HEX, RGB and HSL, and check text contrast against WCAG.</p>
   </header>
 
   <main class="container">
@@ -100,7 +92,7 @@
       <div class="card" style="border-left:3px solid var(--negative)">This tool needs JavaScript to run. Please enable it and reload. / Alat ini membutuhkan JavaScript. Aktifkan lalu muat ulang.</div>
     </noscript>
 
-    <div class="card tool-card">
+    <div class="card tool-card" data-reveal>
       <h2 class="sub" data-i18n="conv_title">Convert a color</h2>
       <label for="cc-in" data-i18n="in_label">Color (HEX, RGB, HSL, or a CSS name like "teal")</label>
       <div class="color-in">
@@ -119,7 +111,7 @@
       <p class="msg" id="cc-msg" aria-live="polite"></p>
     </div>
 
-    <div class="card tool-card">
+    <div class="card tool-card" data-reveal>
       <h2 class="sub" data-i18n="ct_title">Contrast checker (WCAG)</h2>
       <div class="pair">
         <div>
@@ -154,10 +146,10 @@
       <div class="badges" id="ct-badges"></div>
     </div>
 
-    <section class="card how-card" aria-labelledby="how-heading">
+    <section class="card how-card" data-reveal aria-labelledby="how-heading">
       <h2 id="how-heading" data-i18n="how_title">What the badges mean</h2>
-      <p data-i18n="how_1">WCAG measures contrast as a ratio from 1:1 (identical) to 21:1 (black on white). Level AA — the common legal/professional bar — requires 4.5:1 for normal text and 3:1 for large text (18pt+, or 14pt bold). The stricter AAA level requires 7:1 and 4.5:1. If the text color has transparency, it is composited onto the background before measuring, just like the browser renders it.</p>
-      <p class="muted small" data-i18n="privacy">Everything runs in your browser — nothing is uploaded and nothing is tracked.</p>
+      <p data-i18n="how_1">Contrast runs from 1:1 (identical) to 21:1 (black on white). AA, the usual standard, needs 4.5:1 for normal text and 3:1 for large text (18pt+, or 14pt bold). AAA needs 7:1 and 4.5:1. Transparent text is blended onto the background first, as the browser would.</p>
+      <p class="muted small" data-i18n="privacy">Runs in your browser. Nothing is uploaded or tracked.</p>
     </section>
   </main>
 
@@ -178,10 +170,10 @@
         _meta: 'Free color converter and WCAG contrast checker. Convert between HEX, RGB, and HSL, and test text/background contrast against accessibility guidelines — all in your browser.',
         nav_site: 'Site',
         h1: 'Color Converter & Contrast Checker',
-        lede: 'Convert any CSS color between HEX, RGB, and HSL, and check text/background contrast against the WCAG accessibility guidelines.',
+        lede: 'Convert colors between HEX, RGB and HSL, and check text contrast against WCAG.',
         conv_title: 'Convert a color',
         in_label: 'Color (HEX, RGB, HSL, or a CSS name like "teal")',
-        err_color: 'Not a recognizable CSS color — try #0d9488, rgb(13, 148, 136), or "teal".',
+        err_color: 'Not a CSS color. Try #0d9488, rgb(13, 148, 136) or "teal".',
         btn_copy: 'Copy',
         ct_title: 'Contrast checker (WCAG)',
         fg_label: 'Text color',
@@ -197,10 +189,10 @@
         pass: 'pass',
         fail: 'fail',
         msg_copied: 'Copied to clipboard.',
-        msg_copy_fail: 'Could not copy automatically — select the value and copy it manually.',
+        msg_copy_fail: 'Couldn\'t copy. Select the value and copy it manually.',
         how_title: 'What the badges mean',
-        how_1: 'WCAG measures contrast as a ratio from 1:1 (identical) to 21:1 (black on white). Level AA — the common legal/professional bar — requires 4.5:1 for normal text and 3:1 for large text (18pt+, or 14pt bold). The stricter AAA level requires 7:1 and 4.5:1. If the text color has transparency, it is composited onto the background before measuring, just like the browser renders it.',
-        privacy: 'Everything runs in your browser — nothing is uploaded and nothing is tracked.',
+        how_1: 'Contrast runs from 1:1 (identical) to 21:1 (black on white). AA, the usual standard, needs 4.5:1 for normal text and 3:1 for large text (18pt+, or 14pt bold). AAA needs 7:1 and 4.5:1. Transparent text is blended onto the background first, as the browser would.',
+        privacy: 'Runs in your browser. Nothing is uploaded or tracked.',
         footer_back: '← back to all tools'
       },
       id: {
@@ -208,10 +200,10 @@
         _meta: 'Konverter warna dan pemeriksa kontras WCAG gratis. Konversi antara HEX, RGB, dan HSL, dan uji kontras teks/latar terhadap pedoman aksesibilitas — semuanya di browser Anda.',
         nav_site: 'Situs',
         h1: 'Konverter Warna & Pemeriksa Kontras',
-        lede: 'Konversi warna CSS apa pun antara HEX, RGB, dan HSL, dan periksa kontras teks/latar terhadap pedoman aksesibilitas WCAG.',
+        lede: 'Konversi warna antara HEX, RGB, dan HSL, dan cek kontras teks terhadap WCAG.',
         conv_title: 'Konversi warna',
         in_label: 'Warna (HEX, RGB, HSL, atau nama CSS seperti "teal")',
-        err_color: 'Bukan warna CSS yang dikenali — coba #0d9488, rgb(13, 148, 136), atau "teal".',
+        err_color: 'Bukan warna CSS. Coba #0d9488, rgb(13, 148, 136), atau "teal".',
         btn_copy: 'Salin',
         ct_title: 'Pemeriksa kontras (WCAG)',
         fg_label: 'Warna teks',
@@ -227,10 +219,10 @@
         pass: 'lolos',
         fail: 'gagal',
         msg_copied: 'Disalin ke clipboard.',
-        msg_copy_fail: 'Tidak bisa menyalin otomatis — pilih nilainya lalu salin manual.',
+        msg_copy_fail: 'Gagal menyalin. Pilih nilainya lalu salin manual.',
         how_title: 'Arti lencana',
-        how_1: 'WCAG mengukur kontras sebagai rasio dari 1:1 (identik) sampai 21:1 (hitam di atas putih). Level AA — standar umum legal/profesional — mensyaratkan 4,5:1 untuk teks normal dan 3:1 untuk teks besar (18pt+, atau 14pt tebal). Level AAA yang lebih ketat mensyaratkan 7:1 dan 4,5:1. Jika warna teks punya transparansi, warnanya digabungkan ke latar sebelum diukur, persis seperti yang dirender browser.',
-        privacy: 'Semuanya berjalan di browser Anda — tidak ada yang diunggah dan tidak ada pelacakan.',
+        how_1: 'Kontras berkisar dari 1:1 (identik) sampai 21:1 (hitam di atas putih). AA, standar yang umum, butuh 4,5:1 untuk teks normal dan 3:1 untuk teks besar (18pt+, atau 14pt tebal). AAA butuh 7:1 dan 4,5:1. Teks transparan dicampur ke latar dulu, seperti di browser.',
+        privacy: 'Berjalan di browser Anda. Tidak ada yang diunggah atau dilacak.',
         footer_back: '← kembali ke semua alat'
       }
     };

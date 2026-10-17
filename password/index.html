@@ -8,17 +8,8 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231e40af'/%3E%3Cg stroke='%23ffffff' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='8' y='14' width='16' height='11' rx='2'/%3E%3Cpath d='M11 14v-3a5 5 0 0 1 10 0v3'/%3E%3C/g%3E%3C/svg%3E">
   <link rel="stylesheet" href="../assets/style.css">
   <script src="../assets/theme.js"></script>
+  <script src="../assets/motion.js"></script>
   <style>
-    .top-nav {
-      padding: 1.25rem 0 2.25rem; font-size: 0.9rem;
-      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
-    }
-    .top-nav a { color: var(--text-muted); text-decoration: none; }
-    .top-nav a:hover { color: var(--accent-strong); }
-    .lede { color: var(--text-muted); max-width: 44rem; margin-bottom: 0; }
-    .tool-card { margin: 1.75rem 0 2rem; }
-    .how-card { margin-bottom: 1rem; }
-
     :root { --warn: #d97706; }
     @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --warn: #fbbf24; } }
     :root[data-theme="dark"] { --warn: #fbbf24; }
@@ -69,7 +60,7 @@
 <body>
   <header class="container">
     <nav class="top-nav" aria-label="Site" data-i18n-attr="aria-label:nav_site">
-      <a href="../">&#8592; samba nugraha</a>
+      <a class="home-link" href="../"><span class="brand-mark" aria-hidden="true">SN</span><span class="home-name">samba nugraha</span></a>
       <div class="nav-actions">
       <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
         <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
@@ -86,7 +77,7 @@
       </div>
     </nav>
     <h1 data-i18n="h1">Password Generator</h1>
-    <p class="lede" data-i18n="lede">Strong random passwords, generated locally by your browser's secure crypto. Nothing is sent or saved anywhere.</p>
+    <p class="lede" data-i18n="lede">Strong random passwords, made on your device. Nothing is sent or saved.</p>
   </header>
 
   <main class="container">
@@ -94,7 +85,7 @@
       <div class="card" style="border-left:3px solid var(--negative)">This tool needs JavaScript to run. Please enable it and reload. / Alat ini membutuhkan JavaScript. Aktifkan lalu muat ulang.</div>
     </noscript>
 
-    <div class="card tool-card">
+    <div class="card tool-card" data-reveal>
       <label for="pw-out" data-i18n="out_label">Your password</label>
       <div class="pw-out-row">
         <output id="pw-out" aria-live="polite">—</output>
@@ -125,11 +116,11 @@
       <p class="msg" id="pw-msg" aria-live="polite"></p>
     </div>
 
-    <section class="card how-card" aria-labelledby="how-heading">
+    <section class="card how-card" data-reveal aria-labelledby="how-heading">
       <h2 id="how-heading" data-i18n="how_title">How strength is measured</h2>
-      <p data-i18n="how_1">Every character is drawn with the browser's cryptographically secure random generator (with rejection sampling, so no character is more likely than another), and at least one character from each selected set is guaranteed. Strength is estimated as entropy: length × log₂(pool size). Around 60 bits is reasonable, 80+ bits is strong for anything important.</p>
-      <p data-i18n="how_2">The best password is one you never type or remember: use a password manager, and use a unique password for every account.</p>
-      <p class="muted small" data-i18n="privacy">Passwords are generated on this page and deliberately never saved anywhere — not even in this browser. Only your option settings are remembered.</p>
+      <p data-i18n="how_1">Each character comes from the browser's cryptographically secure generator, with no bias between characters, and every selected set appears at least once. Strength is entropy: length × log₂(pool size). About 60 bits is fine; use 80+ for anything important.</p>
+      <p data-i18n="how_2">Better still: let a password manager remember them, and use a different password for every account.</p>
+      <p class="muted small" data-i18n="privacy">Passwords are never saved, not even in this browser. Only your options are remembered.</p>
     </section>
   </main>
 
@@ -150,7 +141,7 @@
         _meta: "Free password generator. Strong random passwords created locally with your browser's secure crypto — length, character options, and a strength meter. Nothing leaves your device.",
         nav_site: 'Site',
         h1: 'Password Generator',
-        lede: "Strong random passwords, generated locally by your browser's secure crypto. Nothing is sent or saved anywhere.",
+        lede: 'Strong random passwords, made on your device. Nothing is sent or saved.',
         out_label: 'Your password',
         btn_copy: 'Copy',
         btn_regen: 'Regenerate',
@@ -167,13 +158,13 @@
         s_strong: 'Strong',
         bits: '{n} bits of entropy',
         err_nosets: 'Select at least one character set.',
-        err_insecure: 'Secure random numbers are unavailable on this connection (needs https).',
+        err_insecure: 'Secure randomness needs an https connection, so it isn\'t available here.',
         msg_copied: 'Copied to clipboard.',
-        msg_copy_fail: 'Could not copy automatically — select the password and copy it manually.',
+        msg_copy_fail: 'Couldn\'t copy. Select the password and copy it manually.',
         how_title: 'How strength is measured',
-        how_1: "Every character is drawn with the browser's cryptographically secure random generator (with rejection sampling, so no character is more likely than another), and at least one character from each selected set is guaranteed. Strength is estimated as entropy: length × log₂(pool size). Around 60 bits is reasonable, 80+ bits is strong for anything important.",
-        how_2: 'The best password is one you never type or remember: use a password manager, and use a unique password for every account.',
-        privacy: 'Passwords are generated on this page and deliberately never saved anywhere — not even in this browser. Only your option settings are remembered.',
+        how_1: 'Each character comes from the browser\'s cryptographically secure generator, with no bias between characters, and every selected set appears at least once. Strength is entropy: length × log₂(pool size). About 60 bits is fine; use 80+ for anything important.',
+        how_2: 'Better still: let a password manager remember them, and use a different password for every account.',
+        privacy: 'Passwords are never saved, not even in this browser. Only your options are remembered.',
         footer_back: '← back to all tools'
       },
       id: {
@@ -181,7 +172,7 @@
         _meta: 'Generator password gratis. Password acak yang kuat dibuat secara lokal dengan crypto aman browser Anda — panjang, opsi karakter, dan pengukur kekuatan. Tidak ada yang keluar dari perangkat Anda.',
         nav_site: 'Situs',
         h1: 'Generator Password',
-        lede: 'Password acak yang kuat, dibuat secara lokal oleh crypto aman browser Anda. Tidak ada yang dikirim atau disimpan di mana pun.',
+        lede: 'Password acak yang kuat, dibuat di perangkat Anda. Tidak ada yang dikirim atau disimpan.',
         out_label: 'Password Anda',
         btn_copy: 'Salin',
         btn_regen: 'Buat ulang',
@@ -198,13 +189,13 @@
         s_strong: 'Kuat',
         bits: '{n} bit entropi',
         err_nosets: 'Pilih minimal satu set karakter.',
-        err_insecure: 'Angka acak yang aman tidak tersedia pada koneksi ini (butuh https).',
+        err_insecure: 'Keacakan yang aman butuh koneksi https, jadi tidak tersedia di sini.',
         msg_copied: 'Disalin ke clipboard.',
-        msg_copy_fail: 'Tidak bisa menyalin otomatis — pilih password-nya lalu salin manual.',
+        msg_copy_fail: 'Gagal menyalin. Pilih password-nya lalu salin manual.',
         how_title: 'Cara mengukur kekuatan',
-        how_1: 'Setiap karakter diambil dengan generator acak browser yang aman secara kriptografis (dengan rejection sampling, sehingga tidak ada karakter yang lebih mungkin muncul), dan minimal satu karakter dari setiap set yang dipilih dijamin ada. Kekuatan diperkirakan sebagai entropi: panjang × log₂(ukuran pool). Sekitar 60 bit cukup wajar, 80+ bit kuat untuk hal yang penting.',
-        how_2: 'Password terbaik adalah yang tidak pernah Anda ketik atau hafal: gunakan password manager, dan pakai password unik untuk setiap akun.',
-        privacy: 'Password dibuat di halaman ini dan sengaja tidak pernah disimpan di mana pun — bahkan di browser ini. Hanya pengaturan opsi Anda yang diingat.',
+        how_1: 'Setiap karakter berasal dari generator acak browser yang aman secara kriptografis, tanpa bias antar-karakter, dan setiap set yang dipilih muncul minimal sekali. Kekuatan dihitung sebagai entropi: panjang × log₂(ukuran pool). Sekitar 60 bit cukup; pakai 80+ untuk hal yang penting.',
+        how_2: 'Lebih baik lagi: biarkan password manager yang mengingatnya, dan pakai password berbeda untuk setiap akun.',
+        privacy: 'Password tidak pernah disimpan, bahkan di browser ini. Hanya pilihan opsi Anda yang diingat.',
         footer_back: '← kembali ke semua alat'
       }
     };

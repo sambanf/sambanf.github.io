@@ -8,18 +8,8 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%231e40af'/><path d='M5 9l9 9 5-4 8 8' stroke='%23ffffff' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/><path d='M27 15v7h-7' stroke='%23ffffff' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
   <link rel="stylesheet" href="../assets/style.css">
   <script src="../assets/theme.js"></script>
+  <script src="../assets/motion.js"></script>
   <style>
-    .top-nav {
-      padding: 1.25rem 0 2.25rem; font-size: 0.9rem;
-      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
-    }
-    .top-nav a { color: var(--text-muted); text-decoration: none; }
-    .top-nav a:hover { color: var(--accent-strong); }
-    .lede { color: var(--text-muted); max-width: 44rem; margin-bottom: 0; }
-    .tool-card { margin: 1.75rem 0 2rem; }
-    .how-card { margin-bottom: 1rem; }
-    .how-card h3 { margin-top: 1.5rem; }
-
     /* Tabs */
     .tabs {
       display: flex; gap: 0.25rem; padding: 0.25rem;
@@ -146,7 +136,7 @@
 <body>
   <header class="container">
     <nav class="top-nav" aria-label="Site" data-i18n-attr="aria-label:nav_site">
-      <a href="../">&#8592; samba nugraha</a>
+      <a class="home-link" href="../"><span class="brand-mark" aria-hidden="true">SN</span><span class="home-name">samba nugraha</span></a>
       <div class="nav-actions">
       <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
         <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
@@ -163,7 +153,7 @@
       </div>
     </nav>
     <h1 data-i18n="h1">Stock Average Calculator</h1>
-    <p class="lede" data-i18n="lede">See how buying more shares changes your average cost per share &mdash; average down after a buy, work backwards from a target average, or combine multiple lots.</p>
+    <p class="lede" data-i18n="lede">See how buying more shares changes your average price — average down, work back from a target, or combine several buys.</p>
   </header>
 
   <main class="container">
@@ -171,7 +161,7 @@
       <div class="notice notice-error">This calculator needs JavaScript to run. Please enable it and reload the page. / Kalkulator ini membutuhkan JavaScript. Aktifkan JavaScript lalu muat ulang halaman.</div>
     </noscript>
 
-    <div class="card tool-card">
+    <div class="card tool-card" data-reveal>
       <div class="tabs" role="tablist" aria-label="Calculator mode" data-i18n-attr="aria-label:tabs_aria">
         <button type="button" role="tab" id="tab-avgdown" aria-controls="panel-avgdown" aria-selected="true" data-i18n="tab_avgdown">Average down</button>
         <button type="button" role="tab" id="tab-target" aria-controls="panel-target" aria-selected="false" tabindex="-1" data-i18n="tab_target">Target average</button>
@@ -252,7 +242,7 @@
             <div><dt data-i18n="row_invested_after">Total invested after</dt><dd id="ta-invested">&mdash;</dd></div>
             <div><dt data-i18n="row_resulting_avg">Resulting average cost</dt><dd id="ta-newavg">&mdash;</dd></div>
           </dl>
-          <p class="note" data-i18n="note_fractional">Assumes fractional shares are allowed. If your broker only trades whole shares, round up to stay at or below the target.</p>
+          <p class="note" data-i18n="note_fractional">Assumes fractional shares. If your broker only trades whole shares, round up to stay at or below the target.</p>
         </div>
       </div>
 
@@ -279,9 +269,9 @@
       </div>
     </div>
 
-    <section class="card pf-card" aria-labelledby="pf-heading">
+    <section class="card pf-card" data-reveal aria-labelledby="pf-heading">
       <h2 id="pf-heading" data-i18n="pf_title">My portfolio</h2>
-      <p class="muted small" data-i18n="pf_intro">Positions are saved only in this browser (localStorage) — nothing leaves your device. Use export / import to move them to another device.</p>
+      <p class="muted small" data-i18n="pf_intro">Positions are saved in this browser only (localStorage). Use export / import to move them to another device.</p>
 
       <p class="hint" id="pf-empty" data-i18n="pf_empty">No saved positions yet. Add one below.</p>
       <ul class="pf-list" id="pf-list"></ul>
@@ -316,9 +306,9 @@
       <p class="help" id="pf-msg" aria-live="polite"></p>
     </section>
 
-    <section class="card how-card" aria-labelledby="how-heading">
+    <section class="card how-card" data-reveal aria-labelledby="how-heading">
       <h2 id="how-heading" data-i18n="how_title">How it works</h2>
-      <p data-i18n="how_intro">Your average cost per share is your total money in divided by your total shares. Buying more shares below your current average pulls the average down toward the new buy price &mdash; it can never go below it.</p>
+      <p data-i18n="how_intro">Your average price is total money in ÷ total shares. Buying below your average pulls it toward the new buy price — but never below it.</p>
 
       <h3 data-i18n="how_h_newavg">New average after a buy</h3>
       <div class="formula">new average = (S&#8320; &times; A&#8320; + S&#8321; &times; P) &divide; (S&#8320; + S&#8321;)</div>
@@ -326,7 +316,7 @@
 
       <h3 data-i18n="how_h_target">Shares needed to reach a target average</h3>
       <div class="formula">shares to buy = S&#8320; &times; (A&#8320; &minus; T) &divide; (T &minus; P)</div>
-      <p class="muted small" data-i18n="how_legend_target">T = target average. Only possible when P &lt; T &lt; A&#8320;: the target must sit between the current price and your existing average.</p>
+      <p class="muted small" data-i18n="how_legend_target">T = target average. Only possible when P &lt; T &lt; A₀ — the target must sit between the current price and your average.</p>
 
       <h3 data-i18n="how_h_weighted">Weighted average across lots</h3>
       <div class="formula">average = &Sigma;(shares&#7522; &times; price&#7522;) &divide; &Sigma; shares&#7522;</div>
@@ -335,9 +325,9 @@
       <div class="formula">rise needed from buy price = (new average &divide; P &minus; 1) &times; 100%</div>
 
       <h3 data-i18n="how_h_example">Worked example</h3>
-      <p><span data-i18n="how_ex_1">You own 100 shares at an average of 10.00 and buy 100 more at 5.00. Total invested is 100&times;10.00 + 100&times;5.00 = 1,500 across 200 shares, so the new average is</span> <strong class="mono" data-i18n="how_ex_num">7.50</strong> <span data-i18n="how_ex_2">&mdash; a 25.00% reduction. From the 5.00 buy price, the stock must rise 50.00% to reach the new 7.50 break-even.</span></p>
+      <p><span data-i18n="how_ex_1">You own 100 shares at an average of 10.00 and buy 100 more at 5.00. That's 100×10.00 + 100×5.00 = 1,500 over 200 shares, so the new average is</span> <strong class="mono" data-i18n="how_ex_num">7.50</strong> <span data-i18n="how_ex_2">— 25.00% lower. From the 5.00 buy price, the stock must rise 50.00% to reach the new 7.50 break-even.</span></p>
 
-      <p class="muted small" data-i18n="disclaimer">This tool only does the arithmetic &mdash; it is not investment advice. Averaging down increases your exposure to a falling position.</p>
+      <p class="muted small" data-i18n="disclaimer">This tool only does the math — it's not investment advice. Averaging down increases your exposure to a falling stock.</p>
     </section>
   </main>
 
@@ -362,7 +352,7 @@
         _meta: 'Free stock average calculator. Find your new average cost after buying more shares, the exact shares needed to hit a target average, and weighted averages across multiple lots.',
         nav_site: 'Site',
         h1: 'Stock Average Calculator',
-        lede: 'See how buying more shares changes your average cost per share — average down after a buy, work backwards from a target average, or combine multiple lots.',
+        lede: 'See how buying more shares changes your average price — average down, work back from a target, or combine several buys.',
         tabs_aria: 'Calculator mode',
         tab_avgdown: 'Average down',
         tab_target: 'Target average',
@@ -392,7 +382,7 @@
         row_invested_after: 'Total invested after',
         row_resulting_avg: 'Resulting average cost',
         row_total_cost: 'Total cost',
-        note_fractional: 'Assumes fractional shares are allowed. If your broker only trades whole shares, round up to stay at or below the target.',
+        note_fractional: 'Assumes fractional shares. If your broker only trades whole shares, round up to stay at or below the target.',
         lots_head_shares: 'Shares',
         lots_head_price: 'Price per share',
         add_lot: '+ Add lot',
@@ -401,30 +391,30 @@
         delta_up: '↑ {n} per share (+{pct})',
         delta_none: 'No change in average',
         breakeven_rise: 'Break-even: the stock must rise {pct} from the buy price of {price} to reach your new average.',
-        breakeven_already: 'Break-even: at this buy price you would already be at or above break-even — the new average is not above the buy price.',
-        notice_no_purchase: 'Good news — your average cost is already at or below the target. No purchase needed.',
-        notice_price_high: 'The current price is at or above your average cost, so buying now cannot lower your average. Averaging down needs a price below your average.',
-        notice_target_low: 'The target must be above the current price of {p}. Buying at that price can only pull your average down toward it — never to it or below it.',
+        breakeven_already: 'Break-even: already reached — your new average isn\'t above the buy price.',
+        notice_no_purchase: 'Good news — your average is already at or below the target. No need to buy.',
+        notice_price_high: 'The current price is at or above your average, so buying now can\'t lower it. Averaging down needs a price below your average.',
+        notice_target_low: 'The target must be above the current price of {p}. Buying at that price pulls your average toward it, but never to it or below.',
         at_per_share: 'at {p} per share',
         aria_lot_shares: 'Lot {n} shares',
         aria_lot_price: 'Lot {n} price per share',
         aria_lot_remove: 'Remove lot {n}',
         how_title: 'How it works',
-        how_intro: 'Your average cost per share is your total money in divided by your total shares. Buying more shares below your current average pulls the average down toward the new buy price — it can never go below it.',
+        how_intro: 'Your average price is total money in ÷ total shares. Buying below your average pulls it toward the new buy price — but never below it.',
         how_h_newavg: 'New average after a buy',
         how_legend_newavg: 'S₀ = shares owned, A₀ = current average cost, S₁ = shares bought, P = buy price per share.',
         how_h_target: 'Shares needed to reach a target average',
-        how_legend_target: 'T = target average. Only possible when P < T < A₀: the target must sit between the current price and your existing average.',
+        how_legend_target: 'T = target average. Only possible when P < T < A₀ — the target must sit between the current price and your average.',
         how_h_weighted: 'Weighted average across lots',
         how_h_breakeven: 'Break-even after averaging down',
         how_h_example: 'Worked example',
-        how_ex_1: 'You own 100 shares at an average of 10.00 and buy 100 more at 5.00. Total invested is 100×10.00 + 100×5.00 = 1,500 across 200 shares, so the new average is',
+        how_ex_1: 'You own 100 shares at an average of 10.00 and buy 100 more at 5.00. That\'s 100×10.00 + 100×5.00 = 1,500 over 200 shares, so the new average is',
         how_ex_num: '7.50',
-        how_ex_2: '— a 25.00% reduction. From the 5.00 buy price, the stock must rise 50.00% to reach the new 7.50 break-even.',
-        disclaimer: 'This tool only does the arithmetic — it is not investment advice. Averaging down increases your exposure to a falling position.',
+        how_ex_2: '— 25.00% lower. From the 5.00 buy price, the stock must rise 50.00% to reach the new 7.50 break-even.',
+        disclaimer: 'This tool only does the math — it\'s not investment advice. Averaging down increases your exposure to a falling stock.',
         footer_back: '← back to all tools',
         pf_title: 'My portfolio',
-        pf_intro: 'Positions are saved only in this browser (localStorage) — nothing leaves your device. Use export / import to move them to another device.',
+        pf_intro: 'Positions are saved in this browser only (localStorage). Use export / import to move them to another device.',
         pf_empty: 'No saved positions yet. Add one below.',
         pf_add_title: 'Add or update a position',
         pf_name: 'Name',
@@ -444,13 +434,13 @@
         pf_msg_deleted: 'Deleted "{name}".',
         pf_msg_loaded: 'Loaded "{name}" into the calculator.',
         pf_msg_copied: 'Copied to clipboard.',
-        pf_msg_copy_fail: 'Could not copy automatically — select the text and copy it manually.',
+        pf_msg_copy_fail: 'Couldn\'t copy. Select the text and copy it manually.',
         pf_msg_exported: 'Exported {n} positions — copy the text below.',
         pf_msg_imported: 'Imported {n} positions.',
         pf_msg_imported_skipped: 'Imported {n} positions, skipped {m} invalid entries.',
         pf_err_name: 'Enter a name for the position.',
         pf_err_values: 'Shares and average price must be above zero.',
-        pf_err_json: 'Invalid JSON — paste the exported text exactly as it was.',
+        pf_err_json: 'Invalid JSON. Paste the exported text exactly as it was.',
         pf_err_none: 'No valid positions found in the pasted JSON.',
         pf_err_import_first: 'Paste exported JSON into the text box, then press Import again.',
         pf_err_full: 'Portfolio is full ({n} positions max).'
@@ -460,7 +450,7 @@
         _meta: 'Kalkulator average saham gratis. Hitung harga rata-rata baru setelah membeli saham tambahan, jumlah saham yang dibutuhkan untuk mencapai target rata-rata, dan rata-rata tertimbang dari beberapa transaksi.',
         nav_site: 'Situs',
         h1: 'Kalkulator Average Saham',
-        lede: 'Lihat bagaimana membeli saham tambahan mengubah harga rata-rata per saham Anda — average down setelah pembelian, hitung mundur dari target rata-rata, atau gabungkan beberapa transaksi.',
+        lede: 'Lihat bagaimana tambahan saham mengubah harga rata-rata Anda — average down, hitung mundur dari target, atau gabungkan beberapa transaksi.',
         tabs_aria: 'Mode kalkulator',
         tab_avgdown: 'Average down',
         tab_target: 'Target rata-rata',
@@ -490,7 +480,7 @@
         row_invested_after: 'Total investasi setelahnya',
         row_resulting_avg: 'Harga rata-rata akhir',
         row_total_cost: 'Total biaya',
-        note_fractional: 'Diasumsikan saham pecahan diperbolehkan. Jika broker Anda hanya bisa membeli saham utuh, bulatkan ke atas agar tetap di atau di bawah target.',
+        note_fractional: 'Diasumsikan saham pecahan diperbolehkan. Jika broker Anda hanya melayani saham utuh, bulatkan ke atas agar tetap di atau di bawah target.',
         lots_head_shares: 'Saham',
         lots_head_price: 'Harga per saham',
         add_lot: '+ Tambah transaksi',
@@ -499,30 +489,30 @@
         delta_up: '↑ {n} per saham (+{pct})',
         delta_none: 'Rata-rata tidak berubah',
         breakeven_rise: 'Break-even: saham harus naik {pct} dari harga beli {price} untuk mencapai rata-rata baru Anda.',
-        breakeven_already: 'Break-even: pada harga beli ini Anda sudah berada di atau di atas break-even — rata-rata baru tidak berada di atas harga beli.',
-        notice_no_purchase: 'Kabar baik — harga rata-rata Anda sudah berada di atau di bawah target. Tidak perlu membeli.',
-        notice_price_high: 'Harga saat ini berada di atau di atas harga rata-rata Anda, jadi membeli sekarang tidak dapat menurunkan rata-rata Anda. Average down membutuhkan harga di bawah rata-rata Anda.',
-        notice_target_low: 'Target harus di atas harga saat ini {p}. Membeli di harga itu hanya bisa menarik rata-rata Anda turun mendekatinya — tidak akan pernah mencapai atau melewatinya.',
+        breakeven_already: 'Break-even: sudah tercapai — rata-rata baru Anda tidak di atas harga beli.',
+        notice_no_purchase: 'Kabar baik — harga rata-rata Anda sudah di atau di bawah target. Tidak perlu membeli.',
+        notice_price_high: 'Harga saat ini di atau di atas rata-rata Anda, jadi membeli sekarang tidak bisa menurunkannya. Average down butuh harga di bawah rata-rata Anda.',
+        notice_target_low: 'Target harus di atas harga saat ini {p}. Membeli di harga itu menarik rata-rata Anda mendekatinya, tapi tidak pernah mencapai atau melewatinya.',
         at_per_share: 'pada {p} per saham',
         aria_lot_shares: 'Jumlah saham transaksi {n}',
         aria_lot_price: 'Harga per saham transaksi {n}',
         aria_lot_remove: 'Hapus transaksi {n}',
         how_title: 'Cara kerjanya',
-        how_intro: 'Harga rata-rata per saham Anda adalah total dana yang ditanamkan dibagi total saham Anda. Membeli saham tambahan di bawah rata-rata saat ini menarik rata-rata turun mendekati harga beli baru — tidak akan pernah bisa lebih rendah dari harga beli itu.',
+        how_intro: 'Harga rata-rata adalah total dana ÷ total saham. Membeli di bawah rata-rata menariknya mendekati harga beli baru — tapi tidak pernah lebih rendah dari harga itu.',
         how_h_newavg: 'Rata-rata baru setelah pembelian',
         how_legend_newavg: 'S₀ = jumlah saham dimiliki, A₀ = harga rata-rata saat ini, S₁ = jumlah saham dibeli, P = harga beli per saham.',
         how_h_target: 'Saham yang dibutuhkan untuk mencapai target rata-rata',
-        how_legend_target: 'T = target rata-rata. Hanya mungkin ketika P < T < A₀: target harus berada di antara harga saat ini dan rata-rata Anda yang sekarang.',
+        how_legend_target: 'T = target rata-rata. Hanya mungkin jika P < T < A₀ — target harus berada di antara harga saat ini dan rata-rata Anda.',
         how_h_weighted: 'Rata-rata tertimbang antar transaksi',
         how_h_breakeven: 'Break-even setelah average down',
         how_h_example: 'Contoh perhitungan',
-        how_ex_1: 'Anda memiliki 100 saham dengan rata-rata 10,00 dan membeli 100 saham lagi di harga 5,00. Total investasi adalah 100×10,00 + 100×5,00 = 1.500 untuk 200 saham, sehingga rata-rata baru menjadi',
+        how_ex_1: 'Anda punya 100 saham dengan rata-rata 10,00 dan membeli 100 lagi di 5,00. Totalnya 100×10,00 + 100×5,00 = 1.500 untuk 200 saham, jadi rata-rata barunya',
         how_ex_num: '7,50',
-        how_ex_2: '— penurunan 25,00%. Dari harga beli 5,00, saham harus naik 50,00% untuk mencapai break-even baru di 7,50.',
-        disclaimer: 'Alat ini hanya melakukan perhitungan — bukan saran investasi. Average down memperbesar eksposur Anda pada posisi yang sedang turun.',
+        how_ex_2: '— turun 25,00%. Dari harga beli 5,00, saham harus naik 50,00% untuk mencapai break-even baru di 7,50.',
+        disclaimer: 'Alat ini hanya menghitung — bukan saran investasi. Average down memperbesar eksposur Anda pada saham yang sedang turun.',
         footer_back: '← kembali ke semua alat',
         pf_title: 'Portofolio saya',
-        pf_intro: 'Posisi hanya disimpan di browser ini (localStorage) — tidak ada data yang keluar dari perangkat Anda. Gunakan ekspor / impor untuk memindahkannya ke perangkat lain.',
+        pf_intro: 'Posisi hanya disimpan di browser ini (localStorage). Gunakan ekspor / impor untuk memindahkannya ke perangkat lain.',
         pf_empty: 'Belum ada posisi tersimpan. Tambahkan di bawah.',
         pf_add_title: 'Tambah atau perbarui posisi',
         pf_name: 'Nama',
@@ -542,13 +532,13 @@
         pf_msg_deleted: 'Posisi "{name}" dihapus.',
         pf_msg_loaded: 'Posisi "{name}" dimuat ke kalkulator.',
         pf_msg_copied: 'Disalin ke clipboard.',
-        pf_msg_copy_fail: 'Tidak bisa menyalin otomatis — pilih teksnya lalu salin manual.',
+        pf_msg_copy_fail: 'Gagal menyalin. Pilih teksnya lalu salin manual.',
         pf_msg_exported: '{n} posisi diekspor — salin teks di bawah.',
         pf_msg_imported: '{n} posisi diimpor.',
         pf_msg_imported_skipped: '{n} posisi diimpor, {m} entri tidak valid dilewati.',
         pf_err_name: 'Masukkan nama posisi.',
         pf_err_values: 'Jumlah saham dan harga rata-rata harus di atas nol.',
-        pf_err_json: 'JSON tidak valid — tempel teks hasil ekspor apa adanya.',
+        pf_err_json: 'JSON tidak valid. Tempel teks hasil ekspor apa adanya.',
         pf_err_none: 'Tidak ada posisi valid dalam JSON yang ditempel.',
         pf_err_import_first: 'Tempel JSON hasil ekspor ke kotak teks, lalu tekan Impor lagi.',
         pf_err_full: 'Portofolio penuh (maksimal {n} posisi).'

@@ -8,17 +8,8 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231e40af'/%3E%3Cg stroke='%23ffffff' stroke-width='2.4' fill='none' stroke-linecap='round'%3E%3Cpath d='M10 7v7M6.5 10.5h7'/%3E%3Cpath d='M18.5 21.5h7'/%3E%3Cpath d='M6 26L26 6'/%3E%3C/g%3E%3C/svg%3E">
   <link rel="stylesheet" href="../assets/style.css">
   <script src="../assets/theme.js"></script>
+  <script src="../assets/motion.js"></script>
   <style>
-    .top-nav {
-      padding: 1.25rem 0 2.25rem; font-size: 0.9rem;
-      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
-    }
-    .top-nav a { color: var(--text-muted); text-decoration: none; }
-    .top-nav a:hover { color: var(--accent-strong); }
-    .lede { color: var(--text-muted); max-width: 44rem; margin-bottom: 0; }
-    .tool-card { margin: 1.75rem 0 1.25rem; }
-    .how-card { margin-bottom: 1rem; }
-
     .panes { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
     .panes textarea {
       width: 100%; min-height: 180px; padding: 0.75rem 0.9rem;
@@ -64,7 +55,7 @@
 <body>
   <header class="container">
     <nav class="top-nav" aria-label="Site" data-i18n-attr="aria-label:nav_site">
-      <a href="../">&#8592; samba nugraha</a>
+      <a class="home-link" href="../"><span class="brand-mark" aria-hidden="true">SN</span><span class="home-name">samba nugraha</span></a>
       <div class="nav-actions">
       <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
         <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
@@ -81,7 +72,7 @@
       </div>
     </nav>
     <h1 data-i18n="h1">Text Diff Checker</h1>
-    <p class="lede" data-i18n="lede">Compare two texts line by line. Additions, removals, and in-line changes are highlighted — everything runs in your browser.</p>
+    <p class="lede" data-i18n="lede">Compare two texts line by line, with every change highlighted.</p>
   </header>
 
   <main class="container">
@@ -89,7 +80,7 @@
       <div class="card" style="border-left:3px solid var(--negative)">This tool needs JavaScript to run. Please enable it and reload. / Alat ini membutuhkan JavaScript. Aktifkan lalu muat ulang.</div>
     </noscript>
 
-    <div class="card tool-card">
+    <div class="card tool-card" data-reveal>
       <div class="panes">
         <div>
           <label for="df-a" data-i18n="a_label">Original text</label>
@@ -117,10 +108,10 @@
       <div class="diff-out" id="df-out" hidden></div>
     </div>
 
-    <section class="card how-card" aria-labelledby="how-heading">
+    <section class="card how-card" data-reveal aria-labelledby="how-heading">
       <h2 id="how-heading" data-i18n="how_title">How it compares</h2>
-      <p data-i18n="how_1">The two texts are compared line by line using the longest-common-subsequence algorithm — the same idea behind git diff. Removed lines are red with a −, added lines green with a +, and when a line was modified, the changed part inside it is highlighted more strongly. Line numbers show where each line sits in the original (left) and changed (right) text.</p>
-      <p class="muted small" data-i18n="privacy">Both texts stay in your browser — nothing is uploaded and nothing is tracked. They are remembered only on this device.</p>
+      <p data-i18n="how_1">Lines are matched with the longest-common-subsequence algorithm, the idea behind git diff. Removed lines are red (−), added lines green (+), and edits inside a line are highlighted. Line numbers refer to the original (left) and changed (right) text.</p>
+      <p class="muted small" data-i18n="privacy">Both texts stay in this browser. Nothing is uploaded or tracked.</p>
     </section>
   </main>
 
@@ -141,17 +132,17 @@
         _meta: 'Free text diff checker. Compare two texts line by line with highlighted additions, removals, and in-line changes — everything runs in your browser.',
         nav_site: 'Site',
         h1: 'Text Diff Checker',
-        lede: 'Compare two texts line by line. Additions, removals, and in-line changes are highlighted — everything runs in your browser.',
+        lede: 'Compare two texts line by line, with every change highlighted.',
         a_label: 'Original text',
         b_label: 'Changed text',
         opt_trim: 'Ignore leading/trailing whitespace',
         opt_case: 'Ignore case',
         stats: '{a} added · {d} removed · {s} unchanged',
         stats_same: 'The texts are identical.',
-        err_large: 'These texts are too large to compare here (try under ~2,000 differing lines).',
+        err_large: 'Too large to compare here. Try under ~2,000 differing lines.',
         how_title: 'How it compares',
-        how_1: 'The two texts are compared line by line using the longest-common-subsequence algorithm — the same idea behind git diff. Removed lines are red with a −, added lines green with a +, and when a line was modified, the changed part inside it is highlighted more strongly. Line numbers show where each line sits in the original (left) and changed (right) text.',
-        privacy: 'Both texts stay in your browser — nothing is uploaded and nothing is tracked. They are remembered only on this device.',
+        how_1: 'Lines are matched with the longest-common-subsequence algorithm, the idea behind git diff. Removed lines are red (−), added lines green (+), and edits inside a line are highlighted. Line numbers refer to the original (left) and changed (right) text.',
+        privacy: 'Both texts stay in this browser. Nothing is uploaded or tracked.',
         footer_back: '← back to all tools'
       },
       id: {
@@ -159,17 +150,17 @@
         _meta: 'Pembanding teks (diff) gratis. Bandingkan dua teks baris per baris dengan sorotan penambahan, penghapusan, dan perubahan di dalam baris — semuanya berjalan di browser Anda.',
         nav_site: 'Situs',
         h1: 'Pembanding Teks (Diff)',
-        lede: 'Bandingkan dua teks baris per baris. Penambahan, penghapusan, dan perubahan di dalam baris disorot — semuanya berjalan di browser Anda.',
+        lede: 'Bandingkan dua teks baris per baris, dengan setiap perubahan disorot.',
         a_label: 'Teks asli',
         b_label: 'Teks yang diubah',
         opt_trim: 'Abaikan spasi di awal/akhir baris',
         opt_case: 'Abaikan besar kecil huruf',
         stats: '{a} ditambah · {d} dihapus · {s} tidak berubah',
         stats_same: 'Kedua teks identik.',
-        err_large: 'Teks terlalu besar untuk dibandingkan di sini (usahakan di bawah ~2.000 baris yang berbeda).',
+        err_large: 'Terlalu besar untuk dibandingkan di sini. Usahakan di bawah ~2.000 baris yang berbeda.',
         how_title: 'Cara membandingkan',
-        how_1: 'Kedua teks dibandingkan baris per baris memakai algoritme longest common subsequence — ide yang sama di balik git diff. Baris yang dihapus berwarna merah dengan −, baris yang ditambah hijau dengan +, dan jika sebuah baris diubah, bagian yang berubah di dalamnya disorot lebih kuat. Nomor baris menunjukkan posisi tiap baris di teks asli (kiri) dan teks yang diubah (kanan).',
-        privacy: 'Kedua teks tetap di browser Anda — tidak ada yang diunggah dan tidak ada pelacakan. Teks hanya diingat di perangkat ini.',
+        how_1: 'Baris dicocokkan dengan algoritme longest common subsequence, ide di balik git diff. Baris yang dihapus berwarna merah (−), yang ditambah hijau (+), dan perubahan di dalam baris disorot. Nomor baris merujuk ke teks asli (kiri) dan teks yang diubah (kanan).',
+        privacy: 'Kedua teks tetap di browser ini. Tidak ada yang diunggah atau dilacak.',
         footer_back: '← kembali ke semua alat'
       }
     };

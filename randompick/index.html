@@ -8,17 +8,8 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231e40af'/%3E%3Cg stroke='%23ffffff' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 7h5v5'/%3E%3Cpath d='M7 25L25 7'/%3E%3Cpath d='M25 20v5h-5'/%3E%3Cpath d='M18 18l7 7'/%3E%3Cpath d='M7 7l5 5'/%3E%3C/g%3E%3C/svg%3E">
   <link rel="stylesheet" href="../assets/style.css">
   <script src="../assets/theme.js"></script>
+  <script src="../assets/motion.js"></script>
   <style>
-    .top-nav {
-      padding: 1.25rem 0 2.25rem; font-size: 0.9rem;
-      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
-    }
-    .top-nav a { color: var(--text-muted); text-decoration: none; }
-    .top-nav a:hover { color: var(--accent-strong); }
-    .lede { color: var(--text-muted); max-width: 44rem; margin-bottom: 0; }
-    .tool-card { margin: 1.75rem 0 1.25rem; }
-    .how-card { margin-bottom: 1rem; }
-
     textarea#rp-list {
       width: 100%; min-height: 200px; padding: 0.85rem 1rem;
       font: inherit; line-height: 1.7; color: var(--text);
@@ -73,7 +64,7 @@
 <body>
   <header class="container">
     <nav class="top-nav" aria-label="Site" data-i18n-attr="aria-label:nav_site">
-      <a href="../">&#8592; samba nugraha</a>
+      <a class="home-link" href="../"><span class="brand-mark" aria-hidden="true">SN</span><span class="home-name">samba nugraha</span></a>
       <div class="nav-actions">
       <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
         <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
@@ -90,7 +81,7 @@
       </div>
     </nav>
     <h1 data-i18n="h1">Random List Picker</h1>
-    <p class="lede" data-i18n="lede">Paste a list — one entry per line — and draw one or more winners with cryptographically fair randomness. Great for arisan, doorprizes, and giveaways.</p>
+    <p class="lede" data-i18n="lede">Paste a list, one name per line, and draw fair winners. Made for arisan, doorprizes and giveaways.</p>
   </header>
 
   <main class="container">
@@ -98,7 +89,7 @@
       <div class="card" style="border-left:3px solid var(--negative)">This tool needs JavaScript to run. Please enable it and reload. / Alat ini membutuhkan JavaScript. Aktifkan lalu muat ulang.</div>
     </noscript>
 
-    <div class="card tool-card">
+    <div class="card tool-card" data-reveal>
       <label for="rp-list" data-i18n="list_label">Entries (one per line)</label>
       <textarea id="rp-list" spellcheck="false" placeholder="Fore&#10;Kenangan&#10;Point&#10;Nescafe" data-i18n-attr="placeholder:list_ph"></textarea>
       <p class="count" id="rp-count" aria-live="polite"></p>
@@ -117,11 +108,11 @@
       <div class="opts">
         <label class="opt" for="rp-remove">
           <input type="checkbox" id="rp-remove">
-          <span data-i18n="opt_remove">Remove winners from the list after drawing (for successive rounds)</span>
+          <span data-i18n="opt_remove">Remove winners after each draw (for more rounds)</span>
         </label>
         <label class="opt" for="rp-dedupe">
           <input type="checkbox" id="rp-dedupe">
-          <span data-i18n="opt_dedupe">Ignore duplicate entries (each name gets one chance)</span>
+          <span data-i18n="opt_dedupe">Ignore duplicates (one chance per name)</span>
         </label>
       </div>
 
@@ -144,10 +135,10 @@
       <ul class="history" id="rp-history"></ul>
     </div>
 
-    <section class="card how-card" aria-labelledby="how-heading">
+    <section class="card how-card" data-reveal aria-labelledby="how-heading">
       <h2 id="how-heading" data-i18n="how_title">Is it fair?</h2>
-      <p data-i18n="how_1">Yes — winners are drawn with the browser's cryptographically secure random generator (the same one used for encryption keys), with rejection sampling so every entry has exactly the same chance. Duplicate lines count as extra chances unless you tick "ignore duplicates". Drawing several winners at once never picks the same line twice.</p>
-      <p class="muted small" data-i18n="privacy">Everything happens in your browser — no server, no upload, no tracking. Your list is remembered only on this device; the draw history disappears when you close the page.</p>
+      <p data-i18n="how_1">Yes. Winners come from the browser's cryptographically secure generator, so every entry has exactly the same chance. Duplicate lines count as extra chances unless you tick “Ignore duplicates”. Drawing several winners at once never repeats a line.</p>
+      <p class="muted small" data-i18n="privacy">Runs in your browser. Your list is saved on this device only; the draw history clears when you close the page.</p>
     </section>
   </main>
 
@@ -168,7 +159,7 @@
         _meta: 'Free random name picker. Paste a list, draw one or more winners with cryptographically fair randomness — great for arisan, doorprizes, and giveaways. Nothing leaves your browser.',
         nav_site: 'Site',
         h1: 'Random List Picker',
-        lede: 'Paste a list — one entry per line — and draw one or more winners with cryptographically fair randomness. Great for arisan, doorprizes, and giveaways.',
+        lede: 'Paste a list, one name per line, and draw fair winners. Made for arisan, doorprizes and giveaways.',
         list_label: 'Entries (one per line)',
         list_ph: 'Fore\nKenangan\nPoint\nNescafe',
         count_entries: '{n} entries',
@@ -176,22 +167,22 @@
         k_label: 'Winners',
         btn_pick: 'Pick winners',
         btn_shuffle: 'Shuffle list',
-        opt_remove: 'Remove winners from the list after drawing (for successive rounds)',
-        opt_dedupe: 'Ignore duplicate entries (each name gets one chance)',
+        opt_remove: 'Remove winners after each draw (for more rounds)',
+        opt_dedupe: 'Ignore duplicates (one chance per name)',
         winner_one: 'Winner',
         winner_many: 'Winners',
         btn_copy: 'Copy winners',
         hist_title: 'Draw history',
         btn_clear_hist: 'Clear',
         err_empty: 'Add at least one entry to the list.',
-        err_insecure: 'Secure random numbers are unavailable on this connection (needs https).',
+        err_insecure: 'Secure randomness needs an https connection, so it isn\'t available here.',
         msg_copied: 'Copied to clipboard.',
-        msg_copy_fail: 'Could not copy automatically — select the names and copy them manually.',
+        msg_copy_fail: 'Couldn\'t copy. Select the names and copy them manually.',
         msg_removed: 'Removed {n} winner(s) from the list.',
         msg_shuffled: 'List order shuffled.',
         how_title: 'Is it fair?',
-        how_1: 'Yes — winners are drawn with the browser’s cryptographically secure random generator (the same one used for encryption keys), with rejection sampling so every entry has exactly the same chance. Duplicate lines count as extra chances unless you tick "ignore duplicates". Drawing several winners at once never picks the same line twice.',
-        privacy: 'Everything happens in your browser — no server, no upload, no tracking. Your list is remembered only on this device; the draw history disappears when you close the page.',
+        how_1: 'Yes. Winners come from the browser\'s cryptographically secure generator, so every entry has exactly the same chance. Duplicate lines count as extra chances unless you tick “Ignore duplicates”. Drawing several winners at once never repeats a line.',
+        privacy: 'Runs in your browser. Your list is saved on this device only; the draw history clears when you close the page.',
         footer_back: '← back to all tools'
       },
       id: {
@@ -199,7 +190,7 @@
         _meta: 'Pengundi nama acak gratis. Tempel daftar, undi satu atau beberapa pemenang dengan keacakan yang adil secara kriptografis — cocok untuk arisan, doorprize, dan giveaway. Tidak ada data yang keluar dari browser Anda.',
         nav_site: 'Situs',
         h1: 'Pengundi Acak',
-        lede: 'Tempel daftar — satu entri per baris — lalu undi satu atau beberapa pemenang dengan keacakan yang adil secara kriptografis. Cocok untuk arisan, doorprize, dan giveaway.',
+        lede: 'Tempel daftar, satu nama per baris, lalu undi pemenang secara adil. Pas untuk arisan, doorprize, dan giveaway.',
         list_label: 'Daftar (satu per baris)',
         list_ph: 'Fore\nKenangan\nPoint\nNescafe',
         count_entries: '{n} entri',
@@ -207,22 +198,22 @@
         k_label: 'Pemenang',
         btn_pick: 'Undi sekarang',
         btn_shuffle: 'Acak urutan',
-        opt_remove: 'Hapus pemenang dari daftar setelah diundi (untuk putaran berikutnya)',
-        opt_dedupe: 'Abaikan entri duplikat (setiap nama dapat satu kesempatan)',
+        opt_remove: 'Hapus pemenang setelah diundi (untuk putaran berikutnya)',
+        opt_dedupe: 'Abaikan duplikat (satu kesempatan per nama)',
         winner_one: 'Pemenang',
         winner_many: 'Para pemenang',
         btn_copy: 'Salin pemenang',
         hist_title: 'Riwayat undian',
         btn_clear_hist: 'Bersihkan',
         err_empty: 'Tambahkan minimal satu entri ke daftar.',
-        err_insecure: 'Angka acak yang aman tidak tersedia pada koneksi ini (butuh https).',
+        err_insecure: 'Keacakan yang aman butuh koneksi https, jadi tidak tersedia di sini.',
         msg_copied: 'Disalin ke clipboard.',
-        msg_copy_fail: 'Tidak bisa menyalin otomatis — pilih namanya lalu salin manual.',
+        msg_copy_fail: 'Gagal menyalin. Pilih namanya lalu salin manual.',
         msg_removed: '{n} pemenang dihapus dari daftar.',
         msg_shuffled: 'Urutan daftar diacak.',
         how_title: 'Apakah adil?',
-        how_1: 'Ya — pemenang diundi dengan generator acak browser yang aman secara kriptografis (yang sama dipakai untuk kunci enkripsi), dengan rejection sampling sehingga setiap entri punya peluang persis sama. Baris duplikat dihitung sebagai kesempatan ekstra kecuali Anda mencentang "abaikan duplikat". Mengundi beberapa pemenang sekaligus tidak akan memilih baris yang sama dua kali.',
-        privacy: 'Semuanya terjadi di browser Anda — tanpa server, tanpa unggahan, tanpa pelacakan. Daftar hanya diingat di perangkat ini; riwayat undian hilang saat halaman ditutup.',
+        how_1: 'Ya. Pemenang diambil dari generator acak browser yang aman secara kriptografis, jadi setiap entri punya peluang yang persis sama. Baris duplikat dihitung sebagai kesempatan ekstra kecuali Anda mencentang “Abaikan duplikat”. Mengundi beberapa pemenang sekaligus tidak pernah mengulang baris yang sama.',
+        privacy: 'Berjalan di browser Anda. Daftar hanya disimpan di perangkat ini; riwayat undian hilang saat halaman ditutup.',
         footer_back: '← kembali ke semua alat'
       }
     };

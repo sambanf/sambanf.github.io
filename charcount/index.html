@@ -8,18 +8,8 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231e40af'/%3E%3Cg stroke='%23ffffff' stroke-width='2.6' stroke-linecap='round'%3E%3Cpath d='M8 11h16'/%3E%3Cpath d='M8 16h16'/%3E%3Cpath d='M8 21h10'/%3E%3C/g%3E%3C/svg%3E">
   <link rel="stylesheet" href="../assets/style.css">
   <script src="../assets/theme.js"></script>
+  <script src="../assets/motion.js"></script>
   <style>
-    .top-nav {
-      padding: 1.25rem 0 2.25rem; font-size: 0.9rem;
-      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
-    }
-    .top-nav a { color: var(--text-muted); text-decoration: none; }
-    .top-nav a:hover { color: var(--accent-strong); }
-    .lede { color: var(--text-muted); max-width: 44rem; margin-bottom: 0; }
-    .tool-card { margin: 1.75rem 0 2rem; }
-    .how-card { margin-bottom: 1rem; }
-    .how-card h3 { margin-top: 1.25rem; }
-
     textarea#cc-text {
       width: 100%; min-height: 240px; padding: 0.85rem 1rem;
       font: inherit; line-height: 1.6; color: var(--text);
@@ -53,7 +43,7 @@
 <body>
   <header class="container">
     <nav class="top-nav" aria-label="Site" data-i18n-attr="aria-label:nav_site">
-      <a href="../">&#8592; samba nugraha</a>
+      <a class="home-link" href="../"><span class="brand-mark" aria-hidden="true">SN</span><span class="home-name">samba nugraha</span></a>
       <div class="nav-actions">
       <div class="lang-toggle" role="group" aria-label="Language / Bahasa">
         <button type="button" data-lang="en" aria-pressed="true" aria-label="English">
@@ -70,7 +60,7 @@
       </div>
     </nav>
     <h1 data-i18n="h1">Character &amp; Word Counter</h1>
-    <p class="lede" data-i18n="lede">Count characters, words, sentences, lines, paragraphs, and reading time as you type. Everything runs in your browser.</p>
+    <p class="lede" data-i18n="lede">Characters, words, sentences and reading time, counted as you type.</p>
   </header>
 
   <main class="container">
@@ -78,7 +68,7 @@
       <div class="card" style="border-left:3px solid var(--negative)">This tool needs JavaScript to run. Please enable it and reload. / Alat ini membutuhkan JavaScript. Aktifkan lalu muat ulang.</div>
     </noscript>
 
-    <div class="card tool-card">
+    <div class="card tool-card" data-reveal>
       <label for="cc-text" data-i18n="input_label">Your text</label>
       <textarea id="cc-text" spellcheck="true" placeholder="Type or paste your text here…" data-i18n-attr="placeholder:input_ph"></textarea>
 
@@ -105,10 +95,10 @@
       </ul>
     </div>
 
-    <section class="card how-card" aria-labelledby="how-heading">
+    <section class="card how-card" data-reveal aria-labelledby="how-heading">
       <h2 id="how-heading" data-i18n="how_title">How the counts work</h2>
-      <p data-i18n="how_1">Characters count every symbol including spaces and line breaks (emoji and accented letters count as one). "Characters (no spaces)" strips all whitespace. Words are runs of non-space characters, sentences end at . ! ? or …, and paragraphs are blocks separated by a blank line.</p>
-      <p class="muted small" data-i18n="privacy">Your text never leaves this page — there is no server, no upload, and no tracking. It is remembered only in this browser so it is still here when you come back.</p>
+      <p data-i18n="how_1">Characters include spaces and line breaks; an emoji or accented letter counts as one. Words are runs of non-space characters. Sentences end at . ! ? or …, and a blank line starts a new paragraph.</p>
+      <p class="muted small" data-i18n="privacy">Your text never leaves this page. It's saved in this browser only, so it's still here when you come back.</p>
     </section>
   </main>
 
@@ -129,7 +119,7 @@
         _meta: 'Free online character and word counter. Count characters, words, sentences, lines, paragraphs, and reading time as you type — nothing leaves your browser.',
         nav_site: 'Site',
         h1: 'Character & Word Counter',
-        lede: 'Count characters, words, sentences, lines, paragraphs, and reading time as you type. Everything runs in your browser.',
+        lede: 'Characters, words, sentences and reading time, counted as you type.',
         input_label: 'Your text',
         input_ph: 'Type or paste your text here…',
         limit_label: 'Character limit (optional)',
@@ -149,11 +139,11 @@
         remaining_over: '{used} / {limit} · {over} over the limit',
         msg_copied: 'Copied to clipboard.',
         msg_copy_empty: 'Nothing to copy yet.',
-        msg_copy_fail: 'Could not copy automatically — select the text and copy it manually.',
+        msg_copy_fail: 'Couldn\'t copy. Select the text and copy it manually.',
         msg_cleared: 'Cleared.',
         how_title: 'How the counts work',
-        how_1: 'Characters count every symbol including spaces and line breaks (emoji and accented letters count as one). "Characters (no spaces)" strips all whitespace. Words are runs of non-space characters, sentences end at . ! ? or …, and paragraphs are blocks separated by a blank line.',
-        privacy: 'Your text never leaves this page — there is no server, no upload, and no tracking. It is remembered only in this browser so it is still here when you come back.',
+        how_1: 'Characters include spaces and line breaks; an emoji or accented letter counts as one. Words are runs of non-space characters. Sentences end at . ! ? or …, and a blank line starts a new paragraph.',
+        privacy: 'Your text never leaves this page. It\'s saved in this browser only, so it\'s still here when you come back.',
         footer_back: '← back to all tools'
       },
       id: {
@@ -161,7 +151,7 @@
         _meta: 'Penghitung karakter dan kata online gratis. Hitung karakter, kata, kalimat, baris, paragraf, dan waktu baca saat Anda mengetik — tidak ada data yang keluar dari browser Anda.',
         nav_site: 'Situs',
         h1: 'Penghitung Karakter & Kata',
-        lede: 'Hitung karakter, kata, kalimat, baris, paragraf, dan waktu baca secara langsung saat Anda mengetik. Semuanya berjalan di browser Anda.',
+        lede: 'Karakter, kata, kalimat, dan waktu baca, dihitung saat Anda mengetik.',
         input_label: 'Teks Anda',
         input_ph: 'Ketik atau tempel teks Anda di sini…',
         limit_label: 'Batas karakter (opsional)',
@@ -181,11 +171,11 @@
         remaining_over: '{used} / {limit} · {over} melebihi batas',
         msg_copied: 'Disalin ke clipboard.',
         msg_copy_empty: 'Belum ada yang bisa disalin.',
-        msg_copy_fail: 'Tidak bisa menyalin otomatis — pilih teksnya lalu salin manual.',
+        msg_copy_fail: 'Gagal menyalin. Pilih teksnya lalu salin manual.',
         msg_cleared: 'Dibersihkan.',
         how_title: 'Cara penghitungan',
-        how_1: 'Karakter menghitung setiap simbol termasuk spasi dan baris baru (emoji dan huruf beraksen dihitung sebagai satu). "Karakter (tanpa spasi)" menghapus semua spasi. Kata adalah rangkaian karakter tanpa spasi, kalimat berakhir di . ! ? atau …, dan paragraf adalah blok yang dipisahkan baris kosong.',
-        privacy: 'Teks Anda tidak pernah keluar dari halaman ini — tidak ada server, tidak ada unggahan, dan tidak ada pelacakan. Teks hanya diingat di browser ini sehingga masih ada saat Anda kembali.',
+        how_1: 'Karakter termasuk spasi dan baris baru; emoji atau huruf beraksen dihitung satu. Kata adalah rangkaian karakter tanpa spasi. Kalimat berakhir di . ! ? atau …, dan baris kosong memulai paragraf baru.',
+        privacy: 'Teks Anda tidak pernah keluar dari halaman ini. Teks hanya disimpan di browser ini, jadi masih ada saat Anda kembali.',
         footer_back: '← kembali ke semua alat'
       }
     };
